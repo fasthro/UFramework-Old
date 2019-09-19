@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace FastEngine.Core
 {
-    public class AssetBundleDependencies : Singleton<AssetBundleDependencies>
+    public class AssetBundleDependencies : FastEngine.Common.Singleton<AssetBundleDependencies>
     {
         private AssetBundle m_bundle;
         private AssetBundleManifest m_manifest;
