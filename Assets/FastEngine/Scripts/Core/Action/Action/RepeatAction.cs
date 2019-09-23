@@ -3,6 +3,8 @@
  * @Date: 2019-09-19 13:29:47
  * @Description: Repeat Action
  */
+using UnityEngine;
+
 namespace FastEngine.Core
 {
     public class RepeatAction : ActionBase
@@ -37,6 +39,7 @@ namespace FastEngine.Core
             {
                 m_residueDegree++;
                 m_action.Reset();
+                BroadcastCallback(ACTION_CALLBACK_TYPE.REPEAT_STEP_COMPLETED);
             }
             if (!m_loop)
             {

@@ -59,7 +59,9 @@ namespace FastEngine.Core
 
             for (int i = m_removes.Count - 1; i >= 0; i--)
             {
-                m_actions.RemoveAt(m_removes[i]);
+                var index = m_removes[i];
+                // m_actions[index].Dispose();
+                m_actions.RemoveAt(index);
             }
         }
     }

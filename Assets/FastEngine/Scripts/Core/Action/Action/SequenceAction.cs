@@ -64,6 +64,7 @@ namespace FastEngine.Core
             m_excutes.Clear();
             foreach (var action in m_actions)
             {
+                action.Reset();
                 m_excutes.Add(action);
             }
         }

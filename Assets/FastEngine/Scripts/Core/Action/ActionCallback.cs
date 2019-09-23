@@ -14,9 +14,11 @@ namespace FastEngine.Core
     {
         COMPLETED,
         DISPOSED,
-        
-        #region MoveAction
-        MOVE_UPDATE,
+        RESET,
+        UPDATE,
+
+        #region repeat action
+        REPEAT_STEP_COMPLETED,
         #endregion
     }
 }
