@@ -11,21 +11,16 @@ namespace FastEngine.Core
 {
     public class DGScaleAction : DGActionTransformBase
     {
-        private Vector3 m_startValue;
-        private Vector3 m_endValue;
-        
-        public DGScaleAction(Transform transform, Vector3 startValue, Vector3 endValue, float duration, Ease ease = Ease.Linear)
-         : base(transform, duration, ease)
+        public DGScaleAction(Transform transform, Vector3 startValue, Vector3 endValue, float duration)
+         : base(transform, startValue, endValue, duration, false)
         {
-            m_startValue = startValue;
-            m_endValue = endValue;
         }
 
         protected override void OnInitialize()
         {
             if (m_tween == null)
             {
-                m_tween = transform.DOScale(m_endValue, m_duration).SetEase(m_ease).SetAutoKill(false);
+                m_tween = transform.DOScale(m_eV3, m_duration).SetEase(m_ease).SetAutoKill(false);
                 m_tween.OnComplete(() =>
                 {
                     isCompleted = true;
@@ -33,9 +28,9 @@ namespace FastEngine.Core
             }
         }
 
-        protected override void OnPlayRestore()
+        protected override void OnRestoreValue()
         {
-            transform.localScale = m_startValue;
+            transform.localScale = m_sV3;
         }
     }
 }
