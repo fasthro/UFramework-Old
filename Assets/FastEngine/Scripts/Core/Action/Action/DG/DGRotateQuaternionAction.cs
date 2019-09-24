@@ -11,21 +11,16 @@ namespace FastEngine.Core
 {
     public class DGRotateQuaternionAction : DGActionTransformBase
     {
-        private Quaternion m_startValue;
-        private Quaternion m_endValue;
-
-        public DGRotateQuaternionAction(Transform transform, Quaternion startValue, Quaternion endValue, float duration, Ease ease = Ease.Linear)
-         : base(transform, duration, ease)
+        public DGRotateQuaternionAction(Transform transform, Quaternion startValue, Quaternion endValue, float duration)
+         : base(transform, startValue, endValue, duration, false)
         {
-            m_startValue = startValue;
-            m_endValue = endValue;
         }
 
         protected override void OnInitialize()
         {
             if (m_tween == null)
             {
-                m_tween = transform.DORotateQuaternion(m_endValue, m_duration).SetEase(m_ease).SetAutoKill(false);
+                m_tween = transform.DORotateQuaternion(m_eQuaternion, m_duration).SetEase(m_ease).SetAutoKill(false);
                 m_tween.OnComplete(() =>
                 {
                     isCompleted = true;
@@ -33,9 +28,9 @@ namespace FastEngine.Core
             }
         }
 
-        protected override void OnPlayRestore()
+        protected override void OnRestoreValue()
         {
-            transform.rotation = m_startValue;
+            transform.rotation = m_sQuaternion;
         }
     }
 }

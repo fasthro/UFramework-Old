@@ -14,10 +14,35 @@ namespace FastEngine.Core
         protected Tween m_tween;
         public Tween tween { get { return m_tween; } }
 
+        // restore
+        protected bool m_isRV = true;
+
         /// <summary>
-        /// 播放之前还原数据
+        /// Set Restore Value
         /// </summary>
-        protected virtual void OnPlayRestore() { }
+        /// <param name="irv"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T SetRestoreValue<T>(bool irv) where T : DGActionBase
+        {
+            m_isRV = irv;
+            return this as T;
+        }
+
+        /// <summary>
+        /// Set Restore Value
+        /// </summary>
+        /// <param name="irv"></param>
+        /// <returns>DGActionTransformBase</returns>
+        public DGActionTransformBase SetRestoreValue(bool irv)
+        {
+            return SetRestoreValue<DGActionTransformBase>(irv);
+        }
+
+        /// <summary>
+        /// Restore Value
+        /// </summary>
+        protected virtual void OnRestoreValue() { }
 
         protected override void OnExecute(float deltaTime)
         {
@@ -25,8 +50,7 @@ namespace FastEngine.Core
             {
                 if (!m_tween.IsPlaying())
                 {
-                    OnPlayRestore();
-
+                    if (m_isRV) OnRestoreValue();
                     if (isReseted) m_tween.Restart();
                     else m_tween.Play();
                 }

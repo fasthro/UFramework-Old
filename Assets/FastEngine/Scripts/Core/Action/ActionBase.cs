@@ -56,6 +56,20 @@ namespace FastEngine.Core
         }
 
         /// <summary>
+        /// 绑定 Callback
+        /// </summary>
+        /// <param name="act"></param>
+        /// <param name="callback"></param>
+        /// <typeparam name="T"></typeparam>
+        public void BindCallback<T>(ACTION_CALLBACK_TYPE act, ActionCallback<T> callback)
+        {
+            if (!m_callbackDic.ContainsKey(act))
+                m_callbackDic.Add(act, null);
+
+            m_callbackDic[act] = (ActionCallback<T>)m_callbackDic[act] + callback;
+        }
+
+        /// <summary>
         /// 广播 Callback
         /// </summary>
         /// <param name="act">callback type</param>
@@ -63,6 +77,18 @@ namespace FastEngine.Core
         {
             if (m_callbackDic.ContainsKey(act))
                 ((ActionCallback)m_callbackDic[act]).InvokeGracefully();
+        }
+
+        /// <summary>
+        /// 广播 Callback
+        /// </summary>
+        /// <param name="act"></param>
+        /// <param name="arg"></param>
+        /// <typeparam name="T"></typeparam>
+        protected void BroadcastCallback<T>(ACTION_CALLBACK_TYPE act, T arg)
+        {
+            if (m_callbackDic.ContainsKey(act))
+                ((ActionCallback<T>)m_callbackDic[act]).InvokeGracefully(arg);
         }
 
         /// <summary>

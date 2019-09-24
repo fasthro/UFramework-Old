@@ -8,6 +8,7 @@ namespace FastEngine.Core
 {
     // Action Callback
     public delegate void ActionCallback();
+    public delegate void ActionCallback<T>(T arg);
 
     // Action Callback Type
     public enum ACTION_CALLBACK_TYPE
@@ -19,6 +20,12 @@ namespace FastEngine.Core
 
         #region repeat action
         REPEAT_STEP_COMPLETED,
+        #endregion
+
+        #region http action
+        HTTP_SUCCEED,
+        HTTP_FAILLED,
+        HTTP_PROGRESS,
         #endregion
     }
 }

@@ -1,7 +1,7 @@
 ﻿/*
  * @Author: fasthro
  * @Date: 2019-09-21 16:25:16
- * @Description: Move Action (DoTween)
+ * @Description: Scale Y Action (DoTween)
  */
 
 using UnityEngine;
@@ -9,10 +9,10 @@ using DG.Tweening;
 
 namespace FastEngine.Core
 {
-    public class DGMoveAction : DGActionTransformBase
-    {        
-        public DGMoveAction(Transform transform, Vector3 startValue, Vector3 endValue, float duration, bool snapping = false)
-         : base(transform, startValue, endValue, duration, snapping)
+    public class DGScaleYAction : DGActionTransformBase
+    {
+        public DGScaleYAction(Transform transform, float startValue, float endValue, float duration)
+         : base(transform, startValue, endValue, duration, false)
         {
         }
 
@@ -20,7 +20,7 @@ namespace FastEngine.Core
         {
             if (m_tween == null)
             {
-                m_tween = transform.DOMove(m_eV3, m_duration, m_snapping).SetEase(m_ease).SetAutoKill(false);
+                m_tween = transform.DOScaleY(m_eVF, m_duration).SetEase(m_ease).SetAutoKill(false);
                 m_tween.OnComplete(() =>
                 {
                     isCompleted = true;
@@ -30,7 +30,7 @@ namespace FastEngine.Core
 
         protected override void OnRestoreValue()
         {
-            transform.position = m_sV3;
+            // TODO
         }
     }
 }
