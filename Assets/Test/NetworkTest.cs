@@ -14,8 +14,9 @@ public class NetworkTest : MonoBehaviour
         client = new SocketClient();
         client.connectedEventCallback += OnConnectedHandler;
         client.sendEventCallback += OnSendHandler;
+        // client.Connect("127.0.0.1", 8080);
+        // client.Connect("192.168.1.48", 8080);
         client.Connect("192.168.1.48", 8083);
-        i = 1;
     }
 
     void OnApplicationQuit()
@@ -26,12 +27,7 @@ public class NetworkTest : MonoBehaviour
 
     void OnConnectedHandler()
     {
-        if (i == 1)
-        {
-            client.Close();
-            client.ReConnect();
-        }
-        i++;
+        Send();
     }
 
     void Send()
@@ -39,32 +35,32 @@ public class NetworkTest : MonoBehaviour
         ByteBuffer buff = ByteBuffer.CreateWriter();
 
         // 协议总厂
-        byte[] size = new byte[4];
-        Array.Copy(BitConverter.GetBytes(132), 0, size, 0, sizeof(int));
-        buff.WriteBytes(size, false);
+        // byte[] size = new byte[4];
+        // Array.Copy(BitConverter.GetBytes(132), 0, size, 0, sizeof(int));
+        // buff.WriteBytes(size, false);
 
         // 特殊标志
-        byte[] flag = new byte[4];
-        int nIndex = 0;
-        Array.Copy(BitConverter.GetBytes('R'), 0, flag, nIndex, sizeof(byte));
-        nIndex += sizeof(byte);
-        Array.Copy(BitConverter.GetBytes('H'), 0, flag, nIndex, sizeof(byte));
-        nIndex += sizeof(byte);
-        Array.Copy(BitConverter.GetBytes('E'), 0, flag, nIndex, sizeof(byte));
-        nIndex += sizeof(byte);
-        Array.Copy(BitConverter.GetBytes('A'), 0, flag, nIndex, sizeof(byte));
+        // byte[] flag = new byte[4];
+        // int nIndex = 0;
+        // Array.Copy(BitConverter.GetBytes('R'), 0, flag, nIndex, sizeof(byte));
+        // nIndex += sizeof(byte);
+        // Array.Copy(BitConverter.GetBytes('H'), 0, flag, nIndex, sizeof(byte));
+        // nIndex += sizeof(byte);
+        // Array.Copy(BitConverter.GetBytes('E'), 0, flag, nIndex, sizeof(byte));
+        // nIndex += sizeof(byte);
+        // Array.Copy(BitConverter.GetBytes('A'), 0, flag, nIndex, sizeof(byte));
 
-        buff.WriteBytes(flag, false);
+        // buff.WriteBytes(flag, false);
 
         // 协议号
-        byte[] protocal = new byte[4];
-        Array.Copy(BitConverter.GetBytes(1001), 0, protocal, 0, sizeof(int));
-        buff.WriteBytes(protocal, false);
+        // byte[] protocal = new byte[4];
+        // Array.Copy(BitConverter.GetBytes(1001), 0, protocal, 0, sizeof(int));
+        // buff.WriteBytes(protocal, false);
 
         // session
-        byte[] session = new byte[4];
-        Array.Copy(BitConverter.GetBytes(1), 0, session, 0, sizeof(int));
-        buff.WriteBytes(session, false);
+        // byte[] session = new byte[4];
+        // Array.Copy(BitConverter.GetBytes(1), 0, session, 0, sizeof(int));
+        // buff.WriteBytes(session, false);
 
         buff.WriteString("cc");
         buff.WriteString("android");
@@ -78,23 +74,23 @@ public class NetworkTest : MonoBehaviour
         buff.WriteInt(4);
 
         CNetMessage msg = new CNetMessage();
-        msg.MessageID = 1001;
-        msg.SessionID = 1;
-        msg.AddString("cc");
-        msg.AddString("android");
-        msg.AddString("google-play");
-        msg.AddString("en");
-        msg.AddString("dw-android-googleplay-en-01");
-        msg.AddString("59d8b89d754d6bc773c68ebe41f40416");
-        msg.AddString("US");
-        msg.AddByte(1);
-        msg.AddString("");
-        msg.AddInt(4);
+        // msg.MessageID = 1001;
+        // msg.SessionID = 1;
+        // msg.AddString("cc");
+        // msg.AddString("android");
+        // msg.AddString("google-play");
+        // msg.AddString("en");
+        // msg.AddString("dw-android-googleplay-en-01");
+        // msg.AddString("59d8b89d754d6bc773c68ebe41f40416");
+        // msg.AddString("US");
+        // msg.AddByte(1);
+        // msg.AddString("");
+        // msg.AddInt(4);
 
-        Debug.Log("msg: " + msg.Bytes.Length);
-        Debug.Log("buff: " + buff.ToArray().Length);
-
-        client.Send(1001, msg.Bytes);
+        // Debug.Log("msg: " + msg.Bytes.Length);
+        // Debug.Log("buff: " + buff.ToArray().Length);
+        
+        client.Send(1001, buff.ToArray());
     }
 
     private void OnSendHandler()
@@ -110,7 +106,7 @@ public class NetworkTest : MonoBehaviour
         if (a <= 0)
         {
             a = 5;
-            Send();
+            // Send();
         }
     }
 }
