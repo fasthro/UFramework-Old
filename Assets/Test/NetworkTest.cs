@@ -16,12 +16,12 @@ public class NetworkTest : MonoBehaviour
         client.sendEventCallback += OnSendHandler;
         // client.Connect("127.0.0.1", 8080);
         // client.Connect("192.168.1.48", 8080);
-        client.Connect("192.168.1.48", 8083);
+        client.Connect("192.168.1.41", 8080);
+
     }
 
     void OnApplicationQuit()
     {
-        Debug.Log("fffffff");
         client.Close();
     }
 
@@ -32,7 +32,6 @@ public class NetworkTest : MonoBehaviour
 
     void Send()
     {
-        ByteBuffer buff = ByteBuffer.CreateWriter();
 
         // 协议总厂
         // byte[] size = new byte[4];
@@ -62,35 +61,35 @@ public class NetworkTest : MonoBehaviour
         // Array.Copy(BitConverter.GetBytes(1), 0, session, 0, sizeof(int));
         // buff.WriteBytes(session, false);
 
-        buff.WriteString("cc");
-        buff.WriteString("android");
-        buff.WriteString("google-play");
-        buff.WriteString("en");
-        buff.WriteString("dw-android-googleplay-en-01");
-        buff.WriteString("59d8b89d754d6bc773c68ebe41f40416");
-        buff.WriteString("US");
-        buff.WriteByte(1);
-        buff.WriteString("");
-        buff.WriteInt(4);
+        // buff.WriteString("cc");
+        // buff.WriteString("android");
+        // buff.WriteString("google-play");
+        // buff.WriteString("en");
+        // buff.WriteString("dw-android-googleplay-en-01");
+        // buff.WriteString("59d8b89d754d6bc773c68ebe41f40416");
+        // buff.WriteString("US");
+        // buff.WriteByte(1);
+        // buff.WriteString("");
+        // buff.WriteInt(4);
 
         CNetMessage msg = new CNetMessage();
-        // msg.MessageID = 1001;
-        // msg.SessionID = 1;
-        // msg.AddString("cc");
-        // msg.AddString("android");
-        // msg.AddString("google-play");
-        // msg.AddString("en");
-        // msg.AddString("dw-android-googleplay-en-01");
-        // msg.AddString("59d8b89d754d6bc773c68ebe41f40416");
-        // msg.AddString("US");
-        // msg.AddByte(1);
-        // msg.AddString("");
-        // msg.AddInt(4);
-
+        msg.MessageID = 1001;
+        msg.SessionID = 1;
+        msg.AddString("cc");
+        msg.AddString("android");
+        msg.AddString("google-play");
+        msg.AddString("en");
+        msg.AddString("dw-android-googleplay-en-01");
+        msg.AddString("59d8b89d754d6bc773c68ebe41f40416");
+        msg.AddString("US");
+        msg.AddByte(1);
+        msg.AddString("");
+        msg.AddInt(4);
+ 
         // Debug.Log("msg: " + msg.Bytes.Length);
         // Debug.Log("buff: " + buff.ToArray().Length);
         
-        client.Send(1001, buff.ToArray());
+        client.Send(1001, msg.Bytes);
     }
 
     private void OnSendHandler()

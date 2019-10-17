@@ -39,5 +39,22 @@ namespace FastEngine.Common
         {
             logWriter.Received(new LogInfo(log, track, type));
         }
+
+        #region 日志模块
+        public static void LogInfo(string message, LogModule module = LogModule.Unity)
+        {
+            Debug.Log(LogModuleWrap.Wrap(module, message));
+        }
+
+        public static void LogWarning(string message, LogModule module = LogModule.Unity)
+        {
+            Debug.LogWarning(LogModuleWrap.Wrap(module, message));
+        }
+
+        public static void LogError(string message, LogModule module = LogModule.Unity)
+        {
+            Debug.LogError(LogModuleWrap.Wrap(module, message));
+        }
+        #endregion
     }
 }

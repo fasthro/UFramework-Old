@@ -20,25 +20,22 @@ namespace FastEngine.Core
 
     public class SocketClient
     {
-        private string m_ip;
-        public string ip { get { return m_ip; } }
-
-        private int m_port;
-        public int port { get { return m_port; } }
-
-        private bool m_isConnected;
-        public bool isConnected { get { return m_isConnected; } }
-
+        // socket
         private Socket m_clientSocket;
+        // 数据接收线程
+        private Thread m_recThread = null;
 
-        private byte[] m_receiveBuffer = new byte[4096];
-
+        #region 数据接收
+        private byte[] m_recBytes = new byte[4096];
         // 接收数据缓冲区
-        private SocketReceiveBuffer m_receiveDataBuffer = new SocketReceiveBuffer();
-        // 接收的协议数据
-        private SocketReceiveProtocal m_receiveData = null;
+        private SocketReceiver m_receiver = new SocketReceiver();
+        // 接收的数据包
+        private SocketPack m_recPack = null;
+        #endregion
 
-        private Thread m_receiveThread = null;
+        public string ip { get; private set; }
+        public int port { get; private set; }
+        public bool isConnected { get; private set; }
 
         // 事件回调
         public event SocketConnectedCallback connectedEventCallback;
@@ -46,15 +43,12 @@ namespace FastEngine.Core
         public event SocketReceiveCallback receiveEventCallback;
         public event SocketCloseCallback closeEventCallback;
 
-        public SocketClient()
-        {
-
-        }
+        public SocketClient() { }
 
         public void Connect(string ip, int port)
         {
-            this.m_ip = ip;
-            this.m_port = port;
+            this.ip = ip;
+            this.port = port;
 
             try
             {
@@ -64,6 +58,8 @@ namespace FastEngine.Core
                 AddressFamily newAddressFamily = AddressFamily.InterNetwork;
                 IPv6SupportMidleware.getIPType(ip, port.ToString(), out newIp, out newAddressFamily);
                 if (!string.IsNullOrEmpty(newIp)) { connetIp = newIp; }
+
+                Log.LogInfo("socket connect to server. " + ip + ":" + port + (string.IsNullOrEmpty(newIp) ? " ipv4" : " ipv6"), LogModule.Network);
 
                 // 解析IP地址
                 IPAddress ipAddress = IPAddress.Parse(connetIp);
@@ -84,6 +80,7 @@ namespace FastEngine.Core
             }
             catch (System.Exception e)
             {
+                Log.LogError("socket connect to server exception. " + ip + ":" + port, LogModule.Network);
                 OnConnetFailed();
             }
         }
@@ -98,15 +95,12 @@ namespace FastEngine.Core
         {
             try
             {
+                Log.LogInfo("socket connect to server succeed.", LogModule.Network);
                 ((Socket)iar.AsyncState).EndConnect(iar);
-
-                m_isConnected = true;
-
-                Debug.Log("Socket Client OnConnetSucceed!");
-
-                m_receiveThread = new Thread(new ThreadStart(OnReceive));
-                m_receiveThread.IsBackground = true;
-                m_receiveThread.Start();
+                isConnected = true;
+                m_recThread = new Thread(new ThreadStart(OnReceive));
+                m_recThread.IsBackground = true;
+                m_recThread.Start();
 
                 connectedEventCallback.InvokeGracefully();
 
@@ -129,7 +123,7 @@ namespace FastEngine.Core
 
         public void Send(int protocal, byte[] data)
         {
-            if (!m_isConnected || m_clientSocket == null || !m_clientSocket.Connected)
+            if (!isConnected || m_clientSocket == null || !m_clientSocket.Connected)
             {
                 ReConnect();
                 return;
@@ -142,13 +136,13 @@ namespace FastEngine.Core
         {
             try
             {
+                Log.LogInfo("socket send to server succeed.", LogModule.Network);
                 ((Socket)iar.AsyncState).EndSend(iar);
-                Debug.Log("Socket Client OnSend");
                 sendEventCallback.InvokeGracefully();
             }
             catch (Exception e)
             {
-                Debug.Log("Socket Client Send Exception: " + e.StackTrace);
+                Log.LogError("socket send to server exception." + e.ToString(), LogModule.Network);
             }
         }
 
@@ -158,22 +152,22 @@ namespace FastEngine.Core
             {
                 if (!m_clientSocket.Connected)
                 {
-                    m_isConnected = false;
+                    isConnected = false;
                     ReConnect();
                     break;
                 }
                 try
                 {
                     // 接受数据
-                    int receiveLength = m_clientSocket.Receive(m_receiveBuffer);
-                    if (receiveLength > 0)
+                    int bSize = m_clientSocket.Receive(m_recBytes);
+                    if (bSize > 0)
                     {
-                        Debug.Log("Socket Client OnReceive " + receiveLength);
-                        // 把接受的数据添加到接受缓冲区内
-                        m_receiveDataBuffer.Push(m_receiveBuffer, receiveLength);
-                        // 在缓冲区内获取到完成协议数据
-                        while (m_receiveDataBuffer.Get(out m_receiveData))
+                        // 向接受者Push数据
+                        m_receiver.Push(m_recBytes, bSize);
+                        // 尝试在向接受者获取Pack
+                        while ((m_recPack = m_receiver.TryGetPack()) != null)
                         {
+                            Log.LogInfo("socket receive data. cmd: " + m_recPack.cmd + " size: " + m_recPack.size, LogModule.Network);
                             // 添加到数据处理队列
                             // lock ()
                             // {
@@ -182,14 +176,13 @@ namespace FastEngine.Core
                         }
                     }
                 }
-                catch (System.Exception e)
+                catch (Exception e)
                 {
-                    Debug.Log(e);
-                    m_clientSocket.Disconnect(true);
-                    m_clientSocket.Shutdown(SocketShutdown.Both);
-                    m_clientSocket.Close();
-
-                    OnClose();
+                    if (isConnected)
+                    {
+                        Log.LogError("socket receive form server exception." + e.ToString(), LogModule.Network);
+                        Close();
+                    }
                     break;
                 }
             }
@@ -197,21 +190,21 @@ namespace FastEngine.Core
 
         public void Close()
         {
-            if (!m_isConnected) return;
+            if (!isConnected) return;
             OnClose();
         }
 
         private void OnClose()
         {
-            m_isConnected = false;
+            Log.LogInfo("socket closed.", LogModule.Network);
 
-            if (m_receiveThread != null) m_receiveThread.Abort();
-            m_receiveThread = null;
+            isConnected = false;
+
+            if (m_recThread != null) m_recThread.Abort();
+            m_recThread = null;
 
             if (m_clientSocket != null && m_clientSocket.Connected) m_clientSocket.Close();
             m_clientSocket = null;
-
-            Debug.Log("Socket Client OnClose!");
 
             closeEventCallback.InvokeGracefully();
         }

@@ -1,56 +1,83 @@
 /*
  * @Author: fasthro
- * @Date: 2019-08-08 11:47:44
- * @Description: 二进制流
+ * @Date: 2019-10-16 19:25:15
+ * @Description: 消息包(小字节序方式读取和写入)
  */
+
 using System;
 using System.IO;
 using System.Text;
+using FastEngine.Common;
 
 namespace FastEngine.Core
 {
-    public class ByteBuffer
+    public class SocketPack
     {
+        #region config
+        /// <summary>
+        /// 包头总大小[协议长度(4个字节)][协议头(4个字节)][协议号(4个字节)]
+        /// </summary>
+        public readonly static int PACK_HEAD_SIZE = 12;
+
+        /// <summary>
+        /// 包头分割大小
+        /// </summary>
+        public readonly static int PACK_HEAD_SPLIT_SIZE = 4;
+
+        #endregion
+
+        // 协议号
+        public int cmd { get; private set; }
+
+        // 数据
+        private byte[] m_data;
+        public byte[] data
+        {
+            get
+            {
+                if (m_data == null && m_writer != null)
+                {
+                    m_stream.Flush();
+                    m_data = m_stream.ToArray();
+                }
+                return m_data;
+            }
+        }
+
+        // 数据长度
+        public int size { get { return data.Length; } }
+
         private MemoryStream m_stream;
         private BinaryWriter m_writer;
         private BinaryReader m_reader;
 
         /// <summary>
-        /// 创建写入二进制流
-        /// </summary>
-        public static ByteBuffer CreateWriter()
-        {
-            return new ByteBuffer(null);
-        }
-
-        /// <summary>
-        /// 创建读取二进制流
+        /// 协议包
         /// </summary>
         /// <param name="data"></param>
-        public static ByteBuffer CreateReader(byte[] data)
+        public SocketPack(int cmd)
         {
-            return new ByteBuffer(data);
-        }
-
-        public ByteBuffer(byte[] data)
-        {
-            if (data != null) InitReader(data);
-            else InitWriter();
+            this.cmd = cmd;
+            m_stream = new MemoryStream();
+            m_writer = new BinaryWriter(m_stream);
         }
 
         /// <summary>
-        /// ToArray
+        /// 协议包
         /// </summary>
-        public byte[] ToArray()
+        /// <param name="data"></param>
+        public SocketPack(int cmd, byte[] data)
         {
-            m_stream.Flush();
-            return m_stream.ToArray();
+            this.cmd = cmd;
+            this.m_data = data;
+            m_stream = new MemoryStream(data);
+            m_reader = new BinaryReader(m_stream);
         }
 
         /// <summary>
-        /// Close
+        /// 释放包
         /// </summary>
-        public void Close()
+        public void Release()
         {
             if (m_stream != null) m_stream.Close();
             m_stream = null;
@@ -60,25 +87,10 @@ namespace FastEngine.Core
 
             if (m_reader != null) m_reader.Close();
             m_reader = null;
+
+            this.m_data = null;
         }
 
-        /// <summary>
-        /// 初始化写
-        /// </summary>
-        private void InitWriter()
-        {
-            m_stream = new MemoryStream();
-            m_writer = new BinaryWriter(m_stream);
-        }
-
-        /// <summary>
-        /// 初始化读
-        /// </summary>
-        private void InitReader(byte[] data)
-        {
-            m_stream = new MemoryStream(data);
-            m_reader = new BinaryReader(m_stream);
-        }
 
         /// <summary>
         /// 判断字节序是否需要翻转
