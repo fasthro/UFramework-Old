@@ -30,7 +30,7 @@ namespace FastEngine.Core
 
             m_client.Get(uri, HttpCompletionOption.StreamResponseContent, (response) =>
             {
-                BroadcastCallback<int>(ACTION_CALLBACK_TYPE.HTTP_PROGRESS, response.PercentageComplete);
+                BroadcastCallback<int>(ActionEvent.HttpProgress, response.PercentageComplete);
 
                 if (m_downloadCache == null)
                     m_downloadCache = new byte[response.ContentLength];
@@ -43,14 +43,14 @@ namespace FastEngine.Core
                 {
                     if (response.PercentageComplete >= 100)
                     {
-                        BroadcastCallback<byte[]>(ACTION_CALLBACK_TYPE.HTTP_SUCCEED, m_downloadCache);
+                        BroadcastCallback<byte[]>(ActionEvent.HttpSucceed, m_downloadCache);
                         DownloadClose();
                         isCompleted = true;
                     }
                 }
                 else
                 {
-                    BroadcastCallback<HttpResponseMessage>(ACTION_CALLBACK_TYPE.HTTP_FAILLED, response);
+                    BroadcastCallback<HttpResponseMessage>(ActionEvent.HttpFailled, response);
                     DownloadClose();
                     isCompleted = true;
                 }

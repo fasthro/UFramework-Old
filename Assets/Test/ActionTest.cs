@@ -48,11 +48,11 @@ public class ActionTest : MonoBehaviour
         // new RepeatAction(DGA4, -1).Start();
 
         var http1 = new GetAction("http://192.168.1.253/platform/devConfig.json");
-        http1.BindCallback<HttpResponseMessage>(ACTION_CALLBACK_TYPE.HTTP_SUCCEED, (rep) =>
+        http1.BindCallback<HttpResponseMessage>(ActionEvent.HttpSucceed, (rep) =>
         {
             Debug.Log("HTTP Get Succeed! ");
         });
-        http1.BindCallback<HttpResponseMessage>(ACTION_CALLBACK_TYPE.HTTP_FAILLED, (rep) =>
+        http1.BindCallback<HttpResponseMessage>(ActionEvent.HttpFailled, (rep) =>
         {
             Debug.Log("HTTP Get Failled! " + rep.StatusCode);
         });

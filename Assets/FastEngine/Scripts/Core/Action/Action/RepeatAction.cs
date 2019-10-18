@@ -39,7 +39,7 @@ namespace FastEngine.Core
             {
                 m_residueDegree++;
                 m_action.Reset();
-                BroadcastCallback(ACTION_CALLBACK_TYPE.REPEAT_STEP_COMPLETED);
+                BroadcastCallback(ActionEvent.RepeatStepCompleted);
             }
             if (!m_loop)
             {

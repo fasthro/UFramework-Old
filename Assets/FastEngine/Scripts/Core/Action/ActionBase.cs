@@ -23,7 +23,7 @@ namespace FastEngine.Core
         public bool isDisposed { get; protected set; }
 
         // callback dic
-        private Dictionary<ACTION_CALLBACK_TYPE, Delegate> m_callbackDic = new Dictionary<ACTION_CALLBACK_TYPE, Delegate>();
+        private Dictionary<ActionEvent, Delegate> m_callbackDic = new Dictionary<ActionEvent, Delegate>();
 
         public ActionBase() { }
 
@@ -47,12 +47,12 @@ namespace FastEngine.Core
         /// </summary>
         /// <param name="act">callback type</param>
         /// <param name="callback">callback</param>
-        public void BindCallback(ACTION_CALLBACK_TYPE act, ActionCallback callback)
+        public void BindCallback(ActionEvent act, ActionEventCallback callback)
         {
             if (!m_callbackDic.ContainsKey(act))
                 m_callbackDic.Add(act, null);
 
-            m_callbackDic[act] = (ActionCallback)m_callbackDic[act] + callback;
+            m_callbackDic[act] = (ActionEventCallback)m_callbackDic[act] + callback;
         }
 
         /// <summary>
@@ -61,22 +61,22 @@ namespace FastEngine.Core
         /// <param name="act"></param>
         /// <param name="callback"></param>
         /// <typeparam name="T"></typeparam>
-        public void BindCallback<T>(ACTION_CALLBACK_TYPE act, ActionCallback<T> callback)
+        public void BindCallback<T>(ActionEvent act, ActionEventCallback<T> callback)
         {
             if (!m_callbackDic.ContainsKey(act))
                 m_callbackDic.Add(act, null);
 
-            m_callbackDic[act] = (ActionCallback<T>)m_callbackDic[act] + callback;
+            m_callbackDic[act] = (ActionEventCallback<T>)m_callbackDic[act] + callback;
         }
 
         /// <summary>
         /// 广播 Callback
         /// </summary>
         /// <param name="act">callback type</param>
-        protected void BroadcastCallback(ACTION_CALLBACK_TYPE act)
+        protected void BroadcastCallback(ActionEvent act)
         {
             if (m_callbackDic.ContainsKey(act))
-                ((ActionCallback)m_callbackDic[act]).InvokeGracefully();
+                ((ActionEventCallback)m_callbackDic[act]).InvokeGracefully();
         }
 
         /// <summary>
@@ -85,10 +85,10 @@ namespace FastEngine.Core
         /// <param name="act"></param>
         /// <param name="arg"></param>
         /// <typeparam name="T"></typeparam>
-        protected void BroadcastCallback<T>(ACTION_CALLBACK_TYPE act, T arg)
+        protected void BroadcastCallback<T>(ActionEvent act, T arg)
         {
             if (m_callbackDic.ContainsKey(act))
-                ((ActionCallback<T>)m_callbackDic[act]).InvokeGracefully(arg);
+                ((ActionEventCallback<T>)m_callbackDic[act]).InvokeGracefully(arg);
         }
 
         /// <summary>
@@ -102,10 +102,10 @@ namespace FastEngine.Core
             if (!isCompleted)
             {
                 OnExecute(deltaTime);
-                BroadcastCallback(ACTION_CALLBACK_TYPE.UPDATE);
+                BroadcastCallback(ActionEvent.Update);
             }
 
-            if (isCompleted) BroadcastCallback(ACTION_CALLBACK_TYPE.COMPLETED);
+            if (isCompleted) BroadcastCallback(ActionEvent.Completed);
             return isCompleted;
         }
 
@@ -123,7 +123,7 @@ namespace FastEngine.Core
             isReseted = true;
             Initialize();
             OnReset();
-            BroadcastCallback(ACTION_CALLBACK_TYPE.RESET);
+            BroadcastCallback(ActionEvent.Reset);
         }
 
         /// <summary>
@@ -140,9 +140,9 @@ namespace FastEngine.Core
             if (isDisposed) return;
             isDisposed = true;
 
-            BroadcastCallback(ACTION_CALLBACK_TYPE.DISPOSED);
+            BroadcastCallback(ActionEvent.Disposed);
 
-            foreach (KeyValuePair<ACTION_CALLBACK_TYPE, Delegate> item in m_callbackDic)
+            foreach (KeyValuePair<ActionEvent, Delegate> item in m_callbackDic)
             {
                 m_callbackDic[item.Key] = null;
             }

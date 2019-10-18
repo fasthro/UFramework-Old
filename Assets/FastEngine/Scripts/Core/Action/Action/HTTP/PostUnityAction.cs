@@ -12,13 +12,13 @@ namespace FastEngine.Core
 {
     public class PostUnityAction : HttpActionBase
     {
-        private WWWForm m_wf;
+        private WWWForm m_field;
         private ByteArrayContent m_content;
 
-        public PostUnityAction(string url, WWWForm wf) : base(url)
+        public PostUnityAction(string url, WWWForm field) : base(url)
         {
-            m_wf = wf;
-            m_content = new ByteArrayContent(m_wf.data, m_wf.headers["Content-Type"]);
+            m_field = field;
+            m_content = new ByteArrayContent(m_field.data, m_field.headers["Content-Type"]);
         }
 
         protected override void OnExecute(float deltaTime)
@@ -31,11 +31,11 @@ namespace FastEngine.Core
            {
                if (response.IsSuccessStatusCode)
                {
-                   BroadcastCallback<HttpResponseMessage>(ACTION_CALLBACK_TYPE.HTTP_SUCCEED, response);
+                   BroadcastCallback<HttpResponseMessage>(ActionEvent.HttpSucceed, response);
                }
                else
                {
-                   BroadcastCallback<HttpResponseMessage>(ACTION_CALLBACK_TYPE.HTTP_FAILLED, response);
+                   BroadcastCallback<HttpResponseMessage>(ActionEvent.HttpFailled, response);
                }
                isCompleted = true;
            });
@@ -44,7 +44,7 @@ namespace FastEngine.Core
         protected override void OnDispose()
         {
             base.OnDispose();
-            m_wf = null;
+            m_field = null;
             m_content = null;
         }
     }

@@ -25,11 +25,11 @@ namespace FastEngine.Core
             {
                 if (response.IsSuccessStatusCode)
                 {
-                    BroadcastCallback<HttpResponseMessage>(ACTION_CALLBACK_TYPE.HTTP_SUCCEED, response);
+                    BroadcastCallback<HttpResponseMessage>(ActionEvent.HttpSucceed, response);
                 }
                 else
                 {
-                    BroadcastCallback<HttpResponseMessage>(ACTION_CALLBACK_TYPE.HTTP_FAILLED, response);
+                    BroadcastCallback<HttpResponseMessage>(ActionEvent.HttpFailled, response);
                 }
                 isCompleted = true;
             });

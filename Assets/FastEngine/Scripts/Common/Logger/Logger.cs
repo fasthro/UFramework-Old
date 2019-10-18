@@ -7,10 +7,13 @@ using UnityEngine;
 
 namespace FastEngine.Common
 {
-    public class Log
+    public class Logger
     {
         // 日志记录器
         private static LogWriter logWriter;
+
+        // 日志状态
+        public static bool logEnabled { get; private set; }
 
         /// <summary>
         /// 日志初始化
@@ -20,6 +23,7 @@ namespace FastEngine.Common
         {
             // Unity 日志开关
             Debug.unityLogger.logEnabled = enabled;
+            logEnabled = enabled;
 
             if (!enabled) return;
 
@@ -39,22 +43,5 @@ namespace FastEngine.Common
         {
             logWriter.Received(new LogInfo(log, track, type));
         }
-
-        #region 日志模块
-        public static void LogInfo(string message, LogModule module = LogModule.Unity)
-        {
-            Debug.Log(LogModuleWrap.Wrap(module, message));
-        }
-
-        public static void LogWarning(string message, LogModule module = LogModule.Unity)
-        {
-            Debug.LogWarning(LogModuleWrap.Wrap(module, message));
-        }
-
-        public static void LogError(string message, LogModule module = LogModule.Unity)
-        {
-            Debug.LogError(LogModuleWrap.Wrap(module, message));
-        }
-        #endregion
     }
 }

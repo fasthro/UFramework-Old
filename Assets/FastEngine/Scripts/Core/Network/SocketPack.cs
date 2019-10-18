@@ -8,24 +8,12 @@ using System;
 using System.IO;
 using System.Text;
 using FastEngine.Common;
+using UnityEngine;
 
 namespace FastEngine.Core
 {
     public class SocketPack
     {
-        #region config
-        /// <summary>
-        /// 包头总大小[协议长度(4个字节)][协议头(4个字节)][协议号(4个字节)]
-        /// </summary>
-        public readonly static int PACK_HEAD_SIZE = 12;
-
-        /// <summary>
-        /// 包头分割大小
-        /// </summary>
-        public readonly static int PACK_HEAD_SPLIT_SIZE = 4;
-
-        #endregion
-
         // 协议号
         public int cmd { get; private set; }
 
@@ -45,7 +33,7 @@ namespace FastEngine.Core
         }
 
         // 数据长度
-        public int size { get { return data.Length; } }
+        public int dataSize { get { return data.Length; } }
 
         private MemoryStream m_stream;
         private BinaryWriter m_writer;
@@ -90,7 +78,6 @@ namespace FastEngine.Core
 
             this.m_data = null;
         }
-
 
         /// <summary>
         /// 判断字节序是否需要翻转

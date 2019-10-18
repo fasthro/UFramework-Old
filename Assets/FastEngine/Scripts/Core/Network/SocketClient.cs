@@ -13,43 +13,134 @@ using FastEngine.Common;
 
 namespace FastEngine.Core
 {
-    public delegate void SocketConnectedCallback();
-    public delegate void SocketSendCallback();
-    public delegate void SocketReceiveCallback();
-    public delegate void SocketCloseCallback();
+    /// <summary>
+    /// socket event callback delegate
+    /// </summary>
+    public delegate void SocketEventCallback(SocketEventArgs args);
 
-    public class SocketClient
+    /// <summary>
+    /// socket state
+    /// </summary>
+    public enum SocketState
     {
+        Connected,
+        Disconnected,
+        Send,
+        Received,
+    }
+
+    public enum SocketException
+    {
+        Timeout,
+        Connect,
+        Receive,
+        Send,
+        Exception,
+    }
+
+    /// <summary>
+    /// socket event callback args
+    /// </summary>
+    public class SocketEventArgs
+    {
+        // socket state
+        public SocketState socketState { get; private set; }
+
+        // socket pack
+        public SocketPack socketPack { get; private set; }
+
+        // cmd
+        public int cmd { get; private set; }
+
+        // exception
+        public SocketException exception { get; private set; }
+
+        // error
+        public string error { get; private set; }
+
+        public SocketEventArgs(SocketState socketState)
+        {
+            this.socketState = socketState;
+        }
+
+        public SocketEventArgs(SocketState socketState, SocketPack socketPack) : this(socketState)
+        {
+            this.socketPack = socketPack;
+        }
+
+        public SocketEventArgs(SocketState socketState, int cmd) : this(socketState)
+        {
+            this.cmd = cmd;
+        }
+
+        public SocketEventArgs(SocketState socketState, SocketException exception, string error) : this(socketState)
+        {
+            this.exception = exception;
+            this.error = error;
+        }
+    }
+
+    public class SocketClient : LogUser
+    {
+        #region config
+        /// <summary>
+        /// 连接超时时间
+        /// </summary>
+        private readonly static int ConnectedTimeout = 5000;
+
+        /// <summary>
+        /// 接收数据池大小
+        /// </summary>
+        private readonly static int ReceiveCacheSize = 4096;
+        #endregion
+
         // socket
         private Socket m_clientSocket;
-        // 数据接收线程
-        private Thread m_recThread = null;
 
-        #region 数据接收
-        private byte[] m_recBytes = new byte[4096];
-        // 接收数据缓冲区
-        private SocketReceiver m_receiver = new SocketReceiver();
+        // 数据接收线程
+        private Thread m_recThread;
+
+        // 事件回调
+        private event SocketEventCallback m_eventCallback;
+
+        #region receive
+        // 数据接收池
+        private byte[] m_recCache;
+        // 数据接收处理器
+        private SocketReceiver m_receiver;
         // 接收的数据包
-        private SocketPack m_recPack = null;
+        private SocketPack m_recPack;
+        #endregion
+
+        #region send
+        // 发送包头
+        public SocketPackHeader m_sendPackHeader;
         #endregion
 
         public string ip { get; private set; }
         public int port { get; private set; }
         public bool isConnected { get; private set; }
 
-        // 事件回调
-        public event SocketConnectedCallback connectedEventCallback;
-        public event SocketSendCallback sendEventCallback;
-        public event SocketReceiveCallback receiveEventCallback;
-        public event SocketCloseCallback closeEventCallback;
-
-        public SocketClient() { }
-
-        public void Connect(string ip, int port)
+        /// <summary>
+        /// socket client
+        /// </summary>
+        /// <param name="ip"></param>
+        /// <param name="port"></param>
+        /// <param name="callback"></param>
+        public SocketClient(string ip, int port, SocketEventCallback callback)
         {
             this.ip = ip;
             this.port = port;
+            this.m_eventCallback = callback;
+            this.m_recCache = new byte[ReceiveCacheSize];
+            this.m_receiver = new SocketReceiver();
+            this.m_sendPackHeader = new SocketPackHeader();
 
+            InitializeLogUser("SocketClient", true);
+        }
+
+        public void Connect()
+        {
             try
             {
                 string newIp = "";
@@ -59,7 +150,7 @@ namespace FastEngine.Core
                 IPv6SupportMidleware.getIPType(ip, port.ToString(), out newIp, out newAddressFamily);
                 if (!string.IsNullOrEmpty(newIp)) { connetIp = newIp; }
 
-                Log.LogInfo("socket connect to server. " + ip + ":" + port + (string.IsNullOrEmpty(newIp) ? " ipv4" : " ipv6"), LogModule.Network);
+                Log("socket connect to server. " + ip + ":" + port + (string.IsNullOrEmpty(newIp) ? " ipv4" : " ipv6"));
 
                 // 解析IP地址
                 IPAddress ipAddress = IPAddress.Parse(connetIp);
@@ -72,56 +163,45 @@ namespace FastEngine.Core
                 IAsyncResult result = m_clientSocket.BeginConnect(ipEndpoint, new AsyncCallback(OnConnetSucceed), m_clientSocket);
 
                 // 连接超时
-                bool success = result.AsyncWaitHandle.WaitOne(5000, true);
+                bool success = result.AsyncWaitHandle.WaitOne(ConnectedTimeout, true);
                 if (!success)
                 {
-                    OnConnetTimeout();
+                    Exception(SocketException.Timeout, null);
                 }
             }
             catch (System.Exception e)
             {
-                Log.LogError("socket connect to server exception. " + ip + ":" + port, LogModule.Network);
-                OnConnetFailed();
+                LogError("socket connect to server exception. " + e.ToString());
+                Exception(SocketException.Connect, e);
             }
         }
 
         public void ReConnect()
         {
-            OnClose();
-            Connect(ip, port);
+            OnDisconnected();
+            Connect();
         }
 
         private void OnConnetSucceed(IAsyncResult iar)
         {
             try
             {
-                Log.LogInfo("socket connect to server succeed.", LogModule.Network);
+                Log("socket connect to server succeed.");
                 ((Socket)iar.AsyncState).EndConnect(iar);
                 isConnected = true;
                 m_recThread = new Thread(new ThreadStart(OnReceive));
                 m_recThread.IsBackground = true;
                 m_recThread.Start();
 
-                connectedEventCallback.InvokeGracefully();
-
+                BroadcastConnected();
             }
             catch (Exception e)
             {
-                Close();
+                Exception(SocketException.Connect, e);
             }
         }
 
-        private void OnConnetFailed()
-        {
-            OnClose();
-        }
-
-        private void OnConnetTimeout()
-        {
-            OnClose();
-        }
-
-        public void Send(int protocal, byte[] data)
+        public void Send(SocketPack pack)
         {
             if (!isConnected || m_clientSocket == null || !m_clientSocket.Connected)
             {
@@ -129,6 +209,7 @@ namespace FastEngine.Core
                 return;
             }
 
+            var data = m_sendPackHeader.Write(pack.cmd, pack.data);
             m_clientSocket.BeginSend(data, 0, data.Length, SocketFlags.None, new AsyncCallback(OnSend), m_clientSocket);
         }
 
@@ -136,13 +217,14 @@ namespace FastEngine.Core
         {
             try
             {
-                Log.LogInfo("socket send to server succeed.", LogModule.Network);
+                Log("socket send to server succeed.");
                 ((Socket)iar.AsyncState).EndSend(iar);
-                sendEventCallback.InvokeGracefully();
+                BroadcastSend(0);
             }
             catch (Exception e)
             {
-                Log.LogError("socket send to server exception." + e.ToString(), LogModule.Network);
+                LogError("socket send to server exception." + e.ToString());
+                Exception(SocketException.Send, e);
             }
         }
 
@@ -159,15 +241,15 @@ namespace FastEngine.Core
                 try
                 {
                     // 接受数据
-                    int bSize = m_clientSocket.Receive(m_recBytes);
+                    int bSize = m_clientSocket.Receive(m_recCache);
                     if (bSize > 0)
                     {
                         // 向接受者Push数据
-                        m_receiver.Push(m_recBytes, bSize);
+                        m_receiver.Push(m_recCache, bSize);
                         // 尝试在向接受者获取Pack
                         while ((m_recPack = m_receiver.TryGetPack()) != null)
                         {
-                            Log.LogInfo("socket receive data. cmd: " + m_recPack.cmd + " size: " + m_recPack.size, LogModule.Network);
+                            Log("socket receive data. cmd: " + m_recPack.cmd + " size: " + m_recPack.dataSize);
                             // 添加到数据处理队列
                             // lock ()
                             // {
@@ -180,33 +262,70 @@ namespace FastEngine.Core
                 {
                     if (isConnected)
                     {
-                        Log.LogError("socket receive form server exception." + e.ToString(), LogModule.Network);
-                        Close();
+                        LogError("socket receive form server exception." + e.ToString());
+                        Exception(SocketException.Receive, e);
                     }
                     break;
                 }
             }
         }
 
-        public void Close()
+        private void Exception(SocketException exception, Exception e = null)
         {
-            if (!isConnected) return;
-            OnClose();
+            OnDisconnected();
+            BroadcastException(exception, e.ToString());
         }
 
-        private void OnClose()
+        public void Disconnecte()
         {
-            Log.LogInfo("socket closed.", LogModule.Network);
+            if (!isConnected) return;
+            OnDisconnected();
+            BroadcastDisconnected();
+        }
+
+        private void OnDisconnected()
+        {
+            Log("socket disconnected && closed.");
 
             isConnected = false;
 
-            if (m_recThread != null) m_recThread.Abort();
+            if (m_recThread != null)
+                m_recThread.Abort();
             m_recThread = null;
 
-            if (m_clientSocket != null && m_clientSocket.Connected) m_clientSocket.Close();
+            if (m_clientSocket != null && m_clientSocket.Connected)
+            {
+                m_clientSocket.Disconnect(false);
+                m_clientSocket.Close();
+            }
             m_clientSocket = null;
-
-            closeEventCallback.InvokeGracefully();
         }
+
+        #region broadcast
+        private void BroadcastConnected()
+        {
+            m_eventCallback.InvokeGracefully(new SocketEventArgs(SocketState.Connected));
+        }
+
+        private void BroadcastSend(int cmd)
+        {
+            m_eventCallback.InvokeGracefully(new SocketEventArgs(SocketState.Send, cmd));
+        }
+
+        private void BroadcastReceived(SocketPack pack)
+        {
+            m_eventCallback.InvokeGracefully(new SocketEventArgs(SocketState.Received, pack));
+        }
+
+        private void BroadcastDisconnected()
+        {
+            m_eventCallback.InvokeGracefully(new SocketEventArgs(SocketState.Disconnected));
+        }
+
+        private void BroadcastException(SocketException exception, string error)
+        {
+            m_eventCallback.InvokeGracefully(new SocketEventArgs(SocketState.Disconnected, exception, error));
+        }
+        #endregion
     }
 }

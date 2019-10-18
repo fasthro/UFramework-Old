@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using FastEngine.Common;
 using UnityEngine;
 
@@ -12,19 +13,21 @@ namespace FastEngine.Core
     [System.Serializable]
     public class SocketReceiver
     {
-        // 接收到的数据
-        private byte[] m_bytes;
+        // 数据池
+        private byte[] m_cache;
         // 游标索引
-        private int m_bytesCursor = 0;
-        
+        private int m_cursor = 0;
+
         // 正在处理包
         private bool m_isProcessing;
-        // 包长度
-        private int m_packSize;
-        // 命令
-        private int m_packCmd;
+        // 包头
+        private SocketPackHeader m_header;
 
-        public SocketReceiver() { m_bytes = new byte[0]; }
+        public SocketReceiver()
+        {
+            m_cache = new byte[0];
+            m_header = new SocketPackHeader();
+        }
 
         /// <summary>
         /// 接收的数据
@@ -35,14 +38,14 @@ namespace FastEngine.Core
         {
             // 首先确保数据可以完全写入到 bytes 中
             // 空闲 Size
-            int freeSize = m_bytes.Length - m_bytesCursor;
+            int freeSize = m_cache.Length - m_cursor;
             if (freeSize < dataSize)
             {
                 // 先扩大自身长度的2倍，如果还不够就扩大道最终需要的长度的2倍
-                int tSize = FixSize(m_bytes.Length) * 2;
+                int tSize = FixSize(m_cache.Length) * 2;
 
                 // Push新数据之后的 bytes 总长度
-                int needSize = m_bytesCursor + dataSize;
+                int needSize = m_cursor + dataSize;
 
                 if (needSize > tSize)
                 {
@@ -51,12 +54,12 @@ namespace FastEngine.Core
 
                 // 当前数据Copy到扩容后的 bytes 中
                 byte[] newBytes = new byte[tSize];
-                Array.Copy(m_bytes, 0, newBytes, 0, m_bytesCursor);
-                m_bytes = newBytes;
+                Array.Copy(m_cache, 0, newBytes, 0, m_cursor);
+                m_cache = newBytes;
             }
 
-            Array.Copy(data, 0, m_bytes, m_bytesCursor, dataSize);
-            m_bytesCursor += dataSize;
+            Array.Copy(data, 0, m_cache, m_cursor, dataSize);
+            m_cursor += dataSize;
         }
 
         /// <summary>
@@ -66,43 +69,30 @@ namespace FastEngine.Core
         {
             if (!m_isProcessing)
             {
-                if (m_bytesCursor >= SocketPack.PACK_HEAD_SIZE)
+                if (m_cursor >= SocketPackHeader.HEADER_SIZE)
                 {
-                    // 长度
-                    byte[] tempBytes = new byte[SocketPack.PACK_HEAD_SPLIT_SIZE];
-                    Array.Copy(m_bytes, 0, tempBytes, 0, SocketPack.PACK_HEAD_SPLIT_SIZE);
-                    m_packSize = BitConverter.ToInt32(tempBytes, 0);
-
-                    // 头
-                    tempBytes = new byte[SocketPack.PACK_HEAD_SPLIT_SIZE];
-                    Array.Copy(m_bytes, SocketPack.PACK_HEAD_SPLIT_SIZE, tempBytes, 0, SocketPack.PACK_HEAD_SPLIT_SIZE);
-
-                    // 命令
-                    tempBytes = new byte[SocketPack.PACK_HEAD_SPLIT_SIZE];
-                    Array.Copy(m_bytes, SocketPack.PACK_HEAD_SPLIT_SIZE * 2, tempBytes, 0, SocketPack.PACK_HEAD_SPLIT_SIZE);
-                    m_packCmd = BitConverter.ToInt32(tempBytes, 0);
-
+                    m_header.Read(m_cache);
                     m_isProcessing = true;
                 }
             }
 
             if (m_isProcessing)
             {
-                if (m_bytesCursor >= m_packSize)
+                if (m_cursor >= m_header.packSize)
                 {
                     // copy pack data
-                    byte[] packData = new byte[m_packSize];
-                    Array.Copy(m_bytes, SocketPack.PACK_HEAD_SIZE, packData, 0, m_packSize - SocketPack.PACK_HEAD_SIZE);
-                    
+                    byte[] packData = new byte[m_header.packSize];
+                    Array.Copy(m_cache, SocketPackHeader.HEADER_SIZE, packData, 0, m_header.packSize - SocketPackHeader.HEADER_SIZE);
+
                     // delete rec pack data
-                    m_bytesCursor -= m_packSize;
-                    byte[] newBytes = new byte[m_bytesCursor];
-                    Array.Copy(m_bytes, m_packSize, newBytes, 0, m_bytesCursor);
-                    m_bytes = newBytes;
+                    m_cursor -= m_header.packSize;
+                    byte[] newBytes = new byte[m_cursor];
+                    Array.Copy(m_cache, m_header.packSize, newBytes, 0, m_cursor);
+                    m_cache = newBytes;
 
                     m_isProcessing = false;
 
-                    return SocketPackFactory.CreateReader(m_packCmd, packData);
+                    return SocketPackFactory.CreateReader(m_header.cmd, packData);
                 }
             }
             return null;

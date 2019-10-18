@@ -8,6 +8,7 @@ using UnityEngine;
 using FastEngine.Common;
 using System.Collections.Generic;
 using System;
+using Logger = FastEngine.Common.Logger;
 
 namespace FastEngine
 {
@@ -41,7 +42,7 @@ namespace FastEngine
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
             // 日志
-            Log.Initialize(true);
+            Logger.Initialize(true);
         }
 
         #region Delegate
