@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using FastEngine.Core;
+using FastEngine.Protos;
 
 public class NetworkTest : MonoBehaviour
 {
@@ -29,13 +30,21 @@ public class NetworkTest : MonoBehaviour
 
     void Send()
     {
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < 1; i++)
         {
-            var pack = SocketPackFactory.CreateWriter(1000 + i);
-            for (int k = 0; k < 100; k++)
-            {
-                pack.WriteInt(i);
-            }
+            // stream
+            // var pack = SocketPackFactory.CreateWriter(1000 + i);
+            // for (int k = 0; k < 100; k++)
+            // {
+            //     pack.WriteInt(i);
+            // }
+            // client.Send(pack);
+
+            // protobuf
+            var pack = SocketPackFactory.CreateWriter<C2S_Login>(1000 + i);
+            var message = pack.GetMessage<C2S_Login>();
+            message.Account = 99;
+            message.Password = 88;
             client.Send(pack);
         }
     }
@@ -54,5 +63,7 @@ public class NetworkTest : MonoBehaviour
             isSend = true;
            Send();
         }
+
+        client.Update();
     }
 }

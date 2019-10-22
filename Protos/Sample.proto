@@ -1,0 +1,16 @@
+syntax = "proto3"; //类型 value:proto3/proto2
+package FastEngine.Protos;  // 命名空间
+
+// 消息结构 C2S 客户端发送给服务器
+message C2S_Login
+{
+	int32	Account	 = 1;	// 帐号
+	int32	Password = 2;	// 密码
+}
+
+// 消息结构 S2C 服务器发送给客户端
+message S2C_Login
+{
+	int32	Account	 = 1;	// 帐号
+	int32	Password = 2;	// 密码
+}

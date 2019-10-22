@@ -10,6 +10,9 @@ using System.Net.Sockets;
 using System.Threading;
 using UnityEngine;
 using FastEngine.Common;
+using Google.Protobuf;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace FastEngine.Core
 {
@@ -92,6 +95,16 @@ namespace FastEngine.Core
         /// 接收数据池大小
         /// </summary>
         private readonly static int ReceiveCacheSize = 4096;
+
+        /// <summary>
+        /// 最大发送数据大小
+        /// </summary>
+        private readonly static int SendMaxSize = 15360;
+
+        /// <summary>
+        /// 发送间隔时间
+        /// </summary>
+        private readonly static float SendIntervalTime = 0.2f;
         #endregion
 
         // socket
@@ -110,11 +123,21 @@ namespace FastEngine.Core
         private SocketReceiver m_receiver;
         // 接收的数据包
         private SocketPack m_recPack;
+        // 双队列接收处理机制
+        private DoubleQueue<SocketPack> m_recDQueue;
         #endregion
 
         #region send
         // 发送包头
         public SocketPackHeader m_sendPackHeader;
+        // 发送队列
+        private Queue<byte[]> m_sendQueue;
+        // 发送缓存池
+        private ByteCache m_sendCache;
+        // 发送数据大小
+        private int m_sendSize;
+        // 发送开始时间
+        private float m_sendStartTime;
         #endregion
 
         public string ip { get; private set; }
@@ -135,8 +158,18 @@ namespace FastEngine.Core
             this.m_recCache = new byte[ReceiveCacheSize];
             this.m_receiver = new SocketReceiver();
             this.m_sendPackHeader = new SocketPackHeader();
+            this.m_recDQueue = new DoubleQueue<SocketPack>(128);
+            this.m_sendQueue = new Queue<byte[]>();
+            this.m_sendCache = new ByteCache();
 
             InitializeLogUser("SocketClient", true);
+        }
+
+        public void Update()
+        {
+            if (!isConnected) return;
+            ProcessReceive();
+            ProcessSend();
         }
 
         public void Connect()
@@ -158,7 +191,8 @@ namespace FastEngine.Core
 
                 // 创建 Socket
                 m_clientSocket = new Socket(newAddressFamily, SocketType.Stream, ProtocolType.Tcp);
-
+                m_clientSocket.NoDelay = true;
+                
                 // 异步连接
                 IAsyncResult result = m_clientSocket.BeginConnect(ipEndpoint, new AsyncCallback(OnConnetSucceed), m_clientSocket);
 
@@ -209,8 +243,12 @@ namespace FastEngine.Core
                 return;
             }
 
-            var data = m_sendPackHeader.Write(pack.cmd, pack.data);
-            m_clientSocket.BeginSend(data, 0, data.Length, SocketFlags.None, new AsyncCallback(OnSend), m_clientSocket);
+            this.m_sendQueue.Enqueue(m_sendPackHeader.Write(pack.cmd, pack.data));
+        }
+
+        public void Send(int cmd, IMessage message)
+        {
+            Send(new SocketPack(cmd, message));
         }
 
         private void OnSend(IAsyncResult iar)
@@ -224,6 +262,40 @@ namespace FastEngine.Core
             catch (Exception e)
             {
                 LogError("socket send to server exception." + e.ToString());
+                Exception(SocketException.Send, e);
+            }
+        }
+
+        private void ProcessSend()
+        {
+            try
+            {
+                if (Time.time - m_sendStartTime < SendIntervalTime) return;
+
+                m_sendCache.Clear();
+                m_sendSize = 0;
+                for (; m_sendQueue.Count > 0;)
+                {
+                    byte[] data = m_sendQueue.Peek();
+                    if ((m_sendSize > 0 && data.Length + m_sendSize > SendMaxSize) || data == null) break;
+                    m_sendSize += data.Length;
+                    m_sendCache.Write(data, data.Length);
+                    m_sendQueue.Dequeue();
+                }
+                if (m_sendCache.size > 0)
+                {
+                    bool succeed = false;
+                    byte[] data = m_sendCache.Read(m_sendCache.size, ref succeed);
+                    if (succeed)
+                    {
+                        m_sendStartTime = Time.time;
+                        m_clientSocket.BeginSend(data, 0, data.Length, SocketFlags.DontRoute, new AsyncCallback(OnSend), m_clientSocket);
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                LogError("socket process send exception. " + e.ToString());
                 Exception(SocketException.Send, e);
             }
         }
@@ -250,11 +322,7 @@ namespace FastEngine.Core
                         while ((m_recPack = m_receiver.TryGetPack()) != null)
                         {
                             Log("socket receive data. cmd: " + m_recPack.cmd + " size: " + m_recPack.dataSize);
-                            // 添加到数据处理队列
-                            // lock ()
-                            // {
-                            //    receiveEventCallback.InvokeGracefully();
-                            // }
+                            this.m_recDQueue.Enqueue(m_recPack);
                         }
                     }
                 }
@@ -267,6 +335,18 @@ namespace FastEngine.Core
                     }
                     break;
                 }
+            }
+        }
+
+        private void ProcessReceive()
+        {
+            m_recDQueue.Swap();
+
+            while (!m_recDQueue.IsEmpty())
+            {
+                var pack = m_recDQueue.Dequeue();
+                Log("broadcast cmd: " + pack.cmd);
+                BroadcastReceived(pack);
             }
         }
 
@@ -295,7 +375,7 @@ namespace FastEngine.Core
 
             if (m_clientSocket != null && m_clientSocket.Connected)
             {
-                m_clientSocket.Disconnect(false);
+                m_clientSocket.Shutdown(SocketShutdown.Both);
                 m_clientSocket.Close();
             }
             m_clientSocket = null;

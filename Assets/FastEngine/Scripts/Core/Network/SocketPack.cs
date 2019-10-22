@@ -9,9 +9,19 @@ using System.IO;
 using System.Text;
 using FastEngine.Common;
 using UnityEngine;
+using Google.Protobuf;
 
 namespace FastEngine.Core
 {
+    /// <summary>
+    /// socket pack type
+    /// </summary>
+    public enum SocketPackType
+    {
+        Stream,
+        Protobuf,
+    }
+
     public class SocketPack
     {
         // 协议号
@@ -23,10 +33,16 @@ namespace FastEngine.Core
         {
             get
             {
-                if (m_data == null && m_writer != null)
+                // stream
+                if (m_data == null && m_writer != null && packType == SocketPackType.Stream)
                 {
                     m_stream.Flush();
                     m_data = m_stream.ToArray();
+                }
+                // protobuf 
+                else if (m_data == null && m_message != null && packType == SocketPackType.Protobuf)
+                {
+                    m_data = m_message.ToByteArray();
                 }
                 return m_data;
             }
@@ -35,9 +51,21 @@ namespace FastEngine.Core
         // 数据长度
         public int dataSize { get { return data.Length; } }
 
+        // socket pack type
+        public SocketPackType packType { get; private set; }
+
         private MemoryStream m_stream;
         private BinaryWriter m_writer;
         private BinaryReader m_reader;
+
+        // pro
+        private IMessage m_message;
+        public T GetMessage<T>() where T : class, IMessage
+        {
+            if (m_message != null)
+                return m_message as T;
+            return null;
+        }
 
         /// <summary>
         /// 协议包
@@ -46,6 +74,7 @@ namespace FastEngine.Core
         public SocketPack(int cmd)
         {
             this.cmd = cmd;
+            this.packType = SocketPackType.Stream;
             m_stream = new MemoryStream();
             m_writer = new BinaryWriter(m_stream);
         }
@@ -58,8 +87,20 @@ namespace FastEngine.Core
         {
             this.cmd = cmd;
             this.m_data = data;
+            this.packType = SocketPackType.Stream;
             m_stream = new MemoryStream(data);
             m_reader = new BinaryReader(m_stream);
+        }
+
+        /// <summary>
+        /// 协议包
+        /// </summary>
+        /// <param name="message">protobuf message</param>
+        public SocketPack(int cmd, IMessage message)
+        {
+            this.cmd = cmd;
+            this.m_message = message;
+            this.packType = SocketPackType.Protobuf;
         }
 
         /// <summary>

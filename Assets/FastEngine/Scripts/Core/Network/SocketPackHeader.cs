@@ -13,9 +13,9 @@ namespace FastEngine.Core
     {
         #region config
         /// <summary>
-        /// 包头总大小[协议长度(4个字节)][协议头(4个字节)][协议号(4个字节)]
+        /// 包头总大小[协议长度(4个字节)][协议头(4个字节)][协议号(4个字节)][SessionId(4个字节)]
         /// </summary>
-        public readonly static int HEADER_SIZE = 12;
+        public readonly static int HEADER_SIZE = 16;
 
         /// <summary>
         /// 包头分割大小
@@ -23,11 +23,12 @@ namespace FastEngine.Core
         public readonly static int SPLIT_SIZE = 4;
         #endregion
 
-
         // 包长度
         public int packSize { get; private set; }
         // 命令
         public int cmd { get; private set; }
+        // sessionId
+        public int sessionId { get; private set; }
         // 预留字节
         public byte[] reserved { get; private set; }
 
@@ -47,6 +48,7 @@ namespace FastEngine.Core
             packSize = m_reader.ReadInt32();
             reserved = m_reader.ReadBytes(4);
             cmd = m_reader.ReadInt32();
+            sessionId = m_reader.ReadInt32();
 
             m_stream.Flush();
             m_stream.Close();
@@ -70,13 +72,19 @@ namespace FastEngine.Core
             // 包长度(总长度不包含前4个字节)
             m_writer.Write(this.packSize - SPLIT_SIZE);
 
+            // 预留头
             m_writer.Write('F');
             m_writer.Write('A');
             m_writer.Write('S');
             m_writer.Write('T');
 
+            // 命令id
             m_writer.Write(this.cmd);
 
+            // sessionId
+            m_writer.Write(this.sessionId);
+            
+            // data
             m_writer.Write(data);
 
             m_stream.Flush();
