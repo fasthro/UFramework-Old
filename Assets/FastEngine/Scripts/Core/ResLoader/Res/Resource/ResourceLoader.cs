@@ -4,8 +4,6 @@
  * @Description: Resources 资源加载器
  */
 
-using FastEngine.Common;
-
 namespace FastEngine.Core
 {
     public class ResourceLoader : ResLoader, IPoolObject

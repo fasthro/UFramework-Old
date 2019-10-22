@@ -7,8 +7,6 @@
 using System;
 using System.IO;
 using System.Text;
-using FastEngine.Common;
-using UnityEngine;
 using Google.Protobuf;
 
 namespace FastEngine.Core

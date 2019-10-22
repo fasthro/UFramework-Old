@@ -1,7 +1,4 @@
 using System;
-using System.IO;
-using FastEngine.Common;
-using UnityEngine;
 
 /*
  * @Author: fasthro

@@ -1,15 +1,15 @@
 /*
  * @Author: fasthro
  * @Date: 2019-06-19 17:39:24
- * @Description: Singleton
+ * @Description: 
  */
 
-namespace FastEngine.Common
+namespace FastEngine
 {
-    public abstract class Singleton<T> : ISingleton where T : Singleton<T>
+    public static class SingletonProperty<T> where T : class, ISingleton
     {
-        protected static T m_instance;
-        private static object m_lock = new object();
+        private static T m_instance;
+        private static readonly object m_lock = new object();
 
         public static T Instance
         {
@@ -24,13 +24,9 @@ namespace FastEngine.Common
             }
         }
 
-        protected Singleton() { }
-
-        public virtual void Dispose()
+        public static void Dispose()
         {
             m_instance = null;
         }
-
-        public virtual void OnSingletonInit() { }
     }
 }

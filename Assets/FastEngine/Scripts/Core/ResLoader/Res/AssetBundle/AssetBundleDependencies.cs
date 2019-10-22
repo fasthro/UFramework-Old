@@ -3,12 +3,12 @@
  * @Date: 2019-06-27 17:33:16
  * @Description: AssetBundle 资源依赖
  */
-using FastEngine.Common;
+ 
 using UnityEngine;
 
 namespace FastEngine.Core
 {
-    public class AssetBundleDependencies : FastEngine.Common.Singleton<AssetBundleDependencies>
+    public class AssetBundleDependencies : Singleton<AssetBundleDependencies>
     {
         private AssetBundle m_bundle;
         private AssetBundleManifest m_manifest;

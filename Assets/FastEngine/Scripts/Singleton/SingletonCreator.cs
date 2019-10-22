@@ -7,7 +7,7 @@
 using System;
 using System.Reflection;
 
-namespace FastEngine.Common
+namespace FastEngine
 {
     public static class SingletonCreator
     {

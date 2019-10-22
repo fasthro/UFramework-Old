@@ -6,7 +6,7 @@
 
 using System;
 
-namespace FastEngine.Common
+namespace FastEngine
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class MonoSingletonPath : Attribute

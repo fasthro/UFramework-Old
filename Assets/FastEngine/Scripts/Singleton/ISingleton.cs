@@ -4,7 +4,7 @@
  * @Description: ISingleton
  */
 
-namespace FastEngine.Common
+namespace FastEngine
 {    
     public interface ISingleton
     {        

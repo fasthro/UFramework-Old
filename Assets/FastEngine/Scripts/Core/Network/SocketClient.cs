@@ -9,9 +9,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using UnityEngine;
-using FastEngine.Common;
 using Google.Protobuf;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace FastEngine.Core
@@ -321,7 +319,6 @@ namespace FastEngine.Core
                         // 尝试在向接受者获取Pack
                         while ((m_recPack = m_receiver.TryGetPack()) != null)
                         {
-                            Log("socket receive data. cmd: " + m_recPack.cmd + " size: " + m_recPack.dataSize);
                             this.m_recDQueue.Enqueue(m_recPack);
                         }
                     }

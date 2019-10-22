@@ -5,7 +5,7 @@
  */
 using UnityEngine;
 
-namespace FastEngine.Common
+namespace FastEngine.Core
 {
     public class LogInfo
     {

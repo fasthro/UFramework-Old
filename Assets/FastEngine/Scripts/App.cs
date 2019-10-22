@@ -5,10 +5,9 @@
  */
 
 using UnityEngine;
-using FastEngine.Common;
 using System.Collections.Generic;
 using System;
-using Logger = FastEngine.Common.Logger;
+using Logger = FastEngine.Core.Logger;
 
 namespace FastEngine
 {

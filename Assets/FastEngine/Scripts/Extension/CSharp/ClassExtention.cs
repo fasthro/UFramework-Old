@@ -3,7 +3,7 @@
  * @Date: 2019-08-03 15:04:42
  * @Description: Class Extention
  */
-namespace FastEngine.Common
+namespace FastEngine
 {
     public static class ClassExtention
     {

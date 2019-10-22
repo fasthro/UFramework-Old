@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace FastEngine.Common
+namespace FastEngine
 {
     public static class IEnumerableExtension
     {

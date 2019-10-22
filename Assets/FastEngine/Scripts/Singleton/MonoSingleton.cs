@@ -5,7 +5,7 @@
  */
 using UnityEngine;
 
-namespace FastEngine.Common
+namespace FastEngine
 {
     public abstract class MonoSingleton<T> : MonoBehaviour, ISingleton where T : MonoSingleton<T>
     {

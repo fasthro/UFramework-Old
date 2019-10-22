@@ -5,7 +5,7 @@
  */
 using System;
 
-namespace FastEngine.Common
+namespace FastEngine
 {
     public static class EventExtension
     {

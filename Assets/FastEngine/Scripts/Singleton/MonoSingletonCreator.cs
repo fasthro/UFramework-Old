@@ -7,7 +7,7 @@
 using System.Reflection;
 using UnityEngine;
 
-namespace FastEngine.Common
+namespace FastEngine
 {
     public static class MonoSingletonCreator
     {

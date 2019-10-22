@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace FastEngine.Common
+namespace FastEngine
 {
     public static class IOExtension
     {
