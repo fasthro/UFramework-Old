@@ -14,23 +14,22 @@ namespace FastEngine.Core
         private SocketClient m_client;
         private bool m_isConnected { get { return m_client != null && m_client.isConnected; } }
 
-        /// <summary>
-        /// 初始化
-        /// </summary>
-        /// <param name="ip"></param>
-        /// <param name="port"></param>
-        /// <param name="enabledLog"></param>
-        public void Initialize(string ip, int port, bool enabledLog = false)
-        {
-            m_client = new SocketClient(ip, port, OnSocketEventCallback, enabledLog);
-        }
-
         void Update()
         {
             if (m_client != null) m_client.Update();
         }
 
         #region internal api
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="ip"></param>
+        /// <param name="port"></param>
+        /// <param name="enabledLog"></param>
+        private void InternalInitialize(string ip, int port, bool enabledLog = false)
+        {
+            m_client = new SocketClient(ip, port, OnSocketEventCallback, enabledLog);
+        }
 
         private void InternalConnecte()
         {
@@ -60,11 +59,19 @@ namespace FastEngine.Core
         /// <param name="args"></param>
         private void OnSocketEventCallback(SocketEventArgs args)
         {
-
+            switch (args.socketState)
+            {
+                case SocketState.Received:
+                    TCPSessionService.Broadcast(args.socketPack);
+                    break;
+                default:
+                    break;
+            }
         }
 
         #region API
         public static bool isConnected { get { return Instance.m_isConnected; } }
+        public static void Initialize(string ip, int port, bool enabledLog = false) { Instance.InternalInitialize(ip, port, enabledLog); }
         public static void Connecte() { Instance.InternalConnecte(); }
         public static void Disconnecte() { Instance.InternalDisconnecte(); }
         public static void Send(int cmd) { Instance.InternalSend(SocketPackFactory.CreateWriter(cmd)); }

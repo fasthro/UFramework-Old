@@ -23,6 +23,10 @@ namespace FastEngine.Core
         public readonly static int SPLIT_SIZE = 4;
         #endregion
 
+        // 发送的 sessionId
+        static int sendSessionId = 0;
+        public static int SendSessionId { get { return ++sendSessionId; } }
+
         // 包长度
         public int packSize { get; private set; }
         // 命令
@@ -49,7 +53,7 @@ namespace FastEngine.Core
             reserved = m_reader.ReadBytes(4);
             cmd = m_reader.ReadInt32();
             sessionId = m_reader.ReadInt32();
-
+            
             m_stream.Flush();
             m_stream.Close();
             m_reader.Close();
@@ -73,17 +77,17 @@ namespace FastEngine.Core
             m_writer.Write(this.packSize - SPLIT_SIZE);
 
             // 预留头
-            m_writer.Write('F');
-            m_writer.Write('A');
+            m_writer.Write('N');
+            m_writer.Write('B');
             m_writer.Write('S');
-            m_writer.Write('T');
+            m_writer.Write('G');
 
             // 命令id
             m_writer.Write(this.cmd);
 
             // sessionId
-            m_writer.Write(this.sessionId);
-            
+            m_writer.Write(SendSessionId);
+
             // data
             m_writer.Write(data);
 
@@ -91,7 +95,7 @@ namespace FastEngine.Core
             var nbs = m_stream.ToArray();
             m_stream.Close();
             m_writer.Close();
-            
+
             return nbs;
         }
     }

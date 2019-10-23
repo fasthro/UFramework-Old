@@ -45,11 +45,18 @@ namespace FastEngine
             Logger.Initialize(true);
 
             // 网络TCP
-            TCPSession.Instance.Initialize("192.168.1.41", 8080, true);
+            // TCPSession.Initialize("192.168.1.41", 8080, true);
+            TCPSession.Initialize("192.168.1.47", 8083, true);
 
             // 资源
 
             // Lua
+        }
+
+        public void AppQuit()
+        {
+            // 网络TCP
+            TCPSession.Disconnecte();
         }
 
         #region Delegate
@@ -108,7 +115,11 @@ namespace FastEngine
         #endregion
 
         #region 生命周期
-        void OnApplicationQuit() { BroadcastCallback(APP_BEHAVIOUR.AppQuit); }
+        void OnApplicationQuit()
+        {
+            AppQuit();
+            BroadcastCallback(APP_BEHAVIOUR.AppQuit);
+        }
         void OnApplicationPause(bool pause) { BroadcastCallback<bool>(APP_BEHAVIOUR.AppPause, pause); }
         void OnApplicationFocus(bool focus) { BroadcastCallback<bool>(APP_BEHAVIOUR.AppFocus, focus); }
         void Update() { BroadcastCallback(APP_BEHAVIOUR.Update); }

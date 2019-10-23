@@ -78,11 +78,12 @@ namespace FastEngine.Core
                 if (m_cursor >= m_header.packSize)
                 {
                     // copy pack data
-                    byte[] packData = new byte[m_header.packSize];
-                    Array.Copy(m_cache, SocketPackHeader.HEADER_SIZE, packData, 0, m_header.packSize - SocketPackHeader.HEADER_SIZE);
+                    var dataSize = m_header.packSize - SocketPackHeader.HEADER_SIZE + SocketPackHeader.SPLIT_SIZE;
+                    byte[] packData = new byte[dataSize];
+                    Array.Copy(m_cache, SocketPackHeader.HEADER_SIZE, packData, 0, dataSize);
 
                     // delete rec pack data
-                    m_cursor -= m_header.packSize;
+                    m_cursor -= (dataSize + SocketPackHeader.HEADER_SIZE);
                     byte[] newBytes = new byte[m_cursor];
                     Array.Copy(m_cache, m_header.packSize, newBytes, 0, m_cursor);
                     m_cache = newBytes;

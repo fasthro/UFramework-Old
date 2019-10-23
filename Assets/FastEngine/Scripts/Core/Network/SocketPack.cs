@@ -17,11 +17,16 @@ namespace FastEngine.Core
     public enum SocketPackType
     {
         Stream,
-        Protobuf,
+        Proto,
     }
 
     public class SocketPack
     {
+        /// <summary>
+        /// 使用 Proto
+        /// </summary>
+        public readonly static bool UseProto = true;
+
         // 协议号
         public int cmd { get; private set; }
 
@@ -31,16 +36,19 @@ namespace FastEngine.Core
         {
             get
             {
-                // stream
-                if (m_data == null && m_writer != null && packType == SocketPackType.Stream)
+                if (!m_isReadPack)
                 {
-                    m_stream.Flush();
-                    m_data = m_stream.ToArray();
-                }
-                // protobuf 
-                else if (m_data == null && m_message != null && packType == SocketPackType.Protobuf)
-                {
-                    m_data = m_message.ToByteArray();
+                    // stream
+                    if (m_data == null && m_writer != null && packType == SocketPackType.Stream)
+                    {
+                        m_stream.Flush();
+                        m_data = m_stream.ToArray();
+                    }
+                    // protobuf 
+                    else if (m_data == null && m_message != null && packType == SocketPackType.Proto)
+                    {
+                        m_data = m_message.ToByteArray();
+                    }
                 }
                 return m_data;
             }
@@ -51,6 +59,8 @@ namespace FastEngine.Core
 
         // socket pack type
         public SocketPackType packType { get; private set; }
+        // 操作类型(true-读取/false-写入)
+        private bool m_isReadPack;
 
         private MemoryStream m_stream;
         private BinaryWriter m_writer;
@@ -58,47 +68,58 @@ namespace FastEngine.Core
 
         // pro
         private IMessage m_message;
-        public T GetMessage<T>() where T : class, IMessage
+        public T GetMessage<T>() where T : class, IMessage, new()
         {
-            if (m_message != null)
-                return m_message as T;
+            if (m_isReadPack)
+            {
+                m_message = new T();
+                m_message.MergeFrom(data);
+                
+            }
+            if (m_message != null) return m_message as T;
             return null;
         }
 
         /// <summary>
-        /// 协议包
+        /// 写入协议包
         /// </summary>
         /// <param name="data"></param>
         public SocketPack(int cmd)
         {
             this.cmd = cmd;
             this.packType = SocketPackType.Stream;
+            this.m_isReadPack = false;
             m_stream = new MemoryStream();
             m_writer = new BinaryWriter(m_stream);
         }
 
         /// <summary>
-        /// 协议包
-        /// </summary>
-        /// <param name="data"></param>
-        public SocketPack(int cmd, byte[] data)
-        {
-            this.cmd = cmd;
-            this.m_data = data;
-            this.packType = SocketPackType.Stream;
-            m_stream = new MemoryStream(data);
-            m_reader = new BinaryReader(m_stream);
-        }
-
-        /// <summary>
-        /// 协议包
+        /// Proto 写入协议包
         /// </summary>
         /// <param name="message">protobuf message</param>
         public SocketPack(int cmd, IMessage message)
         {
             this.cmd = cmd;
             this.m_message = message;
-            this.packType = SocketPackType.Protobuf;
+            this.packType = SocketPackType.Proto;
+            this.m_isReadPack = false;
+        }
+
+        /// <summary>
+        /// 读取协议包
+        /// </summary>
+        /// <param name="data"></param>
+        public SocketPack(int cmd, byte[] data)
+        {
+            this.cmd = cmd;
+            this.m_data = data;
+            this.packType = UseProto ? SocketPackType.Proto : SocketPackType.Stream;
+            this.m_isReadPack = true;
+            if (!UseProto)
+            {
+                m_stream = new MemoryStream(data);
+                m_reader = new BinaryReader(m_stream);
+            }
         }
 
         /// <summary>

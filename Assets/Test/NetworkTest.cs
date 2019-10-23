@@ -9,6 +9,11 @@ public class NetworkTest : MonoBehaviour
 {
     void Start()
     {
+        TCPSessionService.AddListener(30000, (pack) =>
+        {
+            var msg = pack.GetMessage<S2C_Login>();
+        });
+
         TCPSession.Connecte();
     }
 
@@ -21,7 +26,11 @@ public class NetworkTest : MonoBehaviour
         if (t <= 0 && TCPSession.isConnected)
         {
             t = 0.1f;
-            TCPSession.Send(cmd);
+            var pack = SocketPackFactory.CreateWriter<C2S_Login>(30000);
+            var msg = pack.GetMessage<C2S_Login>();
+            msg.Account = 123;
+            msg.Password = 987;
+            TCPSession.Send(pack);
             cmd++;
         }
     }
