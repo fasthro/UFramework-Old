@@ -35,7 +35,9 @@ namespace FastEngine.Core
         Timeout,
         Connect,
         Receive,
+        ProcessReceive,
         Send,
+        ProcessSend,
         Exception,
     }
 
@@ -105,6 +107,15 @@ namespace FastEngine.Core
         private readonly static float SendIntervalTime = 0.2f;
         #endregion
 
+        /// <summary>
+        /// socket async object
+        /// </summary>
+        class AsyncObject
+        {
+            public Socket socket { get; set; }
+            public List<int> cmds = new List<int>();
+        }
+
         // socket
         private Socket m_clientSocket;
 
@@ -130,8 +141,12 @@ namespace FastEngine.Core
         public SocketPackHeader m_sendPackHeader;
         // 发送队列
         private Queue<byte[]> m_sendQueue;
+        // 发送命令队列
+        private Queue<int> m_sendCmdQueue;
         // 发送缓存池
         private ByteCache m_sendCache;
+        // 发送命令数组
+        private AsyncObject m_sendAsyncObj;
         // 发送数据大小
         private int m_sendSize;
         // 发送开始时间
@@ -148,7 +163,8 @@ namespace FastEngine.Core
         /// <param name="ip"></param>
         /// <param name="port"></param>
         /// <param name="callback"></param>
-        public SocketClient(string ip, int port, SocketEventCallback callback)
+        /// <param name="enabledLog"></param>
+        public SocketClient(string ip, int port, SocketEventCallback callback, bool enabledLog = false)
         {
             this.ip = ip;
             this.port = port;
@@ -158,9 +174,11 @@ namespace FastEngine.Core
             this.m_sendPackHeader = new SocketPackHeader();
             this.m_recDQueue = new DoubleQueue<SocketPack>(128);
             this.m_sendQueue = new Queue<byte[]>();
+            this.m_sendCmdQueue = new Queue<int>();
             this.m_sendCache = new ByteCache();
+            this.m_sendAsyncObj = new AsyncObject();
 
-            InitializeLogUser("SocketClient", true);
+            InitializeLogUser("SocketClient", enabledLog);
         }
 
         public void Update()
@@ -190,7 +208,9 @@ namespace FastEngine.Core
                 // 创建 Socket
                 m_clientSocket = new Socket(newAddressFamily, SocketType.Stream, ProtocolType.Tcp);
                 m_clientSocket.NoDelay = true;
-                
+
+                m_sendAsyncObj.socket = m_clientSocket;
+
                 // 异步连接
                 IAsyncResult result = m_clientSocket.BeginConnect(ipEndpoint, new AsyncCallback(OnConnetSucceed), m_clientSocket);
 
@@ -203,7 +223,6 @@ namespace FastEngine.Core
             }
             catch (System.Exception e)
             {
-                LogError("socket connect to server exception. " + e.ToString());
                 Exception(SocketException.Connect, e);
             }
         }
@@ -241,6 +260,7 @@ namespace FastEngine.Core
                 return;
             }
 
+            this.m_sendCmdQueue.Enqueue(pack.cmd);
             this.m_sendQueue.Enqueue(m_sendPackHeader.Write(pack.cmd, pack.data));
         }
 
@@ -253,13 +273,17 @@ namespace FastEngine.Core
         {
             try
             {
-                Log("socket send to server succeed.");
-                ((Socket)iar.AsyncState).EndSend(iar);
-                BroadcastSend(0);
+                var obj = ((AsyncObject)iar.AsyncState);
+                obj.socket.EndSend(iar);
+                for (int i = 0; i < obj.cmds.Count; i++)
+                {
+                    var cmd = obj.cmds[i];
+                    Log("socket send to server succeed. cmd: " + cmd);
+                    BroadcastSend(cmd);
+                }
             }
             catch (Exception e)
             {
-                LogError("socket send to server exception." + e.ToString());
                 Exception(SocketException.Send, e);
             }
         }
@@ -271,6 +295,7 @@ namespace FastEngine.Core
                 if (Time.time - m_sendStartTime < SendIntervalTime) return;
 
                 m_sendCache.Clear();
+                m_sendAsyncObj.cmds.Clear();
                 m_sendSize = 0;
                 for (; m_sendQueue.Count > 0;)
                 {
@@ -279,6 +304,7 @@ namespace FastEngine.Core
                     m_sendSize += data.Length;
                     m_sendCache.Write(data, data.Length);
                     m_sendQueue.Dequeue();
+                    m_sendAsyncObj.cmds.Add(m_sendCmdQueue.Dequeue());
                 }
                 if (m_sendCache.size > 0)
                 {
@@ -287,14 +313,13 @@ namespace FastEngine.Core
                     if (succeed)
                     {
                         m_sendStartTime = Time.time;
-                        m_clientSocket.BeginSend(data, 0, data.Length, SocketFlags.DontRoute, new AsyncCallback(OnSend), m_clientSocket);
+                        m_clientSocket.BeginSend(data, 0, data.Length, SocketFlags.DontRoute, new AsyncCallback(OnSend), m_sendAsyncObj);
                     }
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                LogError("socket process send exception. " + e.ToString());
-                Exception(SocketException.Send, e);
+                Exception(SocketException.ProcessSend, e);
             }
         }
 
@@ -327,7 +352,6 @@ namespace FastEngine.Core
                 {
                     if (isConnected)
                     {
-                        LogError("socket receive form server exception." + e.ToString());
                         Exception(SocketException.Receive, e);
                     }
                     break;
@@ -342,13 +366,14 @@ namespace FastEngine.Core
             while (!m_recDQueue.IsEmpty())
             {
                 var pack = m_recDQueue.Dequeue();
-                Log("broadcast cmd: " + pack.cmd);
+                Log("broadcast receive cmd: " + pack.cmd);
                 BroadcastReceived(pack);
             }
         }
 
         private void Exception(SocketException exception, Exception e = null)
         {
+            LogError("socket exception: [" + exception.ToString() + "] error: " + e.ToString());
             OnDisconnected();
             BroadcastException(exception, e.ToString());
         }

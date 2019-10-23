@@ -7,6 +7,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using FastEngine.Core;
 using Logger = FastEngine.Core.Logger;
 
 namespace FastEngine
@@ -42,6 +43,13 @@ namespace FastEngine
 
             // 日志
             Logger.Initialize(true);
+
+            // 网络TCP
+            TCPSession.Instance.Initialize("192.168.1.41", 8080, true);
+
+            // 资源
+
+            // Lua
         }
 
         #region Delegate
