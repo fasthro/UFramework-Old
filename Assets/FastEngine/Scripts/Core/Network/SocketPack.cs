@@ -74,7 +74,7 @@ namespace FastEngine.Core
             {
                 m_message = new T();
                 m_message.MergeFrom(data);
-                
+
             }
             if (m_message != null) return m_message as T;
             return null;
@@ -137,6 +137,14 @@ namespace FastEngine.Core
             m_reader = null;
 
             this.m_data = null;
+        }
+
+        /// <summary>
+        /// send to server
+        /// </summary>
+        public void Send()
+        {
+            if (m_isReadPack) TCPSession.Send(this);
         }
 
         /// <summary>

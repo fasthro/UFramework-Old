@@ -36,6 +36,17 @@ namespace FastEngine.Core
         /// 移除
         /// </summary>
         /// <param name="cmd"></param>
+        public static void RemoveListener(int cmd)
+        {
+            if (m_eventDic.ContainsKey(cmd))
+                m_eventDic[cmd] = null;
+        }
+
+
+        /// <summary>
+        /// 移除
+        /// </summary>
+        /// <param name="cmd"></param>
         /// <param name="callback"></param>
         public static void RemoveListener(int cmd, TCPSessionServiceEventCallabck callback)
         {
@@ -56,16 +67,6 @@ namespace FastEngine.Core
                 var callback = dc as TCPSessionServiceEventCallabck;
                 if (callback != null) callback.InvokeGracefully(pack);
             }
-        }
-
-        /// <summary>
-        /// 清理
-        /// </summary>
-        /// <param name="cmd"></param>
-        public static void Clear(int cmd)
-        {
-            if (m_eventDic.ContainsKey(cmd))
-                m_eventDic.Remove(cmd);
         }
 
         /// <summary>

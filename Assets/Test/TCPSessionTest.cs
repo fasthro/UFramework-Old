@@ -5,7 +5,7 @@ using UnityEngine;
 using FastEngine.Core;
 using FastEngine.Protos;
 
-public class NetworkTest : MonoBehaviour
+public class TCPSessionTest : MonoBehaviour
 {
     void Start()
     {
