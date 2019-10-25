@@ -31,6 +31,7 @@ namespace FastEngine
         OnDrawGizmos,
     }
 
+    [MonoSingletonPath("FastEngine/App")]
     public class App : MonoSingleton<App>
     {
         /// <summary>
@@ -43,24 +44,20 @@ namespace FastEngine
             Application.targetFrameRate = 60;
             QualitySettings.vSyncCount = 2;
 
-            // dotween
-            DOTween.Init(true, true, LogBehaviour.Default);
             // 设置屏幕分辨率
             Screen.SetResolution(2048, 1152, false);
             GRoot.inst.SetContentScaleFactor(2048, 1152, UIContentScaler.ScreenMatchMode.MatchWidthOrHeight);
-            // 日志
-            Logger.Initialize(true);
-            // 网络TCP
-            // TCPSession.Initialize("192.168.1.41", 8080, true);
-            TCPSession.Initialize("192.168.1.47", 8083, true);
-            // 资源
-            // Lua
+           
+            DOTween.Init(true, true, LogBehaviour.Default);        // DOTween
+            Logger.Initialize(true);                               // 日志
+            TCPSession.Initialize("192.168.1.41", 8080, true);     // 网络TCP
+            Lua.Initialize();                                      // Lua
         }
 
         public void AppQuit()
         {
-            // 网络TCP
-            TCPSession.Disconnecte();
+            TCPSession.Disconnecte();      // 网络TCP
+            Lua.Close();                   // Lua
         }
 
         #region Delegate

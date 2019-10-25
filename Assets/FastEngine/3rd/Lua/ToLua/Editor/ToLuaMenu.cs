@@ -74,7 +74,6 @@ public static class ToLuaMenu
         typeof(System.Array),                        
         typeof(System.Reflection.MemberInfo),    
         typeof(System.Reflection.BindingFlags),
-        typeof(LuaClient),
         typeof(LuaInterface.LuaFunction),
         typeof(LuaInterface.LuaTable),
         typeof(LuaInterface.LuaThread),

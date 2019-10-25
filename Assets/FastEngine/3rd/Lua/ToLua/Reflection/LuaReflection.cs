@@ -104,10 +104,10 @@ namespace LuaInterface
                 LuaState state = LuaState.Get(L);
                 state.BeginModule(null);
                 state.BeginModule("LuaInterface");
-                LuaInterface_LuaMethodWrap.Register(state);
-                LuaInterface_LuaPropertyWrap.Register(state);
-                LuaInterface_LuaFieldWrap.Register(state);
-                LuaInterface_LuaConstructorWrap.Register(state);                
+                // LuaInterface_LuaMethodWrap.Register(state);
+                // LuaInterface_LuaPropertyWrap.Register(state);
+                // LuaInterface_LuaFieldWrap.Register(state);
+                // LuaInterface_LuaConstructorWrap.Register(state);                
                 state.EndModule();
                 state.EndModule();
                 return 0;

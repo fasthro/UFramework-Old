@@ -6,7 +6,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using FastEngine.Core;
-using FastEngine.Protos;
+// using FastEngine.Protos;
 using UnityEngine;
 
 namespace FastEngine.Example

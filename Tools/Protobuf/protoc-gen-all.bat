@@ -1,3 +1,3 @@
-call protoc-gen-csharp.bat ../../Protos ../../Assets/Scripts/Protos
-call protoc-gen-lua.bat ../../Protos ../../Assets/Scripts/Lua/Protos
+call protoc-gen-csharp.bat ../../Proto ../../Assets/Scripts/Proto
+call protoc-gen-lua.bat ../../Proto ../../Assets/LuaScripts//Proto
 pause

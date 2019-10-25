@@ -268,10 +268,5 @@ namespace LuaInterface
 
             return buffer;
         }
-
-        public static string GetOSDir()
-        {
-            return LuaConst.osDir;
-        }
     }
 }
