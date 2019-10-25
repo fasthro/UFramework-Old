@@ -87,7 +87,6 @@ public class LuaResLoader : LuaFileUtils
             }
 
             sb.Append("\n\tno file './Resources/").Append(fileName).Append(".lua'")
-              .Append("\n\tno file '").Append(LuaConst.luaResDir).Append('/')
 			  .Append(fileName).Append(".lua'");
             sb = sb.Replace("?", fileName);
 
@@ -124,10 +123,10 @@ public class LuaResLoader : LuaFileUtils
 
         string path = fileName;
 
-        if (!Path.IsPathRooted(fileName))
-        {            
-            path = string.Format("{0}/{1}", LuaConst.luaResDir, fileName);            
-        }
+        // if (!Path.IsPathRooted(fileName))
+        // {            
+        //     path = string.Format("{0}/{1}", LuaConst.luaResDir, fileName);            
+        // }
 
         if (File.Exists(path))
         {

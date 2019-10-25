@@ -11,7 +11,13 @@ public static class LuaBinder
 		L.BeginModule(null);
 		LuaInterface_DebuggerWrap.Register(L);
 		L.BeginModule("UnityEngine");
+		UnityEngine_GameObjectWrap.Register(L);
+		UnityEngine_TransformWrap.Register(L);
+		UnityEngine_ComponentWrap.Register(L);
+		UnityEngine_BehaviourWrap.Register(L);
+		UnityEngine_MonoBehaviourWrap.Register(L);
 		UnityEngine_TimeWrap.Register(L);
+		UnityEngine_AssetBundleWrap.Register(L);
 		L.EndModule();
 		L.EndModule();
 		Debugger.Log("Register lua type cost time: {0}", Time.realtimeSinceStartup - t);

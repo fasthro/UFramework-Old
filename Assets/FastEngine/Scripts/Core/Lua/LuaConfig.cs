@@ -21,8 +21,14 @@ namespace FastEngine.Core
         };
 
         /// <summary>
-        /// lua wap 导出目录(包含tolua base type)
+        /// lua wrap 导出目录
         /// </summary>
         public static string luaGenerateDirectory = Application.dataPath + "/Scripts/LuaGenerate/";
+
+        /// <summary>
+        /// lua warp base type 导出目录
+        /// </summary>
+        public static string luaGenerateBaseDirectory = Application.dataPath + "/FastEngine/3rd/Lua/ToLua/BaseType/";
+        
     }
 }
