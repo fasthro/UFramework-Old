@@ -22,7 +22,7 @@ namespace FastEngine
 
             // 通过构造函数，常见实例
             var retInstance = ctor.Invoke(null) as T;
-            retInstance.OnSingletonInit();
+            retInstance.InitializeSingleton();
 
             return retInstance;
         }

@@ -9,13 +9,15 @@ using System.Collections.Generic;
 using System;
 using FastEngine.Core;
 using Logger = FastEngine.Core.Logger;
+using DG.Tweening;
+using FairyGUI;
 
 namespace FastEngine
 {
     public delegate void AppBehaviourCallback();
     public delegate void AppBehaviourCallback<T>(T arg);
 
-    public enum APP_BEHAVIOUR
+    public enum AppBehaviour
     {
         AppQuit,
         AppPause,
@@ -31,8 +33,6 @@ namespace FastEngine
 
     public class App : MonoSingleton<App>
     {
-        void Awake() { AppRun(); }
-
         /// <summary>
         /// 程序启动
         /// </summary>
@@ -40,16 +40,20 @@ namespace FastEngine
         {
             Application.runInBackground = true;
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
+            Application.targetFrameRate = 60;
+            QualitySettings.vSyncCount = 2;
 
+            // dotween
+            DOTween.Init(true, true, LogBehaviour.Default);
+            // 设置屏幕分辨率
+            Screen.SetResolution(2048, 1152, false);
+            GRoot.inst.SetContentScaleFactor(2048, 1152, UIContentScaler.ScreenMatchMode.MatchWidthOrHeight);
             // 日志
             Logger.Initialize(true);
-
             // 网络TCP
             // TCPSession.Initialize("192.168.1.41", 8080, true);
             TCPSession.Initialize("192.168.1.47", 8083, true);
-
             // 资源
-
             // Lua
         }
 
@@ -60,14 +64,14 @@ namespace FastEngine
         }
 
         #region Delegate
-        private Dictionary<APP_BEHAVIOUR, Delegate> m_callbackDic = new Dictionary<APP_BEHAVIOUR, Delegate>();
+        private Dictionary<AppBehaviour, Delegate> m_callbackDic = new Dictionary<AppBehaviour, Delegate>();
 
         /// <summary>
         /// 绑定 Callback
         /// </summary>
         /// <param name="act">callback type</param>
         /// <param name="callback">callback</param>
-        public void BindCallback(APP_BEHAVIOUR act, AppBehaviourCallback callback)
+        public void BindCallback(AppBehaviour act, AppBehaviourCallback callback)
         {
             if (!m_callbackDic.ContainsKey(act))
                 m_callbackDic.Add(act, null);
@@ -81,7 +85,7 @@ namespace FastEngine
         /// <param name="act"></param>
         /// <param name="callback"></param>
         /// <typeparam name="T"></typeparam>
-        public void BindCallback<T>(APP_BEHAVIOUR act, AppBehaviourCallback<T> callback)
+        public void BindCallback<T>(AppBehaviour act, AppBehaviourCallback<T> callback)
         {
             if (!m_callbackDic.ContainsKey(act))
                 m_callbackDic.Add(act, null);
@@ -93,7 +97,7 @@ namespace FastEngine
         /// 广播 Callback
         /// </summary>
         /// <param name="act">callback type</param>
-        protected void BroadcastCallback(APP_BEHAVIOUR act)
+        protected void BroadcastCallback(AppBehaviour act)
         {
             if (m_callbackDic.ContainsKey(act))
                 ((AppBehaviourCallback)m_callbackDic[act]).InvokeGracefully();
@@ -105,7 +109,7 @@ namespace FastEngine
         /// <param name="act"></param>
         /// <param name="arg"></param>
         /// <typeparam name="T"></typeparam>
-        protected void BroadcastCallback<T>(APP_BEHAVIOUR act, T arg)
+        protected void BroadcastCallback<T>(AppBehaviour act, T arg)
         {
             if (m_callbackDic.ContainsKey(act))
                 ((AppBehaviourCallback<T>)m_callbackDic[act]).InvokeGracefully(arg);
@@ -118,15 +122,15 @@ namespace FastEngine
         void OnApplicationQuit()
         {
             AppQuit();
-            BroadcastCallback(APP_BEHAVIOUR.AppQuit);
+            BroadcastCallback(AppBehaviour.AppQuit);
         }
-        void OnApplicationPause(bool pause) { BroadcastCallback<bool>(APP_BEHAVIOUR.AppPause, pause); }
-        void OnApplicationFocus(bool focus) { BroadcastCallback<bool>(APP_BEHAVIOUR.AppFocus, focus); }
-        void Update() { BroadcastCallback(APP_BEHAVIOUR.Update); }
-        private void LateUpdate() { BroadcastCallback(APP_BEHAVIOUR.LateUpdate); }
-        private void FixedUpdate() { BroadcastCallback(APP_BEHAVIOUR.FixedUpdate); }
-        void OnGUI() { BroadcastCallback(APP_BEHAVIOUR.OnGUI); }
-        private void OnDrawGizmos() { BroadcastCallback(APP_BEHAVIOUR.OnDrawGizmos); }
+        void OnApplicationPause(bool pause) { BroadcastCallback<bool>(AppBehaviour.AppPause, pause); }
+        void OnApplicationFocus(bool focus) { BroadcastCallback<bool>(AppBehaviour.AppFocus, focus); }
+        void Update() { BroadcastCallback(AppBehaviour.Update); }
+        private void LateUpdate() { BroadcastCallback(AppBehaviour.LateUpdate); }
+        private void FixedUpdate() { BroadcastCallback(AppBehaviour.FixedUpdate); }
+        void OnGUI() { BroadcastCallback(AppBehaviour.OnGUI); }
+        private void OnDrawGizmos() { BroadcastCallback(AppBehaviour.OnDrawGizmos); }
         #endregion
     }
 }

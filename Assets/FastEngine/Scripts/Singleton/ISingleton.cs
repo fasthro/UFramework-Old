@@ -4,10 +4,12 @@
  * @Description: ISingleton
  */
 
+using System;
+
 namespace FastEngine
-{    
-    public interface ISingleton
-    {        
-        void OnSingletonInit();
+{
+    public interface ISingleton : IDisposable
+    {
+        void InitializeSingleton();
     }
 }

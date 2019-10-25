@@ -8,14 +8,13 @@ using UnityEngine;
 
 namespace FastEngine.Core
 {
-    public class AssetBundleDependencies : Singleton<AssetBundleDependencies>
+    [MonoSingletonPath("FastEngine/ResLoader/AssetBundleDependencies")]
+    public class AssetBundleDependencies : MonoSingleton<AssetBundleDependencies>
     {
         private AssetBundle m_bundle;
         private AssetBundleManifest m_manifest;
 
-        private AssetBundleDependencies() { }
-
-        public override void OnSingletonInit()
+        public override void InitializeSingleton()
         {
             m_bundle = AssetBundle.LoadFromFile(AssetBundlePath.GetFullPath(AssetBundlePath.GetPlatformIds()));
             m_manifest = m_bundle.LoadAsset("AssetBundleManifest") as AssetBundleManifest;

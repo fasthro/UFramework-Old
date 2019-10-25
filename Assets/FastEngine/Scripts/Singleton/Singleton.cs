@@ -8,29 +8,35 @@ namespace FastEngine
 {
     public abstract class Singleton<T> : ISingleton where T : Singleton<T>
     {
-        protected static T m_instance;
-        private static object m_lock = new object();
+        protected static T instance;
+        private static object obj = new object();
 
         public static T Instance
         {
             get
             {
-                lock (m_lock)
+                if (null == Singleton<T>.instance)
                 {
-                    if (m_instance == null)
-                        m_instance = SingletonCreator.CreateSingleton<T>();
+                    lock (obj)
+                    {
+                        if (null == Singleton<T>.instance)
+                        {
+                            Singleton<T>.instance = System.Activator.CreateInstance<T>();
+                            (Singleton<T>.instance as Singleton<T>).InitializeSingleton();
+                        }
+                    }
                 }
-                return m_instance;
+                return instance;
             }
         }
 
-        protected Singleton() { }
+        public virtual void InitializeSingleton() { }
+
+        public static bool HasInstance() { return Singleton<T>.instance != null; }
 
         public virtual void Dispose()
         {
-            m_instance = null;
+            if (Singleton<T>.instance != null) Singleton<T>.instance = (T)((object)null);
         }
-
-        public virtual void OnSingletonInit() { }
     }
 }

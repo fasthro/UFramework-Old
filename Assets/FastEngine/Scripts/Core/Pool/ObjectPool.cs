@@ -11,8 +11,7 @@ namespace FastEngine.Core
     public class ObjectPool<T> : Pool<T>, ISingleton where T : IPoolObject, new()
     {
         #region Singleton
-        void ISingleton.OnSingletonInit() { }
-
+        void ISingleton.InitializeSingleton() { }
 
         protected ObjectPool()
         {

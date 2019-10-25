@@ -11,15 +11,12 @@ namespace FastEngine
     [AttributeUsage(AttributeTargets.Class)]
     public class MonoSingletonPath : Attribute
     {
-        private string m_pathInHierarchy;
-        public string pathInHierarchy
-        {
-            get { return m_pathInHierarchy; }
-        }
+        public string pathInHierarchy { get; private set; }
 
         public MonoSingletonPath(string pathInHierarchy)
         {
-            m_pathInHierarchy = pathInHierarchy;
+            this.pathInHierarchy = pathInHierarchy;
         }
+
     }
 }

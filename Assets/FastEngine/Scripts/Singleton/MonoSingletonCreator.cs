@@ -9,72 +9,70 @@ using UnityEngine;
 
 namespace FastEngine
 {
-    public static class MonoSingletonCreator
+    public class MonoSingletonCreator
     {
-        public static bool IsUnitTestMode { get; set; }
-
         public static T CreateMonoSingleton<T>() where T : MonoBehaviour, ISingleton
         {
             T instance = null;
 
-            if (!IsUnitTestMode && !Application.isPlaying) return instance;
-            instance = Object.FindObjectOfType<T>();
-
-            if (instance != null)
+            if (instance == null && Application.isPlaying)
             {
-                instance.OnSingletonInit();
-                return instance;
-            }
+                instance = GameObject.FindObjectOfType(typeof(T)) as T;
 
-            MemberInfo info = typeof(T);
-            var attributes = info.GetCustomAttributes(true);
-            foreach (var atribute in attributes)
-            {
-                var defineAttri = atribute as MonoSingletonPath;
-                if (defineAttri == null)
+                if (instance == null)
                 {
-                    continue;
+                    MemberInfo info = typeof(T);
+                    object[] attributes = info.GetCustomAttributes(true);
+                    for (int i = 0; i < attributes.Length; ++i)
+                    {
+                        MonoSingletonPath defineAttri = attributes[i] as MonoSingletonPath;
+                        if (defineAttri == null)
+                        {
+                            continue;
+                        }
+                        instance = CreateComponentOnGameObject<T>(defineAttri.pathInHierarchy, true);
+                        break;
+                    }
+
+                    if (instance == null)
+                    {
+                        GameObject obj = new GameObject("Singleton of " + typeof(T).Name);
+                        UnityEngine.Object.DontDestroyOnLoad(obj);
+                        instance = obj.AddComponent<T>();
+                    }
                 }
-
-                instance = CreateComponentOnGameObject<T>(defineAttri.pathInHierarchy, true);
-                break;
             }
 
-            if (instance == null)
-            {
-                var obj = new GameObject(typeof(T).Name);
-                if (!IsUnitTestMode)
-                    Object.DontDestroyOnLoad(obj);
-                instance = obj.AddComponent<T>();
-            }
-
-            instance.OnSingletonInit();
             return instance;
         }
 
-        private static T CreateComponentOnGameObject<T>(string path, bool dontDestroy) where T : MonoBehaviour
+        protected static T CreateComponentOnGameObject<T>(string path, bool dontDestroy) where T : MonoBehaviour
         {
-            var obj = FindGameObject(path, true, dontDestroy);
+            GameObject obj = FindGameObject(null, path, true, dontDestroy);
             if (obj == null)
             {
                 obj = new GameObject("Singleton of " + typeof(T).Name);
-                if (dontDestroy && !IsUnitTestMode)
+                if (dontDestroy)
                 {
-                    Object.DontDestroyOnLoad(obj);
+                    UnityEngine.Object.DontDestroyOnLoad(obj);
                 }
             }
 
             return obj.AddComponent<T>();
         }
 
-        private static GameObject FindGameObject(string path, bool build, bool dontDestroy)
+        private static GameObject FindGameObject(GameObject root, string path, bool build, bool dontDestroy)
         {
-            if (string.IsNullOrEmpty(path))
+            if (path == null || path.Length == 0)
+            {
                 return null;
+            }
 
-            var subPath = path.Split('/');
+            string[] subPath = path.Split('/');
             if (subPath == null || subPath.Length == 0)
+            {
                 return null;
+            }
 
             return FindGameObject(null, subPath, 0, build, dontDestroy);
         }
@@ -105,8 +103,7 @@ namespace FastEngine
                     {
                         client.transform.SetParent(root.transform);
                     }
-
-                    if (dontDestroy && index == 0 && !IsUnitTestMode)
+                    if (dontDestroy && index == 0)
                     {
                         GameObject.DontDestroyOnLoad(client);
                     }
@@ -114,9 +111,16 @@ namespace FastEngine
             }
 
             if (client == null)
+            {
                 return null;
+            }
 
-            return ++index == subPath.Length ? client : FindGameObject(client, subPath, index, build, dontDestroy);
+            if (++index == subPath.Length)
+            {
+                return client;
+            }
+
+            return FindGameObject(client, subPath, index, build, dontDestroy);
         }
     }
 }

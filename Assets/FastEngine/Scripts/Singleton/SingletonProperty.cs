@@ -8,25 +8,25 @@ namespace FastEngine
 {
     public static class SingletonProperty<T> where T : class, ISingleton
     {
-        private static T m_instance;
-        private static readonly object m_lock = new object();
+        private static T instance;
+        private static readonly object obj = new object();
 
         public static T Instance
         {
             get
             {
-                lock (m_lock)
+                lock (obj)
                 {
-                    if (m_instance == null)
-                        m_instance = SingletonCreator.CreateSingleton<T>();
+                    if (instance == null)
+                        instance = SingletonCreator.CreateSingleton<T>();
                 }
-                return m_instance;
+                return instance;
             }
         }
 
         public static void Dispose()
         {
-            m_instance = null;
+            instance = null;
         }
     }
 }
