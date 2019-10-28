@@ -15,6 +15,7 @@ namespace FastEngine.Core
         /// <value></value>
         public static string[] luaDirectorys = new string[]
         {
+            // FIXME 未来优化到引擎库中
             Application.dataPath + "/FastEngine/3rd/Lua/ToLua/Lua",      // tolua
             Application.dataPath + "/FastEngine/Scripts/Core/Lua/Libs",  // engine lua libs
             Application.dataPath + "/LuaScripts",                        // project lua script
