@@ -51,6 +51,14 @@ namespace FastEngine.FUI
     {
         static Dictionary<string, FPack> map = new Dictionary<string, FPack>();
 
+        public static void Add(string[] packNames)
+        {
+            for (int i = 0; i < packNames.Length; i++)
+            {
+                Add(packNames[i]);
+            }
+        }
+
         public static UIPackage Add(string packName)
         {
             FPack pack = null;
@@ -67,6 +75,14 @@ namespace FastEngine.FUI
             }
 
             return pack.package;
+        }
+
+        public static void Remove(string[] packNames)
+        {
+            for (int i = 0; i < packNames.Length; i++)
+            {
+                Remove(packNames[i]);
+            }
         }
 
         public static void Remove(string packName)

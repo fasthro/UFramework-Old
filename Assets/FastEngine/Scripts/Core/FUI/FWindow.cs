@@ -57,12 +57,15 @@ namespace FastEngine.FUI
         public void ShowWindow()
         {
             FPackService.Add(m_packName);
+            if (m_dependPackNames != null) FPackService.Add(m_dependPackNames);
             Show();
         }
 
         public void HideWindow(bool autoDestory = false)
         {
             this.m_autoDestory = autoDestory;
+            FPackService.Remove(m_packName);
+            if (m_dependPackNames != null) FPackService.Remove(m_dependPackNames);
             Hide();
         }
 
