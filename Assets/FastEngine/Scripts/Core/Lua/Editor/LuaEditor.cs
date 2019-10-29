@@ -20,7 +20,6 @@ namespace FastEngine.Editor
         static void RegenerateWrap()
         {
             ToLuaMenu.ClearLuaWraps();
-            ToLuaMenu.GenLuaAll();
         }
     }
 }

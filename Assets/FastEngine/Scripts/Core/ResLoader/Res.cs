@@ -3,6 +3,7 @@
  * @Date: 2019-06-22 15:28:19
  * @Description: 资源基类
  */
+using FastEngine.Utils;
 using UnityEngine;
 
 namespace FastEngine.Core
@@ -18,7 +19,7 @@ namespace FastEngine.Core
     /// <summary>
     /// 资源基类
     /// </summary>
-    public abstract class Res : IResRefCounter
+    public abstract class Res : IRef
     {
         // 资源名称
         protected string m_assetName;

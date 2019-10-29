@@ -11,6 +11,7 @@ using FastEngine.Core;
 using Logger = FastEngine.Core.Logger;
 using DG.Tweening;
 using FairyGUI;
+using FastEngine.FUI;
 
 namespace FastEngine
 {
@@ -52,6 +53,10 @@ namespace FastEngine
             Logger.Initialize(true);                               // 日志
             TCPSession.Initialize("192.168.1.41", 8080, true);     // 网络TCP
             Lua.Initialize();                                      // Lua
+            FWindowSortService.Initialize();                       // Window 排序服务
+
+            // var w = new FWindow(FLayer.Window, "test", "test");
+            // w.ShowWindow();
         }
 
         public void AppQuit()

@@ -1,3 +1,5 @@
+require "define"
+
 function LuaStart( ... )
     -- body
     print("lua start!")

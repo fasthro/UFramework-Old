@@ -19,8 +19,311 @@ public static class LuaBinder
 		UnityEngine_TimeWrap.Register(L);
 		UnityEngine_AssetBundleWrap.Register(L);
 		L.EndModule();
+		L.BeginModule("FairyGUI");
+		FairyGUI_EventContextWrap.Register(L);
+		FairyGUI_EventDispatcherWrap.Register(L);
+		FairyGUI_EventListenerWrap.Register(L);
+		FairyGUI_InputEventWrap.Register(L);
+		FairyGUI_DisplayObjectWrap.Register(L);
+		FairyGUI_ContainerWrap.Register(L);
+		FairyGUI_StageWrap.Register(L);
+		FairyGUI_ControllerWrap.Register(L);
+		FairyGUI_GObjectWrap.Register(L);
+		FairyGUI_GGraphWrap.Register(L);
+		FairyGUI_GGroupWrap.Register(L);
+		FairyGUI_GImageWrap.Register(L);
+		FairyGUI_GLoaderWrap.Register(L);
+		FairyGUI_GMovieClipWrap.Register(L);
+		FairyGUI_TextFormatWrap.Register(L);
+		FairyGUI_GTextFieldWrap.Register(L);
+		FairyGUI_GRichTextFieldWrap.Register(L);
+		FairyGUI_GTextInputWrap.Register(L);
+		FairyGUI_GComponentWrap.Register(L);
+		FairyGUI_GListWrap.Register(L);
+		FairyGUI_GRootWrap.Register(L);
+		FairyGUI_GLabelWrap.Register(L);
+		FairyGUI_GButtonWrap.Register(L);
+		FairyGUI_GComboBoxWrap.Register(L);
+		FairyGUI_GProgressBarWrap.Register(L);
+		FairyGUI_GSliderWrap.Register(L);
+		FairyGUI_ScrollPaneWrap.Register(L);
+		FairyGUI_TransitionWrap.Register(L);
+		FairyGUI_GObjectPoolWrap.Register(L);
+		FairyGUI_RelationsWrap.Register(L);
+		FairyGUI_RelationTypeWrap.Register(L);
+		FairyGUI_GTweenWrap.Register(L);
+		FairyGUI_GTweenerWrap.Register(L);
+		FairyGUI_EaseTypeWrap.Register(L);
+		FairyGUI_TweenValueWrap.Register(L);
+		FairyGUI_WindowWrap.Register(L);
+		L.RegFunction("EventCallback1", FairyGUI_EventCallback1);
+		L.RegFunction("EventCallback0", FairyGUI_EventCallback0);
+		L.RegFunction("ListItemRenderer", FairyGUI_ListItemRenderer);
+		L.RegFunction("ListItemProvider", FairyGUI_ListItemProvider);
+		L.RegFunction("PlayCompleteCallback", FairyGUI_PlayCompleteCallback);
+		L.RegFunction("TransitionHook", FairyGUI_TransitionHook);
+		L.RegFunction("GTweenCallback", FairyGUI_GTweenCallback);
+		L.RegFunction("GTweenCallback1", FairyGUI_GTweenCallback1);
+		L.BeginModule("GObjectPool");
+		L.RegFunction("InitCallbackDelegate", FairyGUI_GObjectPool_InitCallbackDelegate);
+		L.EndModule();
+		L.EndModule();
+		L.BeginModule("FastEngine");
+		FastEngine_MonoSingleton_FastEngine_Core_TCPSessionWrap.Register(L);
+		L.BeginModule("Core");
+		FastEngine_Core_TCPSessionWrap.Register(L);
+		L.EndModule();
+		L.BeginModule("FUI");
+		FastEngine_FUI_FWindowWrap.Register(L);
+		FastEngine_FUI_FLayerWrap.Register(L);
+		FastEngine_FUI_FWindowStateWrap.Register(L);
+		L.EndModule();
+		L.EndModule();
 		L.EndModule();
 		Debugger.Log("Register lua type cost time: {0}", Time.realtimeSinceStartup - t);
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int FairyGUI_EventCallback1(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateTraits<FairyGUI.EventCallback1>.Create(func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateTraits<FairyGUI.EventCallback1>.Create(func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int FairyGUI_EventCallback0(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateTraits<FairyGUI.EventCallback0>.Create(func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateTraits<FairyGUI.EventCallback0>.Create(func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int FairyGUI_ListItemRenderer(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateTraits<FairyGUI.ListItemRenderer>.Create(func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateTraits<FairyGUI.ListItemRenderer>.Create(func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int FairyGUI_ListItemProvider(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateTraits<FairyGUI.ListItemProvider>.Create(func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateTraits<FairyGUI.ListItemProvider>.Create(func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int FairyGUI_PlayCompleteCallback(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateTraits<FairyGUI.PlayCompleteCallback>.Create(func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateTraits<FairyGUI.PlayCompleteCallback>.Create(func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int FairyGUI_TransitionHook(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateTraits<FairyGUI.TransitionHook>.Create(func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateTraits<FairyGUI.TransitionHook>.Create(func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int FairyGUI_GTweenCallback(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateTraits<FairyGUI.GTweenCallback>.Create(func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateTraits<FairyGUI.GTweenCallback>.Create(func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int FairyGUI_GTweenCallback1(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateTraits<FairyGUI.GTweenCallback1>.Create(func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateTraits<FairyGUI.GTweenCallback1>.Create(func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int FairyGUI_GObjectPool_InitCallbackDelegate(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateTraits<FairyGUI.GObjectPool.InitCallbackDelegate>.Create(func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateTraits<FairyGUI.GObjectPool.InitCallbackDelegate>.Create(func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
 	}
 }
 

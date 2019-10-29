@@ -8,6 +8,8 @@ using BindType = ToLuaMenu.BindType;
 using UnityEngine.UI;
 using System.Reflection;
 using FastEngine.Core;
+using FairyGUI;
+using FastEngine.FUI;
 
 public static class CustomSettings
 {
@@ -63,6 +65,58 @@ public static class CustomSettings
         _GT(typeof(Vector4)),
         _GT(typeof(Vector2)),
         _GT(typeof(Color)),
+
+        #endregion
+
+        #region FairyGUI
+        _GT(typeof(EventContext)),
+        _GT(typeof(EventDispatcher)),
+        _GT(typeof(EventListener)),
+        _GT(typeof(InputEvent)),
+        _GT(typeof(DisplayObject)),
+        _GT(typeof(Container)),
+        _GT(typeof(Stage)),
+        _GT(typeof(FairyGUI.Controller)),
+        _GT(typeof(GObject)),
+        _GT(typeof(GGraph)),
+        _GT(typeof(GGroup)),
+        _GT(typeof(GImage)),
+        _GT(typeof(GLoader)),
+        _GT(typeof(GMovieClip)),
+        _GT(typeof(TextFormat)),
+        _GT(typeof(GTextField)),
+        _GT(typeof(GRichTextField)),
+        _GT(typeof(GTextInput)),
+        _GT(typeof(GComponent)),
+        _GT(typeof(GList)),
+        _GT(typeof(GRoot)),
+        _GT(typeof(GLabel)),
+        _GT(typeof(GButton)),
+        _GT(typeof(GComboBox)),
+        _GT(typeof(GProgressBar)),
+        _GT(typeof(GSlider)),
+        _GT(typeof(ScrollPane)),
+        _GT(typeof(Transition)),
+        _GT(typeof(GObjectPool)),
+        _GT(typeof(Relations)),
+        _GT(typeof(RelationType)),
+        _GT(typeof(GTween)),
+        _GT(typeof(GTweener)),
+        _GT(typeof(EaseType)),
+        _GT(typeof(TweenValue)),
+        #endregion
+
+        #region fastengine
+
+        _GT(typeof(TCPSession)),
+        
+        #region fui
+        
+        _GT(typeof(FWindow)),
+        _GT(typeof(FLayer)),
+        _GT(typeof(FWindowState)),
+        
+        #endregion
 
         #endregion
     };
