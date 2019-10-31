@@ -104,11 +104,14 @@ public static class CustomSettings
         _GT(typeof(GTweener)),
         _GT(typeof(EaseType)),
         _GT(typeof(TweenValue)),
+        _GT(typeof(UIObjectFactory)),
+        _GT(typeof(UIPackage)),
         #endregion
 
         #region fastengine
 
         _GT(typeof(TCPSession)),
+        _GT(typeof(TCPSessionService)),
         
         #region fui
         

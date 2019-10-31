@@ -51,12 +51,9 @@ namespace FastEngine
            
             DOTween.Init(true, true, LogBehaviour.Default);        // DOTween
             Logger.Initialize(true);                               // 日志
-            TCPSession.Initialize("192.168.1.41", 8080, true);     // 网络TCP
+            TCPSession.Initialize("192.168.1.47", 8083, true);     // 网络TCP
             Lua.Initialize();                                      // Lua
             FWindowSortService.Initialize();                       // Window 排序服务
-
-            // var w = new FWindow(FLayer.Window, "test", "test");
-            // w.ShowWindow();
         }
 
         public void AppQuit()

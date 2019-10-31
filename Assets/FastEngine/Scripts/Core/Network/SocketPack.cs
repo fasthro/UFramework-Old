@@ -18,6 +18,7 @@ namespace FastEngine.Core
     {
         Stream,
         Proto,
+        LuaProto,
     }
 
     public class SocketPack
@@ -44,10 +45,15 @@ namespace FastEngine.Core
                         m_stream.Flush();
                         m_data = m_stream.ToArray();
                     }
-                    // protobuf 
+                    // c# protobuf 
                     else if (m_data == null && m_message != null && packType == SocketPackType.Proto)
                     {
                         m_data = m_message.ToByteArray();
+                    }
+                    // lua protobuf 
+                    else if (m_data == null && string.IsNullOrEmpty(this.m_serialize) == false && packType == SocketPackType.LuaProto)
+                    {
+                        m_data = ByteString.CopyFromUtf8(this.m_serialize).ToByteArray();
                     }
                 }
                 return m_data;
@@ -66,7 +72,7 @@ namespace FastEngine.Core
         private BinaryWriter m_writer;
         private BinaryReader m_reader;
 
-        // pro
+        // c# proto
         private IMessage m_message;
         public T GetMessage<T>() where T : class, IMessage, new()
         {
@@ -79,6 +85,9 @@ namespace FastEngine.Core
             if (m_message != null) return m_message as T;
             return null;
         }
+
+        // 序列化字符串
+        private string m_serialize;
 
         /// <summary>
         /// 写入协议包
@@ -94,7 +103,7 @@ namespace FastEngine.Core
         }
 
         /// <summary>
-        /// Proto 写入协议包
+        /// C# Proto 写入协议包
         /// </summary>
         /// <param name="message">protobuf message</param>
         public SocketPack(int cmd, IMessage message)
@@ -102,6 +111,18 @@ namespace FastEngine.Core
             this.cmd = cmd;
             this.m_message = message;
             this.packType = SocketPackType.Proto;
+            this.m_isReadPack = false;
+        }
+
+        /// <summary>
+        /// Lua Proto 写入协议包
+        /// </summary>
+        /// <param name="serialize">serialize string</param>
+        public SocketPack(int cmd, string serialize)
+        {
+            this.cmd = cmd;
+            this.m_serialize = serialize;
+            this.packType = SocketPackType.LuaProto;
             this.m_isReadPack = false;
         }
 

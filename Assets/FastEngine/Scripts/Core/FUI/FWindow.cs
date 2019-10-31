@@ -6,6 +6,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using FairyGUI;
+using FastEngine.Core;
+using Google.Protobuf;
 using UnityEngine;
 
 namespace FastEngine.FUI
@@ -37,7 +39,10 @@ namespace FastEngine.FUI
 
         // pack
         private string m_packName;
-        private string[] m_dependPackNames;
+        private string[] m_dependencies;
+
+        // main package
+        private UIPackage m_pack;
 
         // com
         private string m_comName;
@@ -46,26 +51,46 @@ namespace FastEngine.FUI
         public bool enabledLog = true;
         public string logMark = "";
 
+        // 窗口组件包装
+        public GComponent ui { get { return contentPane; } }
+
         public FWindow(FLayer layer, string comName, string packName, string[] dependPackNames = null) : base()
         {
             this.layer = layer;
             this.m_comName = comName;
             this.m_packName = packName;
-            this.m_dependPackNames = dependPackNames;
+            this.m_dependencies = dependPackNames;
         }
 
         public void ShowWindow()
         {
-            FPackService.Add(m_packName);
-            if (m_dependPackNames != null) FPackService.Add(m_dependPackNames);
+            // 加载包
+            m_pack = FPackService.Add(m_packName);
+            // 加载依赖包
+            for (int i = 0; i < m_pack.dependencies.Length; i++)
+            {
+                foreach (KeyValuePair<string, string> item in m_pack.dependencies[i])
+                {
+                    if (item.Key == "name") FPackService.Add(item.Value);
+                }
+            }
+            // 加载自定义依赖包
+            if (m_dependencies != null) FPackService.Add(m_dependencies);
+
             Show();
         }
 
         public void HideWindow(bool autoDestory = false)
         {
             this.m_autoDestory = autoDestory;
-            FPackService.Remove(m_packName);
-            if (m_dependPackNames != null) FPackService.Remove(m_dependPackNames);
+            for (int i = 0; i < m_pack.dependencies.Length; i++)
+            {
+                foreach (KeyValuePair<string, string> item in m_pack.dependencies[i])
+                {
+                    if (item.Key == "name") FPackService.Add(item.Value);
+                }
+            }
+            if (m_dependencies != null) FPackService.Remove(m_dependencies);
             Hide();
         }
 
@@ -115,6 +140,13 @@ namespace FastEngine.FUI
             CallLua("OnDestory");
 #endif
         }
+
+        #region 网络消息
+        public void Send(int cmd) { TCPSession.Send(cmd); }
+        public void Send(SocketPack pack) { TCPSession.Send(pack); }
+        public void Send(int cmd, IMessage message) { TCPSession.Send(cmd, message); }
+        public void Send(int cmd, string serialize) { TCPSession.Send(cmd, serialize); }
+        #endregion
 
         #region log
         public void Log(string message)

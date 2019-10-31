@@ -7,6 +7,11 @@ local manager = {
     window_order = {}
 }
 
+local create_window = function(name)
+    local window = require("Window/" .. name)
+    return window.New()
+end
+
 local insert_order = function(window_name)
     for k, v in ipairs(manager.window_order) do
         if v == window_name then
@@ -65,6 +70,20 @@ function manager.refresh_top_window()
     if next(manager.window_order) ~= nil then
         manager.window_order[#manager.window_order]:RefreshWindow()
     end
+end
+
+function manager.call_window(window_name, func_name, args)
+    local window = manager.windows[window_name] or nil
+    if window ~= nil and window.state == FWindowState.Showing then
+        local fun =  window[func_name]
+        if fun ~= nil then
+            fun(window, args)
+        end
+    end
+end
+
+function manager.get_window(window_name)
+    return manager.windows[window_name]
 end
 
 return manager

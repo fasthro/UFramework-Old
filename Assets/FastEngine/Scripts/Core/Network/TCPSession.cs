@@ -77,6 +77,7 @@ namespace FastEngine.Core
         public static void Send(int cmd) { Instance.InternalSend(SocketPackFactory.CreateWriter(cmd)); }
         public static void Send(SocketPack pack) { Instance.InternalSend(pack); }
         public static void Send(int cmd, IMessage message) { Instance.InternalSend(cmd, message); }
+        public static void Send(int cmd, string serialize) { Instance.InternalSend(SocketPackFactory.CreateWriter(cmd, serialize)); }
         #endregion
     }
 }

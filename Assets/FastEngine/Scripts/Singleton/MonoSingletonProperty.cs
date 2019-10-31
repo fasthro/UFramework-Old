@@ -26,7 +26,7 @@ namespace FastEngine
 
         private void Awake() { this.InitializeSingleton(); }
 
-        public void InitializeSingleton() { }
+        public virtual void InitializeSingleton() { }
 
         public void Dispose()
         {

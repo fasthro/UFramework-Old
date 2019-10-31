@@ -13,17 +13,31 @@ namespace FastEngine.Core
         /// <summary>
         /// 创建写入包
         /// </summary>
+        /// <param name="cmd"></param>
+        /// <returns></returns>
         public static SocketPack CreateWriter(int cmd)
         {
             return new SocketPack(cmd);
         }
 
         /// <summary>
-        /// 创建Protobuf写入包
+        /// 创建C# Protobuf写入包
         /// </summary>
+        /// <typeparam name="T"></typeparam>
         public static SocketPack CreateWriter<T>(int cmd) where T : class, IMessage, new()
         {
             return new SocketPack(cmd, new T());
+        }
+
+        /// <summary>
+        /// 创建 lua protobuf 写入包
+        /// </summary>
+        /// <param name="cmd"></param>
+        /// <param name="serialize"></param>
+        /// <returns></returns>
+        public static SocketPack CreateWriter(int cmd, string serialize)
+        {
+            return new SocketPack(cmd, serialize);
         }
 
         /// <summary>

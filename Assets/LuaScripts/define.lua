@@ -2,8 +2,9 @@
  * @Author: fasthro
  * @Description: define
  ]]
-
-require "fairygui"
-
+-- fui
+require("fui")
+-- fairy lua
+require("fairy/define")
 -- manager
 winmgr = require("manager/window_manager")
