@@ -125,6 +125,11 @@ namespace FastEngine.Core
         // 事件回调
         private event SocketEventCallback m_eventCallback;
 
+        #region connect
+        // 连接成功之后主线程通知
+        private bool m_connectedNotification = false;
+        #endregion
+
         #region receive
         // 数据接收池
         private byte[] m_recCache;
@@ -160,14 +165,10 @@ namespace FastEngine.Core
         /// <summary>
         /// socket client
         /// </summary>
-        /// <param name="ip"></param>
-        /// <param name="port"></param>
         /// <param name="callback"></param>
         /// <param name="enabledLog"></param>
-        public SocketClient(string ip, int port, SocketEventCallback callback, bool enabledLog = false)
+        public SocketClient(SocketEventCallback callback, bool enabledLog = false)
         {
-            this.ip = ip;
-            this.port = port;
             this.m_eventCallback = callback;
             this.m_recCache = new byte[ReceiveCacheSize];
             this.m_receiver = new SocketReceiver();
@@ -184,8 +185,16 @@ namespace FastEngine.Core
         public void Update()
         {
             if (!isConnected) return;
+            ProcessConnecte();
             ProcessReceive();
             ProcessSend();
+        }
+
+        public void Connect(string ip, int port)
+        {
+            this.ip = ip;
+            this.port = port;
+            Connect();
         }
 
         public void Connect()
@@ -240,16 +249,22 @@ namespace FastEngine.Core
                 Log("socket connect to server succeed.");
                 ((Socket)iar.AsyncState).EndConnect(iar);
                 isConnected = true;
+                m_connectedNotification = true;
                 m_recThread = new Thread(new ThreadStart(OnReceive));
                 m_recThread.IsBackground = true;
                 m_recThread.Start();
-
-                BroadcastConnected();
             }
             catch (Exception e)
             {
                 Exception(SocketException.Connect, e);
             }
+        }
+
+        public void ProcessConnecte()
+        {
+            if (!isConnected || !m_connectedNotification) return;
+            m_connectedNotification = false;
+            BroadcastConnected();
         }
 
         public void Send(SocketPack pack)

@@ -13,22 +13,25 @@ namespace FastEngine.Core
     {
         private SocketClient m_client;
         private bool m_isConnected { get { return m_client != null && m_client.isConnected; } }
-
         void Update()
         {
             if (m_client != null) m_client.Update();
+
         }
 
         #region internal api
         /// <summary>
         /// 初始化
         /// </summary>
-        /// <param name="ip"></param>
-        /// <param name="port"></param>
         /// <param name="enabledLog"></param>
-        private void InternalInitialize(string ip, int port, bool enabledLog = false)
+        private void InternalInitialize(bool enabledLog = false)
         {
-            m_client = new SocketClient(ip, port, OnSocketEventCallback, enabledLog);
+            m_client = new SocketClient(OnSocketEventCallback, enabledLog);
+        }
+
+        private void InternalConnecte(string ip, int port)
+        {
+            if (!m_isConnected) m_client.Connect(ip, port);
         }
 
         private void InternalConnecte()
@@ -64,6 +67,9 @@ namespace FastEngine.Core
                 case SocketState.Received:
                     TCPSessionService.Broadcast(args.socketPack);
                     break;
+                case SocketState.Connected:
+                    TCPSessionService.Broadcast(TCPSessionServiceBuiltIn.Connected);
+                    break;
                 default:
                     break;
             }
@@ -71,8 +77,9 @@ namespace FastEngine.Core
 
         #region API
         public static bool isConnected { get { return Instance.m_isConnected; } }
-        public static void Initialize(string ip, int port, bool enabledLog = false) { Instance.InternalInitialize(ip, port, enabledLog); }
+        public static void Initialize(bool enabledLog = false) { Instance.InternalInitialize(enabledLog); }
         public static void Connecte() { Instance.InternalConnecte(); }
+        public static void Connecte(string ip, int port) { Instance.InternalConnecte(ip, port); }
         public static void Disconnecte() { Instance.InternalDisconnecte(); }
         public static void Send(int cmd) { Instance.InternalSend(SocketPackFactory.CreateWriter(cmd)); }
         public static void Send(SocketPack pack) { Instance.InternalSend(pack); }

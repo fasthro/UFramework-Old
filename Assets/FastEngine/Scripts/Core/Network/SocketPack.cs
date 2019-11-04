@@ -51,9 +51,9 @@ namespace FastEngine.Core
                         m_data = m_message.ToByteArray();
                     }
                     // lua protobuf 
-                    else if (m_data == null && string.IsNullOrEmpty(this.m_serialize) == false && packType == SocketPackType.LuaProto)
+                    else if (m_data == null && string.IsNullOrEmpty(this.m_luapb) == false && packType == SocketPackType.LuaProto)
                     {
-                        m_data = ByteString.CopyFromUtf8(this.m_serialize).ToByteArray();
+                        m_data = ByteString.CopyFromUtf8(this.m_luapb).ToByteArray();
                     }
                 }
                 return m_data;
@@ -86,8 +86,19 @@ namespace FastEngine.Core
             return null;
         }
 
-        // 序列化字符串
-        private string m_serialize;
+        // lua pb
+        private string m_luapb;
+        public string luapb
+        {
+            get
+            {
+                if (m_isReadPack)
+                {
+                    m_luapb = ByteString.CopyFrom(data).ToStringUtf8();
+                }
+                return m_luapb;
+            }
+        }
 
         /// <summary>
         /// 写入协议包
@@ -117,11 +128,11 @@ namespace FastEngine.Core
         /// <summary>
         /// Lua Proto 写入协议包
         /// </summary>
-        /// <param name="serialize">serialize string</param>
-        public SocketPack(int cmd, string serialize)
+        /// <param name="luapb">lua pb data</param>
+        public SocketPack(int cmd, string luapb)
         {
             this.cmd = cmd;
-            this.m_serialize = serialize;
+            this.m_luapb = luapb;
             this.packType = SocketPackType.LuaProto;
             this.m_isReadPack = false;
         }

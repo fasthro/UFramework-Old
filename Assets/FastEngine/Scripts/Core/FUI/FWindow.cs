@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using FairyGUI;
 using FastEngine.Core;
 using Google.Protobuf;
+using LuaInterface;
 using UnityEngine;
 
 namespace FastEngine.FUI
@@ -44,6 +45,9 @@ namespace FastEngine.FUI
         // main package
         private UIPackage m_pack;
 
+        // TCP 网络协议(自动监听和自动取消监听)
+        private int[] m_tcpCmds;
+
         // com
         private string m_comName;
 
@@ -51,15 +55,16 @@ namespace FastEngine.FUI
         public bool enabledLog = true;
         public string logMark = "";
 
-        // 窗口组件包装
-        public GComponent ui { get { return contentPane; } }
+        // 窗口组件句柄
+        public GComponent handle { get { return contentPane; } }
 
-        public FWindow(FLayer layer, string comName, string packName, string[] dependPackNames = null) : base()
+        public FWindow(FLayer layer, string comName, string packName, string[] dependPackNames = null, int[] tcpCmds = null) : base()
         {
             this.layer = layer;
             this.m_comName = comName;
             this.m_packName = packName;
             this.m_dependencies = dependPackNames;
+            this.m_tcpCmds = tcpCmds;
         }
 
         public void ShowWindow()
@@ -115,12 +120,31 @@ namespace FastEngine.FUI
         {
             state = FWindowState.Showing;
 
+            // 注册网络协议
+            if (m_tcpCmds != null)
+            {
+                for (int i = 0; i < m_tcpCmds.Length; i++)
+                {
+                    TCPAddListener(m_tcpCmds[i], this.TCPReceiveCallback);
+                }
+            }
+
             base.OnShown();
         }
 
         protected override void OnHide()
         {
             state = FWindowState.Hided;
+
+            // 取消注册网络协议
+            if (m_tcpCmds != null)
+            {
+                for (int i = 0; i < m_tcpCmds.Length; i++)
+                {
+                    TCPRemoveListener(m_tcpCmds[i], this.TCPReceiveCallback);
+                }
+            }
+
             base.OnHide();
 
             if (this.m_autoDestory) { OnDestory(); }
@@ -142,10 +166,39 @@ namespace FastEngine.FUI
         }
 
         #region 网络消息
-        public void Send(int cmd) { TCPSession.Send(cmd); }
-        public void Send(SocketPack pack) { TCPSession.Send(pack); }
-        public void Send(int cmd, IMessage message) { TCPSession.Send(cmd, message); }
-        public void Send(int cmd, string serialize) { TCPSession.Send(cmd, serialize); }
+
+        private void TCPReceiveCallback(SocketPack pack)
+        {
+            OnTCPReceiveCallback(pack);
+        }
+
+        protected void OnTCPReceiveCallback(SocketPack pack)
+        {
+#if FAIRYGUI_TOLUA
+            if (_peerTable != null)
+            {
+                LuaFunction ctor = _peerTable.GetLuaFunction("OnTCPReceiveCallback");
+                if (ctor != null)
+                {
+                    ctor.Call(this, pack);
+                    ctor.Dispose();
+                }
+            }
+#endif
+        }
+
+        // 网络协议监听
+        public void TCPAddListener(int cmd, TCPSessionServiceEventCallabck callback) { TCPSessionService.AddListener(cmd, callback); }
+        public void TCPAddListener(int cmd, LuaFunction callback) { TCPSessionService.AddListener(cmd, _peerTable, callback); }
+        public void TCPRemoveListener(int cmd) { TCPSessionService.RemoveListener(cmd); }
+        public void TCPRemoveListener(int cmd, TCPSessionServiceEventCallabck callback) { TCPSessionService.RemoveListener(cmd, callback); }
+        public void TCPRemoveListener(int cmd, LuaFunction callback) { TCPSessionService.RemoveListener(cmd, _peerTable, callback); }
+
+        // 网络发送
+        public void TCPSend(int cmd) { TCPSession.Send(cmd); }
+        public void TCPSend(SocketPack pack) { TCPSession.Send(pack); }
+        public void TCPSend(int cmd, IMessage message) { TCPSession.Send(cmd, message); }
+        public void TCPSend(int cmd, string serialize) { TCPSession.Send(cmd, serialize); }
         #endregion
 
         #region log
