@@ -24,19 +24,15 @@ public class FastEngine_Core_TCPSessionWrap
 		{
 			int count = LuaDLL.lua_gettop(L);
 
-			if (count == 2)
+			if (count == 0)
 			{
-				string arg0 = ToLua.CheckString(L, 1);
-				int arg1 = (int)LuaDLL.luaL_checknumber(L, 2);
-				FastEngine.Core.TCPSession.Initialize(arg0, arg1);
+				FastEngine.Core.TCPSession.Initialize();
 				return 0;
 			}
-			else if (count == 3)
+			else if (count == 1)
 			{
-				string arg0 = ToLua.CheckString(L, 1);
-				int arg1 = (int)LuaDLL.luaL_checknumber(L, 2);
-				bool arg2 = LuaDLL.luaL_checkboolean(L, 3);
-				FastEngine.Core.TCPSession.Initialize(arg0, arg1, arg2);
+				bool arg0 = LuaDLL.luaL_checkboolean(L, 1);
+				FastEngine.Core.TCPSession.Initialize(arg0);
 				return 0;
 			}
 			else
@@ -55,9 +51,24 @@ public class FastEngine_Core_TCPSessionWrap
 	{
 		try
 		{
-			ToLua.CheckArgsCount(L, 0);
-			FastEngine.Core.TCPSession.Connecte();
-			return 0;
+			int count = LuaDLL.lua_gettop(L);
+
+			if (count == 0)
+			{
+				FastEngine.Core.TCPSession.Connecte();
+				return 0;
+			}
+			else if (count == 2)
+			{
+				string arg0 = ToLua.CheckString(L, 1);
+				int arg1 = (int)LuaDLL.luaL_checknumber(L, 2);
+				FastEngine.Core.TCPSession.Connecte(arg0, arg1);
+				return 0;
+			}
+			else
+			{
+				return LuaDLL.luaL_throw(L, "invalid arguments to method: FastEngine.Core.TCPSession.Connecte");
+			}
 		}
 		catch (Exception e)
 		{
@@ -99,10 +110,17 @@ public class FastEngine_Core_TCPSessionWrap
 				FastEngine.Core.TCPSession.Send(arg0);
 				return 0;
 			}
-			else if (count == 2)
+			else if (count == 2 && TypeChecker.CheckTypes<Google.Protobuf.IMessage>(L, 2))
 			{
 				int arg0 = (int)LuaDLL.luaL_checknumber(L, 1);
-				Google.Protobuf.IMessage arg1 = (Google.Protobuf.IMessage)ToLua.CheckObject<Google.Protobuf.IMessage>(L, 2);
+				Google.Protobuf.IMessage arg1 = (Google.Protobuf.IMessage)ToLua.ToObject(L, 2);
+				FastEngine.Core.TCPSession.Send(arg0, arg1);
+				return 0;
+			}
+			else if (count == 2 && TypeChecker.CheckTypes<string>(L, 2))
+			{
+				int arg0 = (int)LuaDLL.luaL_checknumber(L, 1);
+				string arg1 = ToLua.ToString(L, 2);
 				FastEngine.Core.TCPSession.Send(arg0, arg1);
 				return 0;
 			}

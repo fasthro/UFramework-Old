@@ -10,6 +10,9 @@ public class FastEngine_FUI_FWindowWrap
 		L.RegFunction("ShowWindow", ShowWindow);
 		L.RegFunction("HideWindow", HideWindow);
 		L.RegFunction("RefreshWindow", RefreshWindow);
+		L.RegFunction("TCPAddListener", TCPAddListener);
+		L.RegFunction("TCPRemoveListener", TCPRemoveListener);
+		L.RegFunction("TCPSend", TCPSend);
 		L.RegFunction("Log", Log);
 		L.RegFunction("LogError", LogError);
 		L.RegFunction("LogWarning", LogWarning);
@@ -19,6 +22,7 @@ public class FastEngine_FUI_FWindowWrap
 		L.RegVar("logMark", get_logMark, set_logMark);
 		L.RegVar("layer", get_layer, null);
 		L.RegVar("state", get_state, null);
+		L.RegVar("handle", get_handle, null);
 		L.EndClass();
 	}
 
@@ -45,6 +49,17 @@ public class FastEngine_FUI_FWindowWrap
 				string arg2 = ToLua.CheckString(L, 3);
 				string[] arg3 = ToLua.CheckStringArray(L, 4);
 				FastEngine.FUI.FWindow obj = new FastEngine.FUI.FWindow(arg0, arg1, arg2, arg3);
+				ToLua.PushObject(L, obj);
+				return 1;
+			}
+			else if (count == 5)
+			{
+				FastEngine.FUI.FLayer arg0 = (FastEngine.FUI.FLayer)ToLua.CheckObject(L, 1, typeof(FastEngine.FUI.FLayer));
+				string arg1 = ToLua.CheckString(L, 2);
+				string arg2 = ToLua.CheckString(L, 3);
+				string[] arg3 = ToLua.CheckStringArray(L, 4);
+				int[] arg4 = ToLua.CheckNumberArray<int>(L, 5);
+				FastEngine.FUI.FWindow obj = new FastEngine.FUI.FWindow(arg0, arg1, arg2, arg3, arg4);
 				ToLua.PushObject(L, obj);
 				return 1;
 			}
@@ -115,6 +130,129 @@ public class FastEngine_FUI_FWindowWrap
 			FastEngine.FUI.FWindow obj = (FastEngine.FUI.FWindow)ToLua.CheckObject<FastEngine.FUI.FWindow>(L, 1);
 			obj.RefreshWindow();
 			return 0;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int TCPAddListener(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+
+			if (count == 3 && TypeChecker.CheckTypes<FastEngine.Core.TCPSessionServiceEventCallabck>(L, 3))
+			{
+				FastEngine.FUI.FWindow obj = (FastEngine.FUI.FWindow)ToLua.CheckObject<FastEngine.FUI.FWindow>(L, 1);
+				int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
+				FastEngine.Core.TCPSessionServiceEventCallabck arg1 = (FastEngine.Core.TCPSessionServiceEventCallabck)ToLua.ToObject(L, 3);
+				obj.TCPAddListener(arg0, arg1);
+				return 0;
+			}
+			else if (count == 3 && TypeChecker.CheckTypes<LuaInterface.LuaFunction>(L, 3))
+			{
+				FastEngine.FUI.FWindow obj = (FastEngine.FUI.FWindow)ToLua.CheckObject<FastEngine.FUI.FWindow>(L, 1);
+				int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
+				LuaFunction arg1 = ToLua.ToLuaFunction(L, 3);
+				obj.TCPAddListener(arg0, arg1);
+				return 0;
+			}
+			else
+			{
+				return LuaDLL.luaL_throw(L, "invalid arguments to method: FastEngine.FUI.FWindow.TCPAddListener");
+			}
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int TCPRemoveListener(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+
+			if (count == 2)
+			{
+				FastEngine.FUI.FWindow obj = (FastEngine.FUI.FWindow)ToLua.CheckObject<FastEngine.FUI.FWindow>(L, 1);
+				int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
+				obj.TCPRemoveListener(arg0);
+				return 0;
+			}
+			else if (count == 3 && TypeChecker.CheckTypes<FastEngine.Core.TCPSessionServiceEventCallabck>(L, 3))
+			{
+				FastEngine.FUI.FWindow obj = (FastEngine.FUI.FWindow)ToLua.CheckObject<FastEngine.FUI.FWindow>(L, 1);
+				int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
+				FastEngine.Core.TCPSessionServiceEventCallabck arg1 = (FastEngine.Core.TCPSessionServiceEventCallabck)ToLua.ToObject(L, 3);
+				obj.TCPRemoveListener(arg0, arg1);
+				return 0;
+			}
+			else if (count == 3 && TypeChecker.CheckTypes<LuaInterface.LuaFunction>(L, 3))
+			{
+				FastEngine.FUI.FWindow obj = (FastEngine.FUI.FWindow)ToLua.CheckObject<FastEngine.FUI.FWindow>(L, 1);
+				int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
+				LuaFunction arg1 = ToLua.ToLuaFunction(L, 3);
+				obj.TCPRemoveListener(arg0, arg1);
+				return 0;
+			}
+			else
+			{
+				return LuaDLL.luaL_throw(L, "invalid arguments to method: FastEngine.FUI.FWindow.TCPRemoveListener");
+			}
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int TCPSend(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+
+			if (count == 2 && TypeChecker.CheckTypes<int>(L, 2))
+			{
+				FastEngine.FUI.FWindow obj = (FastEngine.FUI.FWindow)ToLua.CheckObject<FastEngine.FUI.FWindow>(L, 1);
+				int arg0 = (int)LuaDLL.lua_tonumber(L, 2);
+				obj.TCPSend(arg0);
+				return 0;
+			}
+			else if (count == 2 && TypeChecker.CheckTypes<FastEngine.Core.SocketPack>(L, 2))
+			{
+				FastEngine.FUI.FWindow obj = (FastEngine.FUI.FWindow)ToLua.CheckObject<FastEngine.FUI.FWindow>(L, 1);
+				FastEngine.Core.SocketPack arg0 = (FastEngine.Core.SocketPack)ToLua.ToObject(L, 2);
+				obj.TCPSend(arg0);
+				return 0;
+			}
+			else if (count == 3 && TypeChecker.CheckTypes<Google.Protobuf.IMessage>(L, 3))
+			{
+				FastEngine.FUI.FWindow obj = (FastEngine.FUI.FWindow)ToLua.CheckObject<FastEngine.FUI.FWindow>(L, 1);
+				int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
+				Google.Protobuf.IMessage arg1 = (Google.Protobuf.IMessage)ToLua.ToObject(L, 3);
+				obj.TCPSend(arg0, arg1);
+				return 0;
+			}
+			else if (count == 3 && TypeChecker.CheckTypes<string>(L, 3))
+			{
+				FastEngine.FUI.FWindow obj = (FastEngine.FUI.FWindow)ToLua.CheckObject<FastEngine.FUI.FWindow>(L, 1);
+				int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
+				string arg1 = ToLua.ToString(L, 3);
+				obj.TCPSend(arg0, arg1);
+				return 0;
+			}
+			else
+			{
+				return LuaDLL.luaL_throw(L, "invalid arguments to method: FastEngine.FUI.FWindow.TCPSend");
+			}
 		}
 		catch (Exception e)
 		{
@@ -246,6 +384,25 @@ public class FastEngine_FUI_FWindowWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o, "attempt to index state on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_handle(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			FastEngine.FUI.FWindow obj = (FastEngine.FUI.FWindow)o;
+			FairyGUI.GComponent ret = obj.handle;
+			ToLua.PushObject(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index handle on a nil value");
 		}
 	}
 

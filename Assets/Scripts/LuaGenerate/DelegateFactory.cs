@@ -26,6 +26,12 @@ public class DelegateFactory
 		dict.Add(typeof(FairyGUI.GObjectPool.InitCallbackDelegate), factory.FairyGUI_GObjectPool_InitCallbackDelegate);
 		dict.Add(typeof(FairyGUI.GTweenCallback), factory.FairyGUI_GTweenCallback);
 		dict.Add(typeof(FairyGUI.GTweenCallback1), factory.FairyGUI_GTweenCallback1);
+		dict.Add(typeof(FairyGUI.UIObjectFactory.GComponentCreator), factory.FairyGUI_UIObjectFactory_GComponentCreator);
+		dict.Add(typeof(FairyGUI.UIObjectFactory.GLoaderCreator), factory.FairyGUI_UIObjectFactory_GLoaderCreator);
+		dict.Add(typeof(FairyGUI.UIPackage.LoadResource), factory.FairyGUI_UIPackage_LoadResource);
+		dict.Add(typeof(FairyGUI.UIPackage.CreateObjectCallback), factory.FairyGUI_UIPackage_CreateObjectCallback);
+		dict.Add(typeof(FastEngine.Core.TCPSessionServiceEventCallabck), factory.FastEngine_Core_TCPSessionServiceEventCallabck);
+		dict.Add(typeof(FastEngine.Core.TCPSessionServiceBuiltInEventCallabck), factory.FastEngine_Core_TCPSessionServiceBuiltInEventCallabck);
 
 		DelegateTraits<FairyGUI.EventCallback1>.Init(factory.FairyGUI_EventCallback1);
 		DelegateTraits<FairyGUI.EventCallback0>.Init(factory.FairyGUI_EventCallback0);
@@ -36,6 +42,12 @@ public class DelegateFactory
 		DelegateTraits<FairyGUI.GObjectPool.InitCallbackDelegate>.Init(factory.FairyGUI_GObjectPool_InitCallbackDelegate);
 		DelegateTraits<FairyGUI.GTweenCallback>.Init(factory.FairyGUI_GTweenCallback);
 		DelegateTraits<FairyGUI.GTweenCallback1>.Init(factory.FairyGUI_GTweenCallback1);
+		DelegateTraits<FairyGUI.UIObjectFactory.GComponentCreator>.Init(factory.FairyGUI_UIObjectFactory_GComponentCreator);
+		DelegateTraits<FairyGUI.UIObjectFactory.GLoaderCreator>.Init(factory.FairyGUI_UIObjectFactory_GLoaderCreator);
+		DelegateTraits<FairyGUI.UIPackage.LoadResource>.Init(factory.FairyGUI_UIPackage_LoadResource);
+		DelegateTraits<FairyGUI.UIPackage.CreateObjectCallback>.Init(factory.FairyGUI_UIPackage_CreateObjectCallback);
+		DelegateTraits<FastEngine.Core.TCPSessionServiceEventCallabck>.Init(factory.FastEngine_Core_TCPSessionServiceEventCallabck);
+		DelegateTraits<FastEngine.Core.TCPSessionServiceBuiltInEventCallabck>.Init(factory.FastEngine_Core_TCPSessionServiceBuiltInEventCallabck);
 
 		TypeTraits<FairyGUI.EventCallback1>.Init(factory.Check_FairyGUI_EventCallback1);
 		TypeTraits<FairyGUI.EventCallback0>.Init(factory.Check_FairyGUI_EventCallback0);
@@ -46,6 +58,12 @@ public class DelegateFactory
 		TypeTraits<FairyGUI.GObjectPool.InitCallbackDelegate>.Init(factory.Check_FairyGUI_GObjectPool_InitCallbackDelegate);
 		TypeTraits<FairyGUI.GTweenCallback>.Init(factory.Check_FairyGUI_GTweenCallback);
 		TypeTraits<FairyGUI.GTweenCallback1>.Init(factory.Check_FairyGUI_GTweenCallback1);
+		TypeTraits<FairyGUI.UIObjectFactory.GComponentCreator>.Init(factory.Check_FairyGUI_UIObjectFactory_GComponentCreator);
+		TypeTraits<FairyGUI.UIObjectFactory.GLoaderCreator>.Init(factory.Check_FairyGUI_UIObjectFactory_GLoaderCreator);
+		TypeTraits<FairyGUI.UIPackage.LoadResource>.Init(factory.Check_FairyGUI_UIPackage_LoadResource);
+		TypeTraits<FairyGUI.UIPackage.CreateObjectCallback>.Init(factory.Check_FairyGUI_UIPackage_CreateObjectCallback);
+		TypeTraits<FastEngine.Core.TCPSessionServiceEventCallabck>.Init(factory.Check_FastEngine_Core_TCPSessionServiceEventCallabck);
+		TypeTraits<FastEngine.Core.TCPSessionServiceBuiltInEventCallabck>.Init(factory.Check_FastEngine_Core_TCPSessionServiceBuiltInEventCallabck);
 
 		StackTraits<FairyGUI.EventCallback1>.Push = factory.Push_FairyGUI_EventCallback1;
 		StackTraits<FairyGUI.EventCallback0>.Push = factory.Push_FairyGUI_EventCallback0;
@@ -56,6 +74,12 @@ public class DelegateFactory
 		StackTraits<FairyGUI.GObjectPool.InitCallbackDelegate>.Push = factory.Push_FairyGUI_GObjectPool_InitCallbackDelegate;
 		StackTraits<FairyGUI.GTweenCallback>.Push = factory.Push_FairyGUI_GTweenCallback;
 		StackTraits<FairyGUI.GTweenCallback1>.Push = factory.Push_FairyGUI_GTweenCallback1;
+		StackTraits<FairyGUI.UIObjectFactory.GComponentCreator>.Push = factory.Push_FairyGUI_UIObjectFactory_GComponentCreator;
+		StackTraits<FairyGUI.UIObjectFactory.GLoaderCreator>.Push = factory.Push_FairyGUI_UIObjectFactory_GLoaderCreator;
+		StackTraits<FairyGUI.UIPackage.LoadResource>.Push = factory.Push_FairyGUI_UIPackage_LoadResource;
+		StackTraits<FairyGUI.UIPackage.CreateObjectCallback>.Push = factory.Push_FairyGUI_UIPackage_CreateObjectCallback;
+		StackTraits<FastEngine.Core.TCPSessionServiceEventCallabck>.Push = factory.Push_FastEngine_Core_TCPSessionServiceEventCallabck;
+		StackTraits<FastEngine.Core.TCPSessionServiceBuiltInEventCallabck>.Push = factory.Push_FastEngine_Core_TCPSessionServiceBuiltInEventCallabck;
 	}
     
     public static Delegate CreateDelegate(Type t, LuaFunction func = null)
@@ -666,6 +690,362 @@ public class DelegateFactory
 	}
 
 	void Push_FairyGUI_GTweenCallback1(IntPtr L, FairyGUI.GTweenCallback1 o)
+	{
+		ToLua.Push(L, o);
+	}
+
+	class FairyGUI_UIObjectFactory_GComponentCreator_Event : LuaDelegate
+	{
+		public FairyGUI_UIObjectFactory_GComponentCreator_Event(LuaFunction func) : base(func) { }
+		public FairyGUI_UIObjectFactory_GComponentCreator_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public FairyGUI.GComponent Call()
+		{
+			func.BeginPCall();
+			func.PCall();
+			FairyGUI.GComponent ret = (FairyGUI.GComponent)func.CheckObject(typeof(FairyGUI.GComponent));
+			func.EndPCall();
+			return ret;
+		}
+
+		public FairyGUI.GComponent CallWithSelf()
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.PCall();
+			FairyGUI.GComponent ret = (FairyGUI.GComponent)func.CheckObject(typeof(FairyGUI.GComponent));
+			func.EndPCall();
+			return ret;
+		}
+	}
+
+	public FairyGUI.UIObjectFactory.GComponentCreator FairyGUI_UIObjectFactory_GComponentCreator(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			FairyGUI.UIObjectFactory.GComponentCreator fn = delegate() { return null; };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			FairyGUI_UIObjectFactory_GComponentCreator_Event target = new FairyGUI_UIObjectFactory_GComponentCreator_Event(func);
+			FairyGUI.UIObjectFactory.GComponentCreator d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			FairyGUI_UIObjectFactory_GComponentCreator_Event target = new FairyGUI_UIObjectFactory_GComponentCreator_Event(func, self);
+			FairyGUI.UIObjectFactory.GComponentCreator d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	bool Check_FairyGUI_UIObjectFactory_GComponentCreator(IntPtr L, int pos)
+	{
+		return TypeChecker.CheckDelegateType(typeof(FairyGUI.UIObjectFactory.GComponentCreator), L, pos);
+	}
+
+	void Push_FairyGUI_UIObjectFactory_GComponentCreator(IntPtr L, FairyGUI.UIObjectFactory.GComponentCreator o)
+	{
+		ToLua.Push(L, o);
+	}
+
+	class FairyGUI_UIObjectFactory_GLoaderCreator_Event : LuaDelegate
+	{
+		public FairyGUI_UIObjectFactory_GLoaderCreator_Event(LuaFunction func) : base(func) { }
+		public FairyGUI_UIObjectFactory_GLoaderCreator_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public FairyGUI.GLoader Call()
+		{
+			func.BeginPCall();
+			func.PCall();
+			FairyGUI.GLoader ret = (FairyGUI.GLoader)func.CheckObject(typeof(FairyGUI.GLoader));
+			func.EndPCall();
+			return ret;
+		}
+
+		public FairyGUI.GLoader CallWithSelf()
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.PCall();
+			FairyGUI.GLoader ret = (FairyGUI.GLoader)func.CheckObject(typeof(FairyGUI.GLoader));
+			func.EndPCall();
+			return ret;
+		}
+	}
+
+	public FairyGUI.UIObjectFactory.GLoaderCreator FairyGUI_UIObjectFactory_GLoaderCreator(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			FairyGUI.UIObjectFactory.GLoaderCreator fn = delegate() { return null; };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			FairyGUI_UIObjectFactory_GLoaderCreator_Event target = new FairyGUI_UIObjectFactory_GLoaderCreator_Event(func);
+			FairyGUI.UIObjectFactory.GLoaderCreator d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			FairyGUI_UIObjectFactory_GLoaderCreator_Event target = new FairyGUI_UIObjectFactory_GLoaderCreator_Event(func, self);
+			FairyGUI.UIObjectFactory.GLoaderCreator d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	bool Check_FairyGUI_UIObjectFactory_GLoaderCreator(IntPtr L, int pos)
+	{
+		return TypeChecker.CheckDelegateType(typeof(FairyGUI.UIObjectFactory.GLoaderCreator), L, pos);
+	}
+
+	void Push_FairyGUI_UIObjectFactory_GLoaderCreator(IntPtr L, FairyGUI.UIObjectFactory.GLoaderCreator o)
+	{
+		ToLua.Push(L, o);
+	}
+
+	class FairyGUI_UIPackage_LoadResource_Event : LuaDelegate
+	{
+		public FairyGUI_UIPackage_LoadResource_Event(LuaFunction func) : base(func) { }
+		public FairyGUI_UIPackage_LoadResource_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public object Call(string param0, string param1, System.Type param2, out FairyGUI.DestroyMethod param3)
+		{
+			func.BeginPCall();
+			func.Push(param0);
+			func.Push(param1);
+			func.Push(param2);
+			func.PCall();
+			object ret = func.CheckVariant();
+			param3 = (FairyGUI.DestroyMethod)func.CheckObject(typeof(FairyGUI.DestroyMethod));
+			func.EndPCall();
+			return ret;
+		}
+
+		public object CallWithSelf(string param0, string param1, System.Type param2, out FairyGUI.DestroyMethod param3)
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.Push(param0);
+			func.Push(param1);
+			func.Push(param2);
+			func.PCall();
+			object ret = func.CheckVariant();
+			param3 = (FairyGUI.DestroyMethod)func.CheckObject(typeof(FairyGUI.DestroyMethod));
+			func.EndPCall();
+			return ret;
+		}
+	}
+
+	public FairyGUI.UIPackage.LoadResource FairyGUI_UIPackage_LoadResource(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			FairyGUI.UIPackage.LoadResource fn = delegate(string param0, string param1, System.Type param2, out FairyGUI.DestroyMethod param3) 
+			{
+				param3 = default(FairyGUI.DestroyMethod);
+			return null;			};
+
+			return fn;
+		}
+
+		if(!flag)
+		{
+			FairyGUI_UIPackage_LoadResource_Event target = new FairyGUI_UIPackage_LoadResource_Event(func);
+			FairyGUI.UIPackage.LoadResource d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			FairyGUI_UIPackage_LoadResource_Event target = new FairyGUI_UIPackage_LoadResource_Event(func, self);
+			FairyGUI.UIPackage.LoadResource d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	bool Check_FairyGUI_UIPackage_LoadResource(IntPtr L, int pos)
+	{
+		return TypeChecker.CheckDelegateType(typeof(FairyGUI.UIPackage.LoadResource), L, pos);
+	}
+
+	void Push_FairyGUI_UIPackage_LoadResource(IntPtr L, FairyGUI.UIPackage.LoadResource o)
+	{
+		ToLua.Push(L, o);
+	}
+
+	class FairyGUI_UIPackage_CreateObjectCallback_Event : LuaDelegate
+	{
+		public FairyGUI_UIPackage_CreateObjectCallback_Event(LuaFunction func) : base(func) { }
+		public FairyGUI_UIPackage_CreateObjectCallback_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call(FairyGUI.GObject param0)
+		{
+			func.BeginPCall();
+			func.PushObject(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+
+		public void CallWithSelf(FairyGUI.GObject param0)
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.PushObject(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public FairyGUI.UIPackage.CreateObjectCallback FairyGUI_UIPackage_CreateObjectCallback(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			FairyGUI.UIPackage.CreateObjectCallback fn = delegate(FairyGUI.GObject param0) { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			FairyGUI_UIPackage_CreateObjectCallback_Event target = new FairyGUI_UIPackage_CreateObjectCallback_Event(func);
+			FairyGUI.UIPackage.CreateObjectCallback d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			FairyGUI_UIPackage_CreateObjectCallback_Event target = new FairyGUI_UIPackage_CreateObjectCallback_Event(func, self);
+			FairyGUI.UIPackage.CreateObjectCallback d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	bool Check_FairyGUI_UIPackage_CreateObjectCallback(IntPtr L, int pos)
+	{
+		return TypeChecker.CheckDelegateType(typeof(FairyGUI.UIPackage.CreateObjectCallback), L, pos);
+	}
+
+	void Push_FairyGUI_UIPackage_CreateObjectCallback(IntPtr L, FairyGUI.UIPackage.CreateObjectCallback o)
+	{
+		ToLua.Push(L, o);
+	}
+
+	class FastEngine_Core_TCPSessionServiceEventCallabck_Event : LuaDelegate
+	{
+		public FastEngine_Core_TCPSessionServiceEventCallabck_Event(LuaFunction func) : base(func) { }
+		public FastEngine_Core_TCPSessionServiceEventCallabck_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call(FastEngine.Core.SocketPack param0)
+		{
+			func.BeginPCall();
+			func.PushObject(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+
+		public void CallWithSelf(FastEngine.Core.SocketPack param0)
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.PushObject(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public FastEngine.Core.TCPSessionServiceEventCallabck FastEngine_Core_TCPSessionServiceEventCallabck(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			FastEngine.Core.TCPSessionServiceEventCallabck fn = delegate(FastEngine.Core.SocketPack param0) { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			FastEngine_Core_TCPSessionServiceEventCallabck_Event target = new FastEngine_Core_TCPSessionServiceEventCallabck_Event(func);
+			FastEngine.Core.TCPSessionServiceEventCallabck d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			FastEngine_Core_TCPSessionServiceEventCallabck_Event target = new FastEngine_Core_TCPSessionServiceEventCallabck_Event(func, self);
+			FastEngine.Core.TCPSessionServiceEventCallabck d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	bool Check_FastEngine_Core_TCPSessionServiceEventCallabck(IntPtr L, int pos)
+	{
+		return TypeChecker.CheckDelegateType(typeof(FastEngine.Core.TCPSessionServiceEventCallabck), L, pos);
+	}
+
+	void Push_FastEngine_Core_TCPSessionServiceEventCallabck(IntPtr L, FastEngine.Core.TCPSessionServiceEventCallabck o)
+	{
+		ToLua.Push(L, o);
+	}
+
+	class FastEngine_Core_TCPSessionServiceBuiltInEventCallabck_Event : LuaDelegate
+	{
+		public FastEngine_Core_TCPSessionServiceBuiltInEventCallabck_Event(LuaFunction func) : base(func) { }
+		public FastEngine_Core_TCPSessionServiceBuiltInEventCallabck_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call()
+		{
+			func.Call();
+		}
+
+		public void CallWithSelf()
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public FastEngine.Core.TCPSessionServiceBuiltInEventCallabck FastEngine_Core_TCPSessionServiceBuiltInEventCallabck(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			FastEngine.Core.TCPSessionServiceBuiltInEventCallabck fn = delegate() { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			FastEngine_Core_TCPSessionServiceBuiltInEventCallabck_Event target = new FastEngine_Core_TCPSessionServiceBuiltInEventCallabck_Event(func);
+			FastEngine.Core.TCPSessionServiceBuiltInEventCallabck d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			FastEngine_Core_TCPSessionServiceBuiltInEventCallabck_Event target = new FastEngine_Core_TCPSessionServiceBuiltInEventCallabck_Event(func, self);
+			FastEngine.Core.TCPSessionServiceBuiltInEventCallabck d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	bool Check_FastEngine_Core_TCPSessionServiceBuiltInEventCallabck(IntPtr L, int pos)
+	{
+		return TypeChecker.CheckDelegateType(typeof(FastEngine.Core.TCPSessionServiceBuiltInEventCallabck), L, pos);
+	}
+
+	void Push_FastEngine_Core_TCPSessionServiceBuiltInEventCallabck(IntPtr L, FastEngine.Core.TCPSessionServiceBuiltInEventCallabck o)
 	{
 		ToLua.Push(L, o);
 	}
