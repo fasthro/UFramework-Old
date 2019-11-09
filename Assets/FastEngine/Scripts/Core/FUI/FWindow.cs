@@ -206,24 +206,24 @@ namespace FastEngine.FUI
         {
             if (!FastEngine.Core.Logger.logEnabled) return;
             if (!enabledLog) return;
-            if (string.IsNullOrEmpty(logMark)) Debug.Log(message);
-            else Debug.Log(string.Format("[FUI-{0}] {1}", logMark, message));
+            if (string.IsNullOrEmpty(logMark)) logMark = m_comName;
+            Debug.Log(string.Format("[FUI-{0}] {1}", logMark, message));
         }
 
         public void LogError(string message)
         {
             if (!FastEngine.Core.Logger.logEnabled) return;
             if (!enabledLog) return;
-            if (string.IsNullOrEmpty(logMark)) Debug.LogError(message);
-            else Debug.LogError(string.Format("[FUI-{0}] {1}", logMark, message));
+            if (string.IsNullOrEmpty(logMark)) logMark = m_comName;
+            Debug.LogError(string.Format("[FUI-{0}] {1}", logMark, message));
         }
 
         public void LogWarning(string message)
         {
             if (!FastEngine.Core.Logger.logEnabled) return;
             if (!enabledLog) return;
-            if (string.IsNullOrEmpty(logMark)) Debug.LogWarning(message);
-            else Debug.LogWarning(string.Format("[FUI-{0}] {1}", logMark, message));
+            if (string.IsNullOrEmpty(logMark)) logMark = m_comName;
+            Debug.LogWarning(string.Format("[FUI-{0}] {1}", logMark, message));
         }
         #endregion
     }

@@ -46,7 +46,7 @@ namespace FastEngine.Core
         /// </summary>
         private bool FindDependencies()
         {
-            string[] ds = AssetBundleDependencies.Instance.GetDependencies(m_bundleName);
+            string[] ds = AssetBundleDB.GetDependencies(m_bundleName);
             int length = ds.Length;
             m_dependencies = new BundleRes[length];
             for (int i = 0; i < length; i++)
@@ -85,7 +85,7 @@ namespace FastEngine.Core
             }
 
             // 加载本体
-            var url = AssetBundlePath.GetFullPath(m_bundleName);
+            var url = AssetBundlePath.GetFilePath(m_bundleName);
             m_assetBundle = AssetBundle.LoadFromFile(url);
             if (m_assetBundle == null)
             {
@@ -148,7 +148,7 @@ namespace FastEngine.Core
         /// <param name="async"></param>
         public IEnumerator AsyncRun(IRunAsync async)
         {
-            var url = AssetBundlePath.GetFullPath(m_bundleName);
+            var url = AssetBundlePath.GetFilePath(m_bundleName);
             var request = AssetBundle.LoadFromFileAsync(url);
 
             m_request = request;

@@ -31,5 +31,47 @@ namespace FastEngine.Utils
             else if (paths.Length == 4) return Path.Combine(paths[0], paths[1], paths[2], paths[3]);
             else return Path.Combine(paths);
         }
+
+        /// <summary>
+        /// 获取路径上的第几个位置内容
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public static string GetPathSection(string path, int index)
+        {
+            if (index == 0)
+                return "";
+
+            path = ReplaceSeparator(path);
+            char separator = Path.AltDirectorySeparatorChar;
+            string[] ps = path.Split(separator);
+
+            if (index < 0)
+            {
+                index = ps.Length + index + 1;
+            }
+
+            if (ps.Length >= index)
+            {
+                return ps[index - 1];
+            }
+
+            return "";
+        }
+
+        /// <summary>
+        /// 替换路径分隔符
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string ReplaceSeparator(string path, string separator = "")
+        {
+            if (string.IsNullOrEmpty(separator))
+            {
+                separator = Path.AltDirectorySeparatorChar.ToString();
+            }
+            return path.Replace("\\", separator).Replace("//", separator);
+        }
     }
 }

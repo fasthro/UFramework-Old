@@ -12,14 +12,20 @@ using System.IO;
 using System;
 using UnityEditor;
 
-namespace FastEngine.Editor
+namespace FastEngine.Editor.Lua
 {
     public class LuaEditor
     {
-        [MenuItem("FastEngine/tolua 生成 Wrap")]
-        static void RegenerateWrap()
+        [MenuItem("FastEngine/Lua -> 生成 Wrap", false, 1)]
+        static void WrapGenerate()
         {
             ToLuaMenu.ClearLuaWraps();
+        }
+
+        [MenuItem("FastEngine/Lua -> 生成 API", false, 2)]
+        static void LuaApiGenerate()
+        {
+            LuaApi.Generate();
         }
     }
 }

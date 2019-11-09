@@ -9,33 +9,72 @@ using UnityEngine;
 namespace FastEngine.Core
 {
     public class AssetBundlePath
-    {   
+    {
         /// <summary>
-        /// 获取平台标识
+        /// 平台标识Id
         /// </summary>
-        public static string GetPlatformIds()
+        public static string PlatformId()
         {
             string ids = "";
 #if UNITY_ANDROID
-                ids = "Android";
+            ids = "Android";
 #elif UNITY_IPHONE
-                ids = "IOS";
+            ids = "IOS";
 #elif UNITY_STANDALONE_WIN
             ids = "Windows";
 #elif UNITY_STANDALONE_OSX
-                ids = "OSX";
+            ids = "OSX";
 #endif
             return ids;
         }
 
         /// <summary>
-        /// 获取完整的AssetBunlde路径
+        /// AssetBunlde 路径
         /// </summary>
         /// <param name="bundleName"></param>
-        public static string GetFullPath(string bundleName)
+        public static string GetFilePath(string bundleName)
         {
-            string root = Path.Combine(Application.streamingAssetsPath, GetPlatformIds());
-            return Path.Combine(root, bundleName);
+            return Path.Combine(RootDirectory(), bundleName);
+        }
+
+        /// <summary>
+        /// AssetBundle 根目录
+        /// </summary>
+        /// <returns></returns>
+        public static string RootDirectory()
+        {
+            if (Application.isMobilePlatform)
+            {
+                return Path.Combine(Application.persistentDataPath, PlatformId());
+            }
+            return Path.Combine(Application.streamingAssetsPath, PlatformId());
+        }
+
+        /// <summary>
+        /// AssetBundle 依赖文件路径
+        /// </summary>
+        /// <returns></returns>
+        public static string DependencieFilePath()
+        {
+            return Path.Combine(RootDirectory(), PlatformId());
+        }
+
+        /// <summary>
+        /// AssetBundle 资源映射配置路径
+        /// </summary>
+        /// <returns></returns>
+        public static string MappingFilePath()
+        {
+            return Path.Combine(RootDirectory(), PlatformId() + ".json");
+        }
+
+        /// <summary>
+        /// AssetBundle 编辑器配置路径
+        /// </summary>
+        /// <returns></returns>
+        public static string EditorConfigFilePath()
+        {
+            return Path.Combine(Application.dataPath, "EditorConfig/AssetBundleConfig.json");
         }
     }
 }
