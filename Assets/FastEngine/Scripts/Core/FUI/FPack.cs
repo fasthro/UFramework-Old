@@ -4,12 +4,13 @@
  * @Description: FUI package
  */
 using FairyGUI;
+using FastEngine.Core;
 using FastEngine.Utils;
 using System.Collections.Generic;
-using System.IO;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+using UnityEngine;
 
 namespace FastEngine.FUI
 {
@@ -20,6 +21,7 @@ namespace FastEngine.FUI
     {
         public string name { get; private set; }
         public UIPackage package { get; private set; }
+        private AssetBundleLoader m_assetBundleLoader;
 
         public FPack(string name)
         {
@@ -28,19 +30,36 @@ namespace FastEngine.FUI
 
         public void Load()
         {
-            if (this.package != null) return;
+            if (package != null) return;
 
+            if (App.runModel == AppRunModel.Develop)
+            {
 #if UNITY_EDITOR
-            this.package = UIPackage.AddPackage(Path.Combine(FUIConfig.pakageExportDirectory, string.Format("{0}/{1}", name, name)),
-                        (string name, string extension, System.Type type, out DestroyMethod destroyMethod) =>
-                        {
-                            destroyMethod = DestroyMethod.Unload;
-                            return AssetDatabase.LoadAssetAtPath(name + extension, type);
-                        }
-                    );
-#else
-            // TODO Assetbundle
+                // 开发模式直接读取UI包
+                var assetPath = FilePathUtils.Combine("Assets/Art/UI", string.Format("{0}/{1}", name, name));
+                package = UIPackage.AddPackage(assetPath,
+                    (string name, string extension, System.Type type, out DestroyMethod destroyMethod) =>
+                    {
+                        destroyMethod = DestroyMethod.Unload;
+                        return AssetDatabase.LoadAssetAtPath(name + extension, type);
+                    }
+                );
 #endif
+            }
+            else
+            {
+                // 正式模式使用 assetBundle 加载
+                m_assetBundleLoader = AssetBundleLoader.Allocate("ui/" + name, null, null);
+                var ready = m_assetBundleLoader.LoadSync();
+                if (ready) package = UIPackage.AddPackage(m_assetBundleLoader.bundleRes.assetBundle);
+                else Debug.LogError("FPack AddPackage Error! PackageName:" + name);
+            }
+        }
+
+        protected override void OnZeroRef()
+        {
+            if (package != null)
+                UIPackage.RemovePackage(package.id);
         }
     }
 

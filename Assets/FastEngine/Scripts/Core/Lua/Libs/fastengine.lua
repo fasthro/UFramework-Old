@@ -5,3 +5,5 @@
 ]]
 middleclass = require "3rd/middleclass"
 json = require "3rd/json"
+dump = require "3rd/dump"
+string = require "3rd/string"

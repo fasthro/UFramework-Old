@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using AssetBundleBrowser.AssetBundleDataSource;
 using FastEngine.Core;
+using FastEngine.Utils;
 using LitJson;
 using UnityEditor;
 using UnityEngine;
@@ -16,18 +17,18 @@ namespace FastEngine.Editor.AssetBundle
 {
     public class AssetBundleEditor
     {
-        [MenuItem("FastEngine/AssetBundle -> 打开配置" , false, 100)]
+        [MenuItem("FastEngine/AssetBundle -> 打开配置", false, 100)]
         static void OpenConfig()
         {
-            ConfigEditorWindow.OpenWindow();
+            AssetBundleCEW.Open<AssetBundleCEW>();
         }
 
         [MenuItem("FastEngine/AssetBundle -> 打包", false, 101)]
-        static void Build()
+        public static void Build()
         {
             GenMapping();
-
-            string outPath = AssetBundlePath.RootDirectory();
+            CopySource();
+            string outPath = AppUtils.BundleRootDirectory();
             if (!Directory.Exists(outPath))
                 Directory.CreateDirectory(outPath);
 
@@ -41,9 +42,9 @@ namespace FastEngine.Editor.AssetBundle
         }
 
         [MenuItem("FastEngine/AssetBundle -> 清理打包", false, 102)]
-        static void CleanBuild()
+        public static void CleanBuild()
         {
-            string outPath = AssetBundlePath.RootDirectory();
+            string outPath = AppUtils.BundleRootDirectory();
             if (Directory.Exists(outPath))
                 Directory.Delete(outPath, true);
 
@@ -56,16 +57,27 @@ namespace FastEngine.Editor.AssetBundle
             StartGenMapping();
         }
 
+        [MenuItem("FastEngine/AssetBundle -> Copy Source", false, 104)]
+        public static void CopySource()
+        {
+            AssetBundleConfig config = AppUtils.LoadConfig<AssetBundleConfig>(AppUtils.EditorConfigPath("AssetBundleConfig"));
+            for (int i = 0; i < config.sources.Count; i++)
+            {
+                var source = config.sources[i];
+                if (File.Exists(source.source)) FilePathUtils.FileCopy(source.source, source.dest);
+                else FilePathUtils.DirectoryCopy(source.source, FilePathUtils.Combine(AppUtils.BundleRootDirectory(), source.dest));
+            }
+        }
+
         static bool StartGenMapping()
         {
             AssetDatabase.RemoveUnusedAssetBundleNames();
-            List<Pack> packs = ConfigEditorWindow.LoadConfig();
+            AssetBundleConfig config = AppUtils.LoadConfig<AssetBundleConfig>(AppUtils.EditorConfigPath("AssetBundleConfig"));
             Dictionary<string, AssetBundleMappingData> mapingDic = new Dictionary<string, AssetBundleMappingData>();
-            for (int i = 0; i < packs.Count; i++)
+            for (int i = 0; i < config.packs.Count; i++)
             {
-                var pack = packs[i];
+                var pack = config.packs[i];
                 pack.Build();
-                Debug.Log(pack.mapping.Count);
                 if (pack.genMapping == GenerateMapping.Generate)
                 {
                     foreach (KeyValuePair<string, AssetBundleMappingData> dataItem in pack.mapping)
@@ -76,9 +88,11 @@ namespace FastEngine.Editor.AssetBundle
             }
 
             // 映射配置写入文件
-            var mp = AssetBundlePath.MappingFilePath();
-            if (File.Exists(mp)) File.Delete(mp);
-            if (!Directory.Exists(AssetBundlePath.RootDirectory())) Directory.CreateDirectory(AssetBundlePath.RootDirectory());
+            var mp = FilePathUtils.Combine(AppUtils.BundleRootDirectory(), PlatformUtils.PlatformId() + ".json");
+            if (File.Exists(mp))
+                File.Delete(mp);
+            if (!Directory.Exists(AppUtils.BundleRootDirectory()))
+                Directory.CreateDirectory(AppUtils.BundleRootDirectory());
             File.WriteAllText(mp, JsonMapper.ToJson(mapingDic));
             return true;
         }

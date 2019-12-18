@@ -53,7 +53,7 @@ namespace FastEngine.Core
         /// </summary>
         /// <param name="cmd"></param>
         /// <param name="callback"></param>
-        public static void AddListener(TCPSessionServiceBuiltIn et, TCPSessionServiceBuiltInEventCallabck callback)
+        public static void AddBuiltInListener(TCPSessionServiceBuiltIn et, TCPSessionServiceBuiltInEventCallabck callback)
         {
             int cmd = (int)et;
             if (!m_eventDic.ContainsKey(cmd))
@@ -106,7 +106,7 @@ namespace FastEngine.Core
         /// </summary>
         /// <param name="cmd"></param>
         /// <param name="callback"></param>
-        public static void RemoveListener(TCPSessionServiceBuiltIn et, TCPSessionServiceBuiltInEventCallabck callback)
+        public static void RemoveBuiltInListener(TCPSessionServiceBuiltIn et, TCPSessionServiceBuiltInEventCallabck callback)
         {
             int cmd = (int)et;
             if (m_eventDic.ContainsKey(cmd))

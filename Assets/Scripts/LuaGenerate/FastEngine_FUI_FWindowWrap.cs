@@ -10,6 +10,7 @@ public class FastEngine_FUI_FWindowWrap
 		L.RegFunction("ShowWindow", ShowWindow);
 		L.RegFunction("HideWindow", HideWindow);
 		L.RegFunction("RefreshWindow", RefreshWindow);
+		L.RegFunction("LanguageGet", LanguageGet);
 		L.RegFunction("TCPAddListener", TCPAddListener);
 		L.RegFunction("TCPRemoveListener", TCPRemoveListener);
 		L.RegFunction("TCPSend", TCPSend);
@@ -20,6 +21,7 @@ public class FastEngine_FUI_FWindowWrap
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.RegVar("enabledLog", get_enabledLog, set_enabledLog);
 		L.RegVar("logMark", get_logMark, set_logMark);
+		L.RegVar("fullScreen", get_fullScreen, set_fullScreen);
 		L.RegVar("layer", get_layer, null);
 		L.RegVar("state", get_state, null);
 		L.RegVar("handle", get_handle, null);
@@ -138,6 +140,25 @@ public class FastEngine_FUI_FWindowWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int LanguageGet(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 3);
+			FastEngine.FUI.FWindow obj = (FastEngine.FUI.FWindow)ToLua.CheckObject<FastEngine.FUI.FWindow>(L, 1);
+			string arg0 = ToLua.CheckString(L, 2);
+			int arg1 = (int)LuaDLL.luaL_checknumber(L, 3);
+			string o = obj.LanguageGet(arg0, arg1);
+			LuaDLL.lua_pushstring(L, o);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int TCPAddListener(IntPtr L)
 	{
 		try
@@ -241,11 +262,11 @@ public class FastEngine_FUI_FWindowWrap
 				obj.TCPSend(arg0, arg1);
 				return 0;
 			}
-			else if (count == 3 && TypeChecker.CheckTypes<string>(L, 3))
+			else if (count == 3 && TypeChecker.CheckTypes<LuaInterface.LuaByteBuffer>(L, 3))
 			{
 				FastEngine.FUI.FWindow obj = (FastEngine.FUI.FWindow)ToLua.CheckObject<FastEngine.FUI.FWindow>(L, 1);
 				int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
-				string arg1 = ToLua.ToString(L, 3);
+				LuaByteBuffer arg1 = new LuaByteBuffer(ToLua.CheckByteBuffer(L, 3));
 				obj.TCPSend(arg0, arg1);
 				return 0;
 			}
@@ -350,6 +371,25 @@ public class FastEngine_FUI_FWindowWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_fullScreen(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			FastEngine.FUI.FWindow obj = (FastEngine.FUI.FWindow)o;
+			bool ret = obj.fullScreen;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index fullScreen on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_layer(IntPtr L)
 	{
 		object o = null;
@@ -441,6 +481,25 @@ public class FastEngine_FUI_FWindowWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o, "attempt to index logMark on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_fullScreen(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			FastEngine.FUI.FWindow obj = (FastEngine.FUI.FWindow)o;
+			bool arg0 = LuaDLL.luaL_checkboolean(L, 2);
+			obj.fullScreen = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index fullScreen on a nil value");
 		}
 	}
 }

@@ -13,17 +13,17 @@ namespace FastEngine.Editor
         {
             // 构建目录
             // res
-            FilePath.CreateDirectory(FilePath.Combine(Application.dataPath, "Art"));
+            FilePathUtils.DirectoryCreate(FilePathUtils.Combine(Application.dataPath, "Art"));
             // ui
-            FilePath.CreateDirectory(FilePath.Combine(Application.dataPath, "Art", "UI"));
+            FilePathUtils.DirectoryCreate(FilePathUtils.Combine(Application.dataPath, "Art", "UI"));
 
             // script
-            FilePath.CreateDirectory(FilePath.Combine(Application.dataPath, "Scripts"));
-            FilePath.CreateDirectory(FilePath.Combine(Application.dataPath, "Scripts", "LuaGenerate"));
-            FilePath.CreateDirectory(FilePath.Combine(Application.dataPath, "Scripts", "Proto"));
+            FilePathUtils.DirectoryCreate(FilePathUtils.Combine(Application.dataPath, "Scripts"));
+            FilePathUtils.DirectoryCreate(FilePathUtils.Combine(Application.dataPath, "Scripts", "LuaGenerate"));
+            FilePathUtils.DirectoryCreate(FilePathUtils.Combine(Application.dataPath, "Scripts", "Proto"));
             // lua
-            FilePath.CreateDirectory(FilePath.Combine(Application.dataPath, "LuaScripts"));
-            FilePath.CreateDirectory(FilePath.Combine(Application.dataPath, "LuaScripts", "proto"));
+            FilePathUtils.DirectoryCreate(FilePathUtils.Combine(Application.dataPath, "LuaScripts"));
+            FilePathUtils.DirectoryCreate(FilePathUtils.Combine(Application.dataPath, "LuaScripts", "proto"));
 
             Debug.Log("Welcome to fastengine");
         }

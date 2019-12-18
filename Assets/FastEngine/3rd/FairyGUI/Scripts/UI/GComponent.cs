@@ -96,7 +96,7 @@ namespace FairyGUI
 #if FAIRYGUI_TOLUA
             if (_peerTable != null)
             {
-                _peerTable.Dispose();
+                // _peerTable.Dispose();
                 _peerTable = null;
             }
 #endif

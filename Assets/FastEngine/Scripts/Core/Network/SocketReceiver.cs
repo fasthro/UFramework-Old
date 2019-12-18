@@ -83,14 +83,14 @@ namespace FastEngine.Core
                     Array.Copy(m_cache, SocketPackHeader.HEADER_SIZE, packData, 0, dataSize);
 
                     // delete rec pack data
-                    m_cursor -= (dataSize + SocketPackHeader.HEADER_SIZE);
+                    var totalSize = dataSize + SocketPackHeader.HEADER_SIZE;
+                    m_cursor -= totalSize;
                     byte[] newBytes = new byte[m_cursor];
-                    Array.Copy(m_cache, m_header.packSize, newBytes, 0, m_cursor);
+                    Array.Copy(m_cache, totalSize, newBytes, 0, m_cursor);
                     m_cache = newBytes;
 
                     m_isProcessing = false;
-
-                    return SocketPackFactory.CreateReader(m_header.cmd, packData);
+                    return SocketPackFactory.CreateReader(m_header.cmd, m_header.sessionId, packData);
                 }
             }
             return null;

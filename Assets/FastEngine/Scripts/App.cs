@@ -12,6 +12,7 @@ using Logger = FastEngine.Core.Logger;
 using DG.Tweening;
 using FairyGUI;
 using FastEngine.FUI;
+using FastEngine.Debuger;
 
 namespace FastEngine
 {
@@ -32,34 +33,84 @@ namespace FastEngine
         OnDrawGizmos,
     }
 
+    /// <summary>
+    /// App 运行模式
+    /// </summary>
+    /// 开发模式为编辑器开发阶段
+    ///     - 热更新:关闭
+    ///     - Localization:非Bundle加载
+    ///     - UI:非Bundle加载
+    ///     - 其他资源:Bundle加载
+    /// 正式模式为移动包模式
+    ///     - 热更新:开启
+    ///     - Localization:Bundle加载
+    ///     - UI:Bundle加载
+    ///     - 其他资源:Bundle加载
+    public enum AppRunModel
+    {
+        Develop,
+        Release,
+    }
+
     [MonoSingletonPath("FastEngine/App")]
     public class App : MonoSingleton<App>
     {
+        /// <summary>
+        /// 运行模式
+        /// </summary>
+        public static AppRunModel runModel;
+
+        /// <summary>
+        /// QA 测试包
+        /// </summary>
+        public static bool QATest;
+
+        /// <summary>
+        /// App 配置
+        /// </summary>
+        public static AppConfig appConfig;
+
         /// <summary>
         /// 程序启动
         /// </summary>
         public void AppRun()
         {
+            // 加载AppConfig
+            var textAsset = Resources.Load<TextAsset>("AppConfig");
+            if (textAsset == null) appConfig = new AppConfig();
+            else appConfig = LitJson.JsonMapper.ToObject<AppConfig>(textAsset.text);
+
+            // 配置app参数
+            runModel = appConfig.runModel;
+            QATest = appConfig.QATest;
             Application.runInBackground = true;
+            Screen.fullScreen = true;
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
             Application.targetFrameRate = 60;
             QualitySettings.vSyncCount = 2;
 
             // 设置屏幕分辨率
-            Screen.SetResolution(2048, 1152, false);
             GRoot.inst.SetContentScaleFactor(2048, 1152, UIContentScaler.ScreenMatchMode.MatchWidthOrHeight);
-           
-            DOTween.Init(true, true, LogBehaviour.Default);        // DOTween
-            Logger.Initialize(true);                               // 日志
-            TCPSession.Initialize(true);                           // 网络TCP
-            Lua.Initialize();                                      // Lua
-            FWindowSortService.Initialize();                       // Window 排序服务
+            // 设置字体
+            UIConfig.defaultFont = "Helvetica Condensed";
+            // 关闭移除包同时卸载Bundle
+            UIPackage.unloadBundleByFGUI = false;
+
+            DOTween.Init(true, true, LogBehaviour.Default);                       // DOTween
+            ScriptWatch.Initialize(runModel == AppRunModel.Develop || QATest);    // 代码监测
+            Logger.Initialize(appConfig.enableLog);                               // 日志
+            TCPSession.Initialize(appConfig.enableLog);                           // 网络TCP
+            FWindowSortService.Initialize();                                      // Window 排序服务
+            var language = appConfig.useSystemLanguage ? Application.systemLanguage : appConfig.language;
+            Localization.Initialize(language, appConfig.defaultLanguage);         // 本地化多语言
+            if (runModel == AppRunModel.Develop) Lua.Initialize();                // Lua(开发模式或者热更新完成方可启动)
         }
 
         public void AppQuit()
         {
             TCPSession.Disconnecte();      // 网络TCP
             Lua.Close();                   // Lua
+            Localization.Release();        // 本地化多语言
         }
 
         #region Delegate

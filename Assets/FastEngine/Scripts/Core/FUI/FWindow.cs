@@ -30,33 +30,21 @@ namespace FastEngine.FUI
     /// </summary>
     public class FWindow : Window
     {
-        // layer
         public FLayer layer { get; protected set; }
-        // state
         public FWindowState state { get; protected set; }
 
-        // auto destory
-        private bool m_autoDestory;
+        private bool m_autoDestory;        // 关闭界面自动销毁
+        private string m_packName;         // mian package name
+        private UIPackage m_pack;          // main package
+        private string[] m_dependencies;   // 依赖包名称列表
+        private string m_comName;          // 组件名称
+        private int[] m_tcpCmds;           // TCP 网络协议(自动监听和自动取消监听)
 
-        // pack
-        private string m_packName;
-        private string[] m_dependencies;
+        public bool enabledLog = true;     // 是否开启日志
+        public string logMark = "";        // 日志标志
+        public bool fullScreen = true;     // 是否全屏UI(标志是否为全屏UI，可以通过此标志设置场景相机在打开全屏UI的时候关闭渲染，进行DrawCall优化)
 
-        // main package
-        private UIPackage m_pack;
-
-        // TCP 网络协议(自动监听和自动取消监听)
-        private int[] m_tcpCmds;
-
-        // com
-        private string m_comName;
-
-        // log
-        public bool enabledLog = true;
-        public string logMark = "";
-
-        // 窗口组件句柄
-        public GComponent handle { get { return contentPane; } }
+        public GComponent handle { get { return contentPane; } }  // 窗口组件句柄
 
         public FWindow(FLayer layer, string comName, string packName, string[] dependPackNames = null, int[] tcpCmds = null) : base()
         {
@@ -65,22 +53,26 @@ namespace FastEngine.FUI
             this.m_packName = packName;
             this.m_dependencies = dependPackNames;
             this.m_tcpCmds = tcpCmds;
+            this.state = FWindowState.Init;
         }
 
         public void ShowWindow()
         {
-            // 加载包
-            m_pack = FPackService.Add(m_packName);
-            // 加载依赖包
-            for (int i = 0; i < m_pack.dependencies.Length; i++)
+            if (state == FWindowState.Init)
             {
-                foreach (KeyValuePair<string, string> item in m_pack.dependencies[i])
+                // 加载包
+                m_pack = FPackService.Add(m_packName);
+                // 加载依赖包
+                for (int i = 0; i < m_pack.dependencies.Length; i++)
                 {
-                    if (item.Key == "name") FPackService.Add(item.Value);
+                    foreach (KeyValuePair<string, string> item in m_pack.dependencies[i])
+                    {
+                        if (item.Key == "name") FPackService.Add(item.Value);
+                    }
                 }
+                // 加载自定义依赖包
+                if (m_dependencies != null) FPackService.Add(m_dependencies);
             }
-            // 加载自定义依赖包
-            if (m_dependencies != null) FPackService.Add(m_dependencies);
 
             Show();
         }
@@ -88,14 +80,17 @@ namespace FastEngine.FUI
         public void HideWindow(bool autoDestory = false)
         {
             this.m_autoDestory = autoDestory;
-            for (int i = 0; i < m_pack.dependencies.Length; i++)
+            if (autoDestory)
             {
-                foreach (KeyValuePair<string, string> item in m_pack.dependencies[i])
+                for (int i = 0; i < m_pack.dependencies.Length; i++)
                 {
-                    if (item.Key == "name") FPackService.Add(item.Value);
+                    foreach (KeyValuePair<string, string> item in m_pack.dependencies[i])
+                    {
+                        if (item.Key == "name") FPackService.Remove(item.Value);
+                    }
                 }
+                if (m_dependencies != null) FPackService.Remove(m_dependencies);
             }
-            if (m_dependencies != null) FPackService.Remove(m_dependencies);
             Hide();
         }
 
@@ -159,11 +154,30 @@ namespace FastEngine.FUI
 
         protected void OnDestory()
         {
+            Dispose();
             state = FWindowState.Destory;
 #if FAIRYGUI_TOLUA
             CallLua("OnDestory");
 #endif
         }
+
+        #region 定时器
+
+        #endregion
+
+        #region 本地化多语言
+        /// <summary>
+        /// 获取多语言文本
+        /// </summary>
+        /// <param name="model">多语言模块名称</param>
+        /// <param name="key">多语言可以</param>
+        /// <returns></returns>
+        public string LanguageGet(string model, int key)
+        {
+            return Localization.Get(model, key);
+        }
+
+        #endregion
 
         #region 网络消息
 
@@ -198,7 +212,7 @@ namespace FastEngine.FUI
         public void TCPSend(int cmd) { TCPSession.Send(cmd); }
         public void TCPSend(SocketPack pack) { TCPSession.Send(pack); }
         public void TCPSend(int cmd, IMessage message) { TCPSession.Send(cmd, message); }
-        public void TCPSend(int cmd, string serialize) { TCPSession.Send(cmd, serialize); }
+        public void TCPSend(int cmd, LuaByteBuffer luabyte) { TCPSession.Send(cmd, luabyte); }
         #endregion
 
         #region log

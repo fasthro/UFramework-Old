@@ -323,7 +323,7 @@ namespace Google.Protobuf.Collections
                 var extraCount = collection.Count;
                 // For reference types and nullable value types, we need to check that there are no nulls
                 // present. (This isn't a thread-safe approach, but we don't advertise this is thread-safe.)
-                // We expect the JITter to optimize this test to true/false, so it's effectively conditional
+                // We expect the JITter to optimize this FinishCallback to true/false, so it's effectively conditional
                 // specialization.
                 if (default(T) == null)
                 {

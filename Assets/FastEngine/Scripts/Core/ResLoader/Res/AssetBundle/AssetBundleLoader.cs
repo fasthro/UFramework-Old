@@ -19,6 +19,14 @@ namespace FastEngine.Core
         // 只加载bundle
         protected bool m_only;
 
+        public static AssetBundleLoader Allocate(string resPath, ResNotificationListener listener)
+        {
+            var mapping = AssetBundleDB.GetMappingData(resPath);
+            var loader = ObjectPool<AssetBundleLoader>.Instance.Allocate();
+            loader.Init(mapping.bundleName, mapping.assetName, listener);
+            return loader;
+        }
+
         public static AssetBundleLoader Allocate(string bundleName, string assetName, ResNotificationListener listener)
         {
             var loader = ObjectPool<AssetBundleLoader>.Instance.Allocate();

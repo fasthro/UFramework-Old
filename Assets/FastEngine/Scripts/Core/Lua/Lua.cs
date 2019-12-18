@@ -5,6 +5,7 @@
  */
 using System.Collections;
 using System.Collections.Generic;
+using FastEngine.Debuger;
 using LuaInterface;
 using UnityEngine;
 
@@ -15,30 +16,28 @@ namespace FastEngine.Core
     {
         public LuaState luaState { get; private set; }
         public LuaLooper luaLoop { get; private set; }
+        public LuaLoader luaLoader { get; private set; }
 
         private void InternalInitialize()
         {
             luaState = new LuaState();
-
-            #region libs
-
+            
+            // open lib
             luaState.OpenLibs(LuaDLL.luaopen_pb);
-
-            #endregion
-
+            // lua set top
             luaState.LuaSetTop(0);
-
-            #region other
-
+            
             // wrap
             LuaBinder.Bind(luaState);
             // delegate
             DelegateFactory.Init();
             // coroutine
             LuaCoroutine.Register(luaState, this);
-
-            #endregion
-
+            // lua loader
+            luaLoader = new LuaLoader();
+            luaLoader.Initialize();
+           
+            // start
             luaState.Start();
 
             #region add lua file
@@ -49,6 +48,8 @@ namespace FastEngine.Core
             // lua loop
             luaLoop = gameObject.AddComponent<LuaLooper>();
             luaLoop.luaState = luaState;
+
+            
 
             // 启动 lua 脚本
             Lua.Call("LuaStart");
@@ -71,6 +72,34 @@ namespace FastEngine.Core
         public static void Initialize() { Instance.InternalInitialize(); }
         public static void GC() { Instance.InternalGC(); }
         public static void Close() { Instance.InternalClose(); }
+
+        public static int GetTableIntValue(string tableName, string fieldName)
+        {
+            var table = Instance.luaState.GetTable(tableName);
+            try
+            {
+                return int.Parse(table.GetStringField(fieldName));
+            }
+            catch
+            {
+                Debug.LogError("lua table value to int error! tableName: " + tableName + " fieldName: " + fieldName);
+            }
+            return 0;
+        }
+
+        public static string GetTableStringValue(string tableName, string fieldName)
+        {
+            var table = Instance.luaState.GetTable(tableName);
+            try
+            {
+                return table.GetStringField(fieldName);
+            }
+            catch
+            {
+                Debug.LogError("lua table value to string error! tableName: " + tableName + " fieldName: " + fieldName);
+            }
+            return "";
+        }
 
         public static void Call(string funcName)
         {

@@ -79,10 +79,18 @@ public static class LuaBinder
 		L.EndModule();
 		L.EndModule();
 		L.BeginModule("FastEngine");
+		FastEngine_AppWrap.Register(L);
+		FastEngine_AppRunModelWrap.Register(L);
+		FastEngine_MonoSingleton_FastEngine_AppWrap.Register(L);
 		FastEngine_MonoSingleton_FastEngine_Core_TCPSessionWrap.Register(L);
+		FastEngine_MonoSingleton_FastEngine_Core_LocalizationWrap.Register(L);
+		L.RegFunction("AppBehaviourCallback", FastEngine_AppBehaviourCallback);
 		L.BeginModule("Core");
+		FastEngine_Core_SocketPackWrap.Register(L);
 		FastEngine_Core_TCPSessionWrap.Register(L);
 		FastEngine_Core_TCPSessionServiceWrap.Register(L);
+		FastEngine_Core_TCPSessionServiceBuiltInWrap.Register(L);
+		FastEngine_Core_LocalizationWrap.Register(L);
 		L.RegFunction("TCPSessionServiceEventCallabck", FastEngine_Core_TCPSessionServiceEventCallabck);
 		L.RegFunction("TCPSessionServiceBuiltInEventCallabck", FastEngine_Core_TCPSessionServiceBuiltInEventCallabck);
 		L.EndModule();
@@ -437,6 +445,33 @@ public static class LuaBinder
 			{
 				LuaTable self = ToLua.CheckLuaTable(L, 2);
 				Delegate arg1 = DelegateTraits<FairyGUI.UIPackage.CreateObjectCallback>.Create(func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int FastEngine_AppBehaviourCallback(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateTraits<FastEngine.AppBehaviourCallback>.Create(func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateTraits<FastEngine.AppBehaviourCallback>.Create(func, self);
 				ToLua.Push(L, arg1);
 			}
 			return 1;

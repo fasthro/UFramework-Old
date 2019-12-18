@@ -11,6 +11,7 @@ public class FastEngine_Core_TCPSessionWrap
 		L.RegFunction("Connecte", Connecte);
 		L.RegFunction("Disconnecte", Disconnecte);
 		L.RegFunction("Send", Send);
+		L.RegFunction("BroadcastError", BroadcastError);
 		L.RegFunction("__eq", op_Equality);
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.RegVar("isConnected", get_isConnected, null);
@@ -117,10 +118,10 @@ public class FastEngine_Core_TCPSessionWrap
 				FastEngine.Core.TCPSession.Send(arg0, arg1);
 				return 0;
 			}
-			else if (count == 2 && TypeChecker.CheckTypes<string>(L, 2))
+			else if (count == 2 && TypeChecker.CheckTypes<LuaInterface.LuaByteBuffer>(L, 2))
 			{
 				int arg0 = (int)LuaDLL.luaL_checknumber(L, 1);
-				string arg1 = ToLua.ToString(L, 2);
+				LuaByteBuffer arg1 = new LuaByteBuffer(ToLua.CheckByteBuffer(L, 2));
 				FastEngine.Core.TCPSession.Send(arg0, arg1);
 				return 0;
 			}
@@ -128,6 +129,23 @@ public class FastEngine_Core_TCPSessionWrap
 			{
 				return LuaDLL.luaL_throw(L, "invalid arguments to method: FastEngine.Core.TCPSession.Send");
 			}
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int BroadcastError(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			int arg0 = (int)LuaDLL.luaL_checknumber(L, 1);
+			int arg1 = (int)LuaDLL.luaL_checknumber(L, 2);
+			FastEngine.Core.TCPSession.BroadcastError(arg0, arg1);
+			return 0;
 		}
 		catch (Exception e)
 		{

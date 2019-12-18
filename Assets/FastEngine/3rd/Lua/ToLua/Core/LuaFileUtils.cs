@@ -143,7 +143,6 @@ namespace LuaInterface
             for (int i = 0; i < searchPaths.Count; i++)
             {
                 fullPath = searchPaths[i].Replace("?", fileName);
-
                 if (File.Exists(fullPath))
                 {
                     return fullPath;

@@ -27,5 +27,11 @@ namespace FastEngine.Editor.Lua
         {
             LuaApi.Generate();
         }
+
+        [MenuItem("FastEngine/Lua -> 打包", false, 3)]
+        static void BuildBundle()
+        {
+            LuaBuildBundle.Build();
+        }
     }
 }

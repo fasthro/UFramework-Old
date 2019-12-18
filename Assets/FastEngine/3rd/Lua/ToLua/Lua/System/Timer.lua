@@ -14,10 +14,10 @@ local Timer = Timer
 local mt = {__index = Timer}
 
 --unscaled false 采用deltaTime计时，true 采用 unscaledDeltaTime计时
-function Timer.New(func, duration, loop, unscaled)
+function Timer.New(func, duration, loop, unscaled, obj)
 	unscaled = unscaled or false and true	
 	loop = loop or 1
-	return setmetatable({func = func, duration = duration, time = duration, loop = loop, unscaled = unscaled, running = false}, mt)	
+	return setmetatable({func = func, duration = duration, time = duration, loop = loop, unscaled = unscaled, running = false, obj = obj}, mt)	
 end
 
 function Timer:Start()
@@ -55,7 +55,11 @@ function Timer:Update()
 	self.time = self.time - delta
 	
 	if self.time <= 0 then
-		self.func()
+		if self.obj == nil then
+			self.func()
+		else
+			self.func(self.obj)
+		end
 		
 		if self.loop > 0 then
 			self.loop = self.loop - 1

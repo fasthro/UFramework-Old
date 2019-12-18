@@ -9,6 +9,9 @@ namespace FastEngine.Core
 {
     public static class LuaConfig
     {
+        // lua 字节码模式
+        public static bool luaByteMode = false;
+
         /// <summary>
         /// lua 文件目录(编辑器模式)
         /// </summary>

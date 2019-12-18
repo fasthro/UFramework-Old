@@ -119,7 +119,7 @@ namespace LuaInterface
             ToLua.OpenLibs(L);
             OpenBaseLibs();
             LuaSetTop(0);
-            InitLuaPath();
+            InitPackagePath();
             Debugger.Log("Init lua state cost: {0}", Time.realtimeSinceStartup - time);
         }
 
@@ -176,36 +176,7 @@ namespace LuaInterface
             IterMetatable = metaMap[typeof(IEnumerator)];
             EventMetatable = metaMap[typeof(EventObject)];
         }
-
-        void InitLuaPath()
-        {
-            InitPackagePath();
-
-            if (!LuaFileUtils.Instance.beZip)
-            {
-#if UNITY_EDITOR
-                // fast engine do
-                for (int i = 0; i < LuaConfig.luaDirectorys.Length; i++)
-                {
-                    var directory = LuaConfig.luaDirectorys[i];
-
-                    if (!Directory.Exists(directory))
-                    {
-                        string msg = string.Format("lua path not exists: {0}, configer it in FastEngine LuaConfig.cs", directory);
-                        throw new LuaException(msg);
-                    }
-
-                    AddSearchPath(directory);
-                }
-#endif
-                // fast engine do
-                // if (LuaFileUtils.Instance.GetType() == typeof(LuaFileUtils))
-                // {
-                //     AddSearchPath(LuaConst.luaResDir);
-                // }
-            }
-        }
-
+        
         void OpenBaseLuaLibs()
         {
             DoFile("tolua.lua");            //tolua table名字已经存在了,不能用require

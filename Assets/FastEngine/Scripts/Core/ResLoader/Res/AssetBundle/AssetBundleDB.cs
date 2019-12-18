@@ -5,6 +5,7 @@
  */
 using System.Collections.Generic;
 using System.IO;
+using FastEngine.Utils;
 using LitJson;
 using UnityEngine;
 
@@ -18,7 +19,7 @@ namespace FastEngine.Core
         // bundle name
         public string bundleName;
         // res name
-        public string resName;
+        public string assetName;
     }
 
     public class AssetBundleDB
@@ -40,13 +41,13 @@ namespace FastEngine.Core
         public static void Initialize()
         {
             initialized = true;
-            
+
             // manifest
-            manifestBundle = AssetBundle.LoadFromFile(AssetBundlePath.DependencieFilePath());
+            manifestBundle = AssetBundle.LoadFromFile(FilePathUtils.Combine(AppUtils.BundleRootDirectory(), PlatformUtils.PlatformId()));
             manifest = manifestBundle.LoadAsset("AssetBundleManifest") as AssetBundleManifest;
 
             // mapping
-            var ms = File.ReadAllText(AssetBundlePath.MappingFilePath());
+            var ms = File.ReadAllText(FilePathUtils.Combine(AppUtils.BundleRootDirectory(), PlatformUtils.PlatformId() + ".json"));
             mapping = JsonMapper.ToObject<Dictionary<string, AssetBundleMappingData>>(ms);
         }
 
@@ -71,6 +72,7 @@ namespace FastEngine.Core
             if (!initialized) Initialize();
             AssetBundleMappingData data = null;
             mapping.TryGetValue(resPath, out data);
+            if (data == null) Debug.LogError("assetbundle mapping data not exist:" + resPath);
             return data;
         }
     }

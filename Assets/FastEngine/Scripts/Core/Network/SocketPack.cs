@@ -8,6 +8,7 @@ using System;
 using System.IO;
 using System.Text;
 using Google.Protobuf;
+using LuaInterface;
 
 namespace FastEngine.Core
 {
@@ -30,6 +31,7 @@ namespace FastEngine.Core
 
         // 协议号
         public int cmd { get; private set; }
+        public int sessionId { get; private set; }
 
         // 数据
         private byte[] m_data;
@@ -51,9 +53,9 @@ namespace FastEngine.Core
                         m_data = m_message.ToByteArray();
                     }
                     // lua protobuf 
-                    else if (m_data == null && string.IsNullOrEmpty(this.m_luapb) == false && packType == SocketPackType.LuaProto)
+                    else if (m_data == null && packType == SocketPackType.LuaProto)
                     {
-                        m_data = ByteString.CopyFromUtf8(this.m_luapb).ToByteArray();
+                        m_data = this.luapb.buffer;
                     }
                 }
                 return m_data;
@@ -86,19 +88,27 @@ namespace FastEngine.Core
             return null;
         }
 
-        // lua pb
-        private string m_luapb;
-        public string luapb
+        // lua pd data
+        private LuaByteBuffer m_luapb;
+        public LuaByteBuffer luapb
         {
             get
             {
                 if (m_isReadPack)
                 {
-                    m_luapb = ByteString.CopyFrom(data).ToStringUtf8();
+                    m_luapb = new LuaByteBuffer(data);
                 }
                 return m_luapb;
             }
         }
+
+        // 是否为有效消息(当前收到的消息是否为最后发送的消息,是个标志)
+        public bool valid = true;
+
+        // 标志错误消息
+        public bool error { get; private set; }
+        // 错误码
+        public int errorCode { get; private set; }
 
         /// <summary>
         /// 写入协议包
@@ -128,11 +138,12 @@ namespace FastEngine.Core
         /// <summary>
         /// Lua Proto 写入协议包
         /// </summary>
-        /// <param name="luapb">lua pb data</param>
-        public SocketPack(int cmd, string luapb)
+        /// <param name="cmd"></param>
+        /// <param name="luabyte"></param>
+        public SocketPack(int cmd, LuaByteBuffer luabyte)
         {
             this.cmd = cmd;
-            this.m_luapb = luapb;
+            this.m_luapb = luabyte;
             this.packType = SocketPackType.LuaProto;
             this.m_isReadPack = false;
         }
@@ -140,10 +151,13 @@ namespace FastEngine.Core
         /// <summary>
         /// 读取协议包
         /// </summary>
+        /// <param name="cmd"></param>
+        /// <param name="sessionId"></param>
         /// <param name="data"></param>
-        public SocketPack(int cmd, byte[] data)
+        public SocketPack(int cmd, int sessionId, byte[] data)
         {
             this.cmd = cmd;
+            this.sessionId = sessionId;
             this.m_data = data;
             this.packType = UseProto ? SocketPackType.Proto : SocketPackType.Stream;
             this.m_isReadPack = true;
@@ -152,6 +166,18 @@ namespace FastEngine.Core
                 m_stream = new MemoryStream(data);
                 m_reader = new BinaryReader(m_stream);
             }
+        }
+
+        /// <summary>
+        /// 创建错误包(游戏需求)
+        /// </summary>
+        /// <param name="cmd"></param>
+        /// <param name="code"></param>
+        public SocketPack(int cmd, int code)
+        {
+            this.cmd = cmd;
+            this.error = true;
+            this.errorCode = code;
         }
 
         /// <summary>
@@ -176,7 +202,7 @@ namespace FastEngine.Core
         /// </summary>
         public void Send()
         {
-            if (m_isReadPack) TCPSession.Send(this);
+            if (!m_isReadPack) TCPSession.Send(this);
         }
 
         /// <summary>

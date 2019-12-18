@@ -267,21 +267,17 @@ namespace FastEngine.Core
             BroadcastConnected();
         }
 
-        public void Send(SocketPack pack)
+        public int Send(SocketPack pack)
         {
-            if (!isConnected || m_clientSocket == null || !m_clientSocket.Connected)
-            {
-                ReConnect();
-                return;
-            }
-
+            if (!isConnected || m_clientSocket == null || !m_clientSocket.Connected) return -1;
             this.m_sendCmdQueue.Enqueue(pack.cmd);
             this.m_sendQueue.Enqueue(m_sendPackHeader.Write(pack.cmd, pack.data));
+            return m_sendPackHeader.sessionId;
         }
 
-        public void Send(int cmd, IMessage message)
+        public int Send(int cmd, IMessage message)
         {
-            Send(new SocketPack(cmd, message));
+            return Send(new SocketPack(cmd, message));
         }
 
         private void OnSend(IAsyncResult iar)
@@ -345,7 +341,6 @@ namespace FastEngine.Core
                 if (!m_clientSocket.Connected)
                 {
                     isConnected = false;
-                    ReConnect();
                     break;
                 }
                 try

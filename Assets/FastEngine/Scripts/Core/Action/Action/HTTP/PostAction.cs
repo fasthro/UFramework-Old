@@ -50,7 +50,6 @@ namespace FastEngine.Core
             if (m_sent) return;
 
             m_sent = true;
-
             m_client.Post(uri, new FormUrlEncodedContent(m_fields), HttpCompletionOption.AllResponseContent, (response) =>
            {
                if (response.IsSuccessStatusCode)

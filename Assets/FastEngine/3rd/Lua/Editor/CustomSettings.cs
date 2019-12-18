@@ -10,6 +10,7 @@ using System.Reflection;
 using FastEngine.Core;
 using FairyGUI;
 using FastEngine.FUI;
+using FastEngine;
 
 public static class CustomSettings
 {
@@ -76,7 +77,7 @@ public static class CustomSettings
         _GT(typeof(DisplayObject)),
         _GT(typeof(Container)),
         _GT(typeof(Stage)),
-        _GT(typeof(FairyGUI.Controller)),
+        _GT(typeof(Controller)),
         _GT(typeof(GObject)),
         _GT(typeof(GGraph)),
         _GT(typeof(GGroup)),
@@ -109,10 +110,15 @@ public static class CustomSettings
         #endregion
 
         #region fastengine
+        _GT(typeof(App)),
+        _GT(typeof(AppRunModel)),
 
+        _GT(typeof(SocketPack)),
         _GT(typeof(TCPSession)),
         _GT(typeof(TCPSessionService)),
-        
+        _GT(typeof(TCPSessionServiceBuiltIn)),
+
+        _GT(typeof(Localization)),
         #region fui
         
         _GT(typeof(FWindow)),

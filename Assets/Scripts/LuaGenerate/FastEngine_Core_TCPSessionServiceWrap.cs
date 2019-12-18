@@ -8,7 +8,9 @@ public class FastEngine_Core_TCPSessionServiceWrap
 	{
 		L.BeginClass(typeof(FastEngine.Core.TCPSessionService), typeof(System.Object));
 		L.RegFunction("AddListener", AddListener);
+		L.RegFunction("AddBuiltInListener", AddBuiltInListener);
 		L.RegFunction("RemoveListener", RemoveListener);
+		L.RegFunction("RemoveBuiltInListener", RemoveBuiltInListener);
 		L.RegFunction("Broadcast", Broadcast);
 		L.RegFunction("Clear", Clear);
 		L.RegFunction("New", _CreateFastEngine_Core_TCPSessionService);
@@ -47,17 +49,10 @@ public class FastEngine_Core_TCPSessionServiceWrap
 		{
 			int count = LuaDLL.lua_gettop(L);
 
-			if (count == 2 && TypeChecker.CheckTypes<int, FastEngine.Core.TCPSessionServiceEventCallabck>(L, 1))
+			if (count == 2)
 			{
-				int arg0 = (int)LuaDLL.lua_tonumber(L, 1);
-				FastEngine.Core.TCPSessionServiceEventCallabck arg1 = (FastEngine.Core.TCPSessionServiceEventCallabck)ToLua.ToObject(L, 2);
-				FastEngine.Core.TCPSessionService.AddListener(arg0, arg1);
-				return 0;
-			}
-			else if (count == 2 && TypeChecker.CheckTypes<FastEngine.Core.TCPSessionServiceBuiltIn, FastEngine.Core.TCPSessionServiceBuiltInEventCallabck>(L, 1))
-			{
-				FastEngine.Core.TCPSessionServiceBuiltIn arg0 = (FastEngine.Core.TCPSessionServiceBuiltIn)ToLua.ToObject(L, 1);
-				FastEngine.Core.TCPSessionServiceBuiltInEventCallabck arg1 = (FastEngine.Core.TCPSessionServiceBuiltInEventCallabck)ToLua.ToObject(L, 2);
+				int arg0 = (int)LuaDLL.luaL_checknumber(L, 1);
+				FastEngine.Core.TCPSessionServiceEventCallabck arg1 = (FastEngine.Core.TCPSessionServiceEventCallabck)ToLua.CheckDelegate<FastEngine.Core.TCPSessionServiceEventCallabck>(L, 2);
 				FastEngine.Core.TCPSessionService.AddListener(arg0, arg1);
 				return 0;
 			}
@@ -81,6 +76,23 @@ public class FastEngine_Core_TCPSessionServiceWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int AddBuiltInListener(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			FastEngine.Core.TCPSessionServiceBuiltIn arg0 = (FastEngine.Core.TCPSessionServiceBuiltIn)ToLua.CheckObject(L, 1, typeof(FastEngine.Core.TCPSessionServiceBuiltIn));
+			FastEngine.Core.TCPSessionServiceBuiltInEventCallabck arg1 = (FastEngine.Core.TCPSessionServiceBuiltInEventCallabck)ToLua.CheckDelegate<FastEngine.Core.TCPSessionServiceBuiltInEventCallabck>(L, 2);
+			FastEngine.Core.TCPSessionService.AddBuiltInListener(arg0, arg1);
+			return 0;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int RemoveListener(IntPtr L)
 	{
 		try
@@ -93,17 +105,10 @@ public class FastEngine_Core_TCPSessionServiceWrap
 				FastEngine.Core.TCPSessionService.RemoveListener(arg0);
 				return 0;
 			}
-			else if (count == 2 && TypeChecker.CheckTypes<int, FastEngine.Core.TCPSessionServiceEventCallabck>(L, 1))
+			else if (count == 2)
 			{
-				int arg0 = (int)LuaDLL.lua_tonumber(L, 1);
-				FastEngine.Core.TCPSessionServiceEventCallabck arg1 = (FastEngine.Core.TCPSessionServiceEventCallabck)ToLua.ToObject(L, 2);
-				FastEngine.Core.TCPSessionService.RemoveListener(arg0, arg1);
-				return 0;
-			}
-			else if (count == 2 && TypeChecker.CheckTypes<FastEngine.Core.TCPSessionServiceBuiltIn, FastEngine.Core.TCPSessionServiceBuiltInEventCallabck>(L, 1))
-			{
-				FastEngine.Core.TCPSessionServiceBuiltIn arg0 = (FastEngine.Core.TCPSessionServiceBuiltIn)ToLua.ToObject(L, 1);
-				FastEngine.Core.TCPSessionServiceBuiltInEventCallabck arg1 = (FastEngine.Core.TCPSessionServiceBuiltInEventCallabck)ToLua.ToObject(L, 2);
+				int arg0 = (int)LuaDLL.luaL_checknumber(L, 1);
+				FastEngine.Core.TCPSessionServiceEventCallabck arg1 = (FastEngine.Core.TCPSessionServiceEventCallabck)ToLua.CheckDelegate<FastEngine.Core.TCPSessionServiceEventCallabck>(L, 2);
 				FastEngine.Core.TCPSessionService.RemoveListener(arg0, arg1);
 				return 0;
 			}
@@ -119,6 +124,23 @@ public class FastEngine_Core_TCPSessionServiceWrap
 			{
 				return LuaDLL.luaL_throw(L, "invalid arguments to method: FastEngine.Core.TCPSessionService.RemoveListener");
 			}
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int RemoveBuiltInListener(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			FastEngine.Core.TCPSessionServiceBuiltIn arg0 = (FastEngine.Core.TCPSessionServiceBuiltIn)ToLua.CheckObject(L, 1, typeof(FastEngine.Core.TCPSessionServiceBuiltIn));
+			FastEngine.Core.TCPSessionServiceBuiltInEventCallabck arg1 = (FastEngine.Core.TCPSessionServiceBuiltInEventCallabck)ToLua.CheckDelegate<FastEngine.Core.TCPSessionServiceBuiltInEventCallabck>(L, 2);
+			FastEngine.Core.TCPSessionService.RemoveBuiltInListener(arg0, arg1);
+			return 0;
 		}
 		catch (Exception e)
 		{

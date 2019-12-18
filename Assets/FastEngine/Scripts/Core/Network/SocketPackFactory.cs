@@ -5,6 +5,7 @@
  */
 
 using Google.Protobuf;
+using LuaInterface;
 
 namespace FastEngine.Core
 {
@@ -33,20 +34,31 @@ namespace FastEngine.Core
         /// 创建 lua protobuf 写入包
         /// </summary>
         /// <param name="cmd"></param>
-        /// <param name="serialize"></param>
+        /// <param name="luabyte"></param>
         /// <returns></returns>
-        public static SocketPack CreateWriter(int cmd, string serialize)
+        public static SocketPack CreateWriter(int cmd, LuaByteBuffer luabyte)
         {
-            return new SocketPack(cmd, serialize);
+            return new SocketPack(cmd, luabyte);
         }
 
         /// <summary>
         /// 创建读取包
         /// </summary>
         /// <param name="data"></param>
-        public static SocketPack CreateReader(int cmd, byte[] data)
+        public static SocketPack CreateReader(int cmd, int sessionId, byte[] data)
         {
-            return new SocketPack(cmd, data);
+            return new SocketPack(cmd, sessionId, data);
+        }
+
+        /// <summary>
+        /// 创建错误包
+        /// </summary>
+        /// <param name="cmd"></param>
+        /// <param name="errorCode"></param>
+        /// <returns></returns>
+        public static SocketPack CreateError(int cmd, int errorCode)
+        {
+            return new SocketPack(cmd, errorCode);
         }
     }
 }

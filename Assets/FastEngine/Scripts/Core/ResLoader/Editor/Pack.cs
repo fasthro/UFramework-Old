@@ -102,7 +102,7 @@ namespace FastEngine.Editor.AssetBundle
             for (int i = 0; i < typeDirs.Length; i++)
             {
                 var typeDir = typeDirs[i];
-                var _type = FilePath.GetPathSection(typeDir, -1);
+                var _type = FilePathUtils.GetPathSection(typeDir, -1);
                 var dir = Path.Combine(typeDir, "Prefab");
                 if (Directory.Exists(dir))
                 {
@@ -120,8 +120,14 @@ namespace FastEngine.Editor.AssetBundle
         {
             if (File.Exists(target))
             {
-                var abName = Path.Combine(bundlePath, bundleName);
-                SetBundleName(target, abName);
+                if (!string.IsNullOrEmpty(bundlePath))
+                {
+                    SetBundleName(target, FilePathUtils.Combine(bundlePath, FilePathUtils.GetFileName(target, false)));
+                }
+                else
+                {
+                    SetBundleName(target, FilePathUtils.GetFileName(target, false));
+                }
             }
         }
 
@@ -132,8 +138,7 @@ namespace FastEngine.Editor.AssetBundle
                 string[] files = Directory.GetFiles(target, pattern, SearchOption.AllDirectories);
                 for (int index = 0; index < files.Length; index++)
                 {
-                    var abName = Path.Combine(bundlePath, bundleName);
-                    SetBundleName(files[index], abName);
+                    SetBundleName(files[index], FilePathUtils.Combine(bundlePath, bundleName));
                 }
             }
         }
@@ -144,7 +149,7 @@ namespace FastEngine.Editor.AssetBundle
             for (int i = 0; i < typeDirs.Length; i++)
             {
                 var typeDir = typeDirs[i];
-                var _type = FilePath.GetPathSection(typeDir, -1);
+                var _type = FilePathUtils.GetPathSection(typeDir, -1);
                 string[] files = Directory.GetFiles(typeDir, pattern, SearchOption.AllDirectories);
                 for (int index = 0; index < files.Length; index++)
                 {
@@ -159,7 +164,6 @@ namespace FastEngine.Editor.AssetBundle
             AssetImporter import = AssetImporter.GetAtPath(filePath);
             if (import != null)
             {
-                Debug.Log("AssetBundle -> " + import.assetPath + " -> " + bundleName + " -> " + Path.GetFileName(import.assetPath));
                 import.assetBundleName = bundleName;
 
                 // 添加配置
@@ -173,7 +177,7 @@ namespace FastEngine.Editor.AssetBundle
                 {
                     var data = new AssetBundleMappingData();
                     data.bundleName = import.assetBundleName;
-                    data.resName = Path.GetFileName(import.assetPath);
+                    data.assetName = FilePathUtils.GetFileName(import.assetPath, true);
                     mapping.Add(rp, data);
                 }
             }

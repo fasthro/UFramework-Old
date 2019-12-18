@@ -53,7 +53,7 @@ namespace FastEngine.Core
             reserved = m_reader.ReadBytes(4);
             cmd = m_reader.ReadInt32();
             sessionId = m_reader.ReadInt32();
-            
+
             m_stream.Flush();
             m_stream.Close();
             m_reader.Close();
@@ -86,7 +86,8 @@ namespace FastEngine.Core
             m_writer.Write(this.cmd);
 
             // sessionId
-            m_writer.Write(SendSessionId);
+            sessionId = SendSessionId;
+            m_writer.Write(sessionId);
 
             // data
             m_writer.Write(data);

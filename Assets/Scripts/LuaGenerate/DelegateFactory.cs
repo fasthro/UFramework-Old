@@ -30,6 +30,7 @@ public class DelegateFactory
 		dict.Add(typeof(FairyGUI.UIObjectFactory.GLoaderCreator), factory.FairyGUI_UIObjectFactory_GLoaderCreator);
 		dict.Add(typeof(FairyGUI.UIPackage.LoadResource), factory.FairyGUI_UIPackage_LoadResource);
 		dict.Add(typeof(FairyGUI.UIPackage.CreateObjectCallback), factory.FairyGUI_UIPackage_CreateObjectCallback);
+		dict.Add(typeof(FastEngine.AppBehaviourCallback), factory.FastEngine_AppBehaviourCallback);
 		dict.Add(typeof(FastEngine.Core.TCPSessionServiceEventCallabck), factory.FastEngine_Core_TCPSessionServiceEventCallabck);
 		dict.Add(typeof(FastEngine.Core.TCPSessionServiceBuiltInEventCallabck), factory.FastEngine_Core_TCPSessionServiceBuiltInEventCallabck);
 
@@ -46,6 +47,7 @@ public class DelegateFactory
 		DelegateTraits<FairyGUI.UIObjectFactory.GLoaderCreator>.Init(factory.FairyGUI_UIObjectFactory_GLoaderCreator);
 		DelegateTraits<FairyGUI.UIPackage.LoadResource>.Init(factory.FairyGUI_UIPackage_LoadResource);
 		DelegateTraits<FairyGUI.UIPackage.CreateObjectCallback>.Init(factory.FairyGUI_UIPackage_CreateObjectCallback);
+		DelegateTraits<FastEngine.AppBehaviourCallback>.Init(factory.FastEngine_AppBehaviourCallback);
 		DelegateTraits<FastEngine.Core.TCPSessionServiceEventCallabck>.Init(factory.FastEngine_Core_TCPSessionServiceEventCallabck);
 		DelegateTraits<FastEngine.Core.TCPSessionServiceBuiltInEventCallabck>.Init(factory.FastEngine_Core_TCPSessionServiceBuiltInEventCallabck);
 
@@ -62,6 +64,7 @@ public class DelegateFactory
 		TypeTraits<FairyGUI.UIObjectFactory.GLoaderCreator>.Init(factory.Check_FairyGUI_UIObjectFactory_GLoaderCreator);
 		TypeTraits<FairyGUI.UIPackage.LoadResource>.Init(factory.Check_FairyGUI_UIPackage_LoadResource);
 		TypeTraits<FairyGUI.UIPackage.CreateObjectCallback>.Init(factory.Check_FairyGUI_UIPackage_CreateObjectCallback);
+		TypeTraits<FastEngine.AppBehaviourCallback>.Init(factory.Check_FastEngine_AppBehaviourCallback);
 		TypeTraits<FastEngine.Core.TCPSessionServiceEventCallabck>.Init(factory.Check_FastEngine_Core_TCPSessionServiceEventCallabck);
 		TypeTraits<FastEngine.Core.TCPSessionServiceBuiltInEventCallabck>.Init(factory.Check_FastEngine_Core_TCPSessionServiceBuiltInEventCallabck);
 
@@ -78,6 +81,7 @@ public class DelegateFactory
 		StackTraits<FairyGUI.UIObjectFactory.GLoaderCreator>.Push = factory.Push_FairyGUI_UIObjectFactory_GLoaderCreator;
 		StackTraits<FairyGUI.UIPackage.LoadResource>.Push = factory.Push_FairyGUI_UIPackage_LoadResource;
 		StackTraits<FairyGUI.UIPackage.CreateObjectCallback>.Push = factory.Push_FairyGUI_UIPackage_CreateObjectCallback;
+		StackTraits<FastEngine.AppBehaviourCallback>.Push = factory.Push_FastEngine_AppBehaviourCallback;
 		StackTraits<FastEngine.Core.TCPSessionServiceEventCallabck>.Push = factory.Push_FastEngine_Core_TCPSessionServiceEventCallabck;
 		StackTraits<FastEngine.Core.TCPSessionServiceBuiltInEventCallabck>.Push = factory.Push_FastEngine_Core_TCPSessionServiceBuiltInEventCallabck;
 	}
@@ -936,6 +940,59 @@ public class DelegateFactory
 	}
 
 	void Push_FairyGUI_UIPackage_CreateObjectCallback(IntPtr L, FairyGUI.UIPackage.CreateObjectCallback o)
+	{
+		ToLua.Push(L, o);
+	}
+
+	class FastEngine_AppBehaviourCallback_Event : LuaDelegate
+	{
+		public FastEngine_AppBehaviourCallback_Event(LuaFunction func) : base(func) { }
+		public FastEngine_AppBehaviourCallback_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call()
+		{
+			func.Call();
+		}
+
+		public void CallWithSelf()
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public FastEngine.AppBehaviourCallback FastEngine_AppBehaviourCallback(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			FastEngine.AppBehaviourCallback fn = delegate() { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			FastEngine_AppBehaviourCallback_Event target = new FastEngine_AppBehaviourCallback_Event(func);
+			FastEngine.AppBehaviourCallback d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			FastEngine_AppBehaviourCallback_Event target = new FastEngine_AppBehaviourCallback_Event(func, self);
+			FastEngine.AppBehaviourCallback d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	bool Check_FastEngine_AppBehaviourCallback(IntPtr L, int pos)
+	{
+		return TypeChecker.CheckDelegateType(typeof(FastEngine.AppBehaviourCallback), L, pos);
+	}
+
+	void Push_FastEngine_AppBehaviourCallback(IntPtr L, FastEngine.AppBehaviourCallback o)
 	{
 		ToLua.Push(L, o);
 	}

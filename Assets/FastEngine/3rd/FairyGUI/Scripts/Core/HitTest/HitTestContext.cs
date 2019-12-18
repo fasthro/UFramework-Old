@@ -8,7 +8,7 @@ namespace FairyGUI
     /// </summary>
     public class HitTestContext
     {
-        //set before hit test
+        //set before hit FinishCallback
         public static Vector2 screenPoint;
         public static Vector3 worldPoint;
         public static Vector3 direction;

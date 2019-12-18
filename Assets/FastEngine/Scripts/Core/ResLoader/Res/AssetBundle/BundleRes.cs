@@ -4,6 +4,7 @@
  * @Description: Assetbundle 资源
  */
 using System.Collections;
+using FastEngine.Utils;
 using UnityEngine;
 
 namespace FastEngine.Core
@@ -63,7 +64,7 @@ namespace FastEngine.Core
         {
             if (m_state == ResState.Ready)
                 return true;
-                
+
             m_state = ResState.Loading;
 
             // 先加载依赖
@@ -85,7 +86,7 @@ namespace FastEngine.Core
             }
 
             // 加载本体
-            var url = AssetBundlePath.GetFilePath(m_bundleName);
+            var url = FilePathUtils.Combine(AppUtils.BundleRootDirectory(), m_bundleName);
             m_assetBundle = AssetBundle.LoadFromFile(url);
             if (m_assetBundle == null)
             {
@@ -138,7 +139,7 @@ namespace FastEngine.Core
             if (m_dependWaitCount <= 0)
             {
                 // 依赖加载完毕
-               RunAsync.Instance.Push(this);
+                RunAsync.Instance.Push(this);
             }
         }
 
@@ -148,7 +149,7 @@ namespace FastEngine.Core
         /// <param name="async"></param>
         public IEnumerator AsyncRun(IRunAsync async)
         {
-            var url = AssetBundlePath.GetFilePath(m_bundleName);
+            var url = FilePathUtils.Combine(AppUtils.BundleRootDirectory(), m_bundleName); ;
             var request = AssetBundle.LoadFromFileAsync(url);
 
             m_request = request;

@@ -236,6 +236,3 @@ get.grayscale = Color.GrayScale
 UnityEngine.Color = Color
 setmetatable(Color, Color)
 return Color
-
-
-

@@ -11,12 +11,7 @@ namespace FastEngine.Editor
     {
         #region normal
 
-        public static void Run(string fileName, string arg)
-        {
-            Run(fileName, new string[] { arg });
-        }
-
-        public static void Run(string fileName, string[] args)
+        public static void Run(string fileName, string[] args = null)
         {
             Process process = new Process();
             try
@@ -34,15 +29,17 @@ namespace FastEngine.Editor
                 process.StartInfo.RedirectStandardError = true;
                 // 重定向标准错误输出  
                 process.StartInfo.FileName = fileName;
-
-                string arguments = "";
-                for (int i = 0; i < args.Length; i++)
+                if (args != null)
                 {
-                    arguments += args[i];
-                    arguments += " ";
+                    string arguments = "";
+                    for (int i = 0; i < args.Length; i++)
+                    {
+                        arguments += args[i];
+                        arguments += " ";
+                    }
+                    arguments = arguments.TrimEnd(' ');
+                    process.StartInfo.Arguments = arguments;
                 }
-                arguments = arguments.TrimEnd(' ');
-                process.StartInfo.Arguments = arguments;
                 // 启动程序
                 process.Start();
 

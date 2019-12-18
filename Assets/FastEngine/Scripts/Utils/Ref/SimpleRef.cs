@@ -9,7 +9,7 @@ namespace FastEngine.Utils
     {
         public int refCount { get; private set; }
         public bool isRefZero { get { return refCount == 0; } }
-        
+
         public void Release()
         {
             refCount--;

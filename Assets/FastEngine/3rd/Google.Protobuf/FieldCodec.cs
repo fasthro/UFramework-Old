@@ -43,7 +43,7 @@ namespace Google.Protobuf
     /// </summary>
     public static class FieldCodec
     {
-        // TODO: Avoid the "dual hit" of lambda expressions: create open delegates instead. (At least test...)
+        // TODO: Avoid the "dual hit" of lambda expressions: create open delegates instead. (At least FinishCallback...)
 
         /// <summary>
         /// Retrieves a codec suitable for a string field with the given tag.
