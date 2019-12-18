@@ -5,7 +5,7 @@
  */
 namespace FastEngine.Core
 {
-    public class HotfixConfig
+    public class HotfixConfig : IConfig
     {
         /// <summary>
         /// 文件信息
@@ -23,5 +23,13 @@ namespace FastEngine.Core
         public bool hotfix { get; set; }             // 低版本是否进行热更新
         public int hotfixFileSize { get; set; }      // 热更文件总大小
         public int hotfixFileCount { get; set; }     // 热更文件总数量
+
+        public void Initialize()
+        {
+            if (version == null)
+            {
+                version = new VersionConfig();
+            }
+        }
     }
 }

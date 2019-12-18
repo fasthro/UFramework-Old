@@ -47,10 +47,10 @@ namespace FastEngine.Core
         {
             m_only = string.IsNullOrEmpty(assetName);
 
-            m_bundleRes = ResPool.Get<BundleRes>(ResData.AllocateBundle(bundleName), true);
+            m_bundleRes = ResCache.Get<BundleRes>(ResData.AllocateBundle(bundleName), true);
 
             if (!m_only)
-                m_assetRes = ResPool.Get<AssetRes>(ResData.AllocateAsset(assetName, bundleName), true);
+                m_assetRes = ResCache.Get<AssetRes>(ResData.AllocateAsset(assetName, bundleName), true);
 
             m_listener = listener;
         }

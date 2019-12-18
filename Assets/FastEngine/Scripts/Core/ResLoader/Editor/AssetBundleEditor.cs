@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.IO;
 using AssetBundleBrowser.AssetBundleDataSource;
 using FastEngine.Core;
-using FastEngine.Utils;
 using LitJson;
 using UnityEditor;
 using UnityEngine;
@@ -20,7 +19,7 @@ namespace FastEngine.Editor.AssetBundle
         [MenuItem("FastEngine/AssetBundle -> 打开配置", false, 100)]
         static void OpenConfig()
         {
-            AssetBundleCEW.Open<AssetBundleCEW>();
+            FastEditorWindow.ShowWindow<AssetBundleEditorWindow>();
         }
 
         [MenuItem("FastEngine/AssetBundle -> 打包", false, 101)]
@@ -60,7 +59,7 @@ namespace FastEngine.Editor.AssetBundle
         [MenuItem("FastEngine/AssetBundle -> Copy Source", false, 104)]
         public static void CopySource()
         {
-            AssetBundleConfig config = AppUtils.LoadConfig<AssetBundleConfig>(AppUtils.EditorConfigPath("AssetBundleConfig"));
+            AssetBundleConfig config = AppUtils.ReadEditorConfig<AssetBundleConfig>();
             for (int i = 0; i < config.sources.Count; i++)
             {
                 var source = config.sources[i];
@@ -72,7 +71,7 @@ namespace FastEngine.Editor.AssetBundle
         static bool StartGenMapping()
         {
             AssetDatabase.RemoveUnusedAssetBundleNames();
-            AssetBundleConfig config = AppUtils.LoadConfig<AssetBundleConfig>(AppUtils.EditorConfigPath("AssetBundleConfig"));
+            AssetBundleConfig config = AppUtils.ReadEditorConfig<AssetBundleConfig>();
             Dictionary<string, AssetBundleMappingData> mapingDic = new Dictionary<string, AssetBundleMappingData>();
             for (int i = 0; i < config.packs.Count; i++)
             {

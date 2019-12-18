@@ -9,7 +9,7 @@ using LuaInterface;
 
 namespace FastEngine.Core
 {
-    [MonoSingletonPath("FastEngine/Network")]
+    [MonoSingletonPath("FastEngine/TCPSession")]
     public class TCPSession : MonoSingleton<TCPSession>
     {
         private SocketClient m_client;
@@ -90,6 +90,9 @@ namespace FastEngine.Core
                     break;
                 case SocketState.Connected:
                     TCPSessionService.Broadcast(TCPSessionServiceBuiltIn.Connected);
+                    break;
+                case SocketState.Disconnected:
+                    TCPSessionService.Broadcast(TCPSessionServiceBuiltIn.Disconnected);
                     break;
                 default:
                     break;

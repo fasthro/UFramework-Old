@@ -8,7 +8,6 @@ using System.IO;
 using FastEngine.Core;
 using FastEngine.Editor.AssetBundle;
 using FastEngine.Editor.Lua;
-using FastEngine.Utils;
 using LitJson;
 using UnityEngine;
 
@@ -36,7 +35,7 @@ namespace FastEngine.Editor.Version
                 Debug.Log("[Build Hotfix] -> 构建版本配置-失败. 打开菜单(FastEngine-HotfixUpdate -> 打开配置)进行配置.");
                 return;
             }
-            buildConfig = AppUtils.LoadConfig<BuildHotfixConfig>(path);
+            buildConfig = AppUtils.ReadConfig<BuildHotfixConfig>(path);
 
             // 构建资源
             if (buildConfig.cleanBuild) AssetBundleEditor.CleanBuild();
@@ -86,7 +85,7 @@ namespace FastEngine.Editor.Version
             // config
             var configPath = FilePathUtils.Combine(FilePathUtils.GetTopDirectory(Application.dataPath),
                  "Build", buildConfig.version.ToVersionString(), buildConfig.version.ToResourceString(), "HotfixConfig.json");
-            config = AppUtils.LoadConfig<HotfixConfig>(configPath);
+            config = AppUtils.ReadConfig<HotfixConfig>(configPath);
             if (config.fileInfos == null) config.fileInfos = new HotfixConfig.FileInfo[0];
 
             Debug.Log("[Build Hotfix] -> 待修复版本资源数量:" + config.fileInfos.Length);

@@ -12,7 +12,7 @@ namespace FastEngine.Editor.Version
         [MenuItem("FastEngine/Version -> 打开配置", false, 400)]
         public static void OpenConfig()
         {
-            VersionCEW.Open<VersionCEW>();
+            FastEditorWindow.ShowWindow<VersionEditorWindow>();
         }
 
         [MenuItem("FastEngine/Version -> Build Android Application", false, 401)]

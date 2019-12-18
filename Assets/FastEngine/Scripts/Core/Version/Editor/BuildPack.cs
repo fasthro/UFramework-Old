@@ -9,7 +9,6 @@ using System.Linq;
 using FastEngine.Core;
 using FastEngine.Editor.AssetBundle;
 using FastEngine.Editor.Lua;
-using FastEngine.Utils;
 using LitJson;
 using UnityEditor;
 using UnityEngine;
@@ -56,7 +55,7 @@ namespace FastEngine.Editor.Version
             FilePathUtils.DirectoryClean(editorPersistentDataPath);
 
             // 加载构建配置
-            buildConfig = AppUtils.LoadConfig<BuildPackConfig>(AppUtils.EditorConfigPath("BuildPackConfig"));
+            buildConfig = AppUtils.ReadConfig<BuildPackConfig>(AppUtils.EditorConfigPath("BuildPackConfig"));
             // bundleVersionCode 自增
             buildConfig.bundleVersionCode++;
 
@@ -68,7 +67,7 @@ namespace FastEngine.Editor.Version
                 Debug.Log("[Build Pack] -> 构建版本配置-失败. 打开菜单(FastEngine-Version -> 打开配置)进行配置.");
                 return;
             }
-            versionConfig = AppUtils.LoadConfig<VersionConfig>(path);
+            versionConfig = AppUtils.ReadConfig<VersionConfig>(path);
 
             // 构建版本资源
             BuildVersionResource();
@@ -199,7 +198,7 @@ namespace FastEngine.Editor.Version
         {
             // 修改App配置
             var outPath = FilePathUtils.Combine(Application.dataPath, "Resources", "AppConfig.json");
-            var appConfig = AppUtils.LoadConfig<AppConfig>(outPath);
+            var appConfig = AppUtils.ReadConfig<AppConfig>(outPath);
             appConfig.runModel = AppRunModel.Release;
             FilePathUtils.FileWriteAllText(outPath, JsonMapper.ToJson(appConfig));
         }
@@ -213,7 +212,7 @@ namespace FastEngine.Editor.Version
             FilePathUtils.DirectoryDelete(Application.streamingAssetsPath);
             // 修改App配置
             var outPath = FilePathUtils.Combine(Application.dataPath, "Resources", "AppConfig.json");
-            var appConfig = AppUtils.LoadConfig<AppConfig>(outPath);
+            var appConfig = AppUtils.ReadConfig<AppConfig>(outPath);
             appConfig.runModel = AppRunModel.Develop;
             appConfig.enableLog = true;
             appConfig.useSystemLanguage = true;

@@ -8,7 +8,7 @@ using System.IO;
 using System.Collections;
 using UnityEngine;
 using ICSharpCode.SharpZipLib.Zip;
-namespace FastEngine.Utils
+namespace FastEngine
 {
     public static class ZipUtils
     {

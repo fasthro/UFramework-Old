@@ -5,7 +5,7 @@
  */
 namespace FastEngine.Core
 {
-    public class VersionConfig
+    public class VersionConfig : IConfig
     {
         // 大号
         public int large { get; set; }
@@ -18,6 +18,8 @@ namespace FastEngine.Core
 
         // 压缩文件总数量(用于计算解压进度)
         public int compressFileTotalCount { get; set; }
+
+        public void Initialize() { }
 
         /// <summary>
         /// to version string

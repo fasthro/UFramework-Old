@@ -3,7 +3,7 @@
  * @Date: 2019-10-28 16:36:24
  * @Description: 简单的引用计数基类
  */
-namespace FastEngine.Utils
+namespace FastEngine.Ref
 {
     public class SimpleRef : IRef
     {

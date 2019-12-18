@@ -3,7 +3,7 @@
  * @Date: 2019-11-27 10:33:56
  * @Description: 平台工具类
  */
-namespace FastEngine.Utils
+namespace FastEngine
 {
     public static class PlatformUtils
     {

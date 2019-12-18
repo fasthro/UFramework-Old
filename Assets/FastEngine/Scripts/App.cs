@@ -11,7 +11,7 @@ using FastEngine.Core;
 using Logger = FastEngine.Core.Logger;
 using DG.Tweening;
 using FairyGUI;
-using FastEngine.FUI;
+using FastEngine.FairyUI;
 using FastEngine.Debuger;
 
 namespace FastEngine
@@ -41,7 +41,7 @@ namespace FastEngine
     ///     - Localization:非Bundle加载
     ///     - UI:非Bundle加载
     ///     - 其他资源:Bundle加载
-    /// 正式模式为移动包模式
+    /// 正式bundle资源模式
     ///     - 热更新:开启
     ///     - Localization:Bundle加载
     ///     - UI:Bundle加载
@@ -58,17 +58,22 @@ namespace FastEngine
         /// <summary>
         /// 运行模式
         /// </summary>
-        public static AppRunModel runModel;
+        public static AppRunModel runModel { get; private set; }
 
         /// <summary>
         /// QA 测试包
         /// </summary>
-        public static bool QATest;
+        public static bool QATest { get; private set; }
+
+        /// <summary>
+        /// 发布版本
+        /// </summary>
+        public static bool releaseVersion { get; private set; }
 
         /// <summary>
         /// App 配置
         /// </summary>
-        public static AppConfig appConfig;
+        public static AppConfig appConfig { get; private set; }
 
         /// <summary>
         /// 程序启动
@@ -82,6 +87,7 @@ namespace FastEngine
 
             // 配置app参数
             runModel = appConfig.runModel;
+            releaseVersion = appConfig.releaseVersion;
             QATest = appConfig.QATest;
             Application.runInBackground = true;
             Screen.fullScreen = true;
@@ -96,21 +102,21 @@ namespace FastEngine
             // 关闭移除包同时卸载Bundle
             UIPackage.unloadBundleByFGUI = false;
 
-            DOTween.Init(true, true, LogBehaviour.Default);                       // DOTween
-            ScriptWatch.Initialize(runModel == AppRunModel.Develop || QATest);    // 代码监测
-            Logger.Initialize(appConfig.enableLog);                               // 日志
-            TCPSession.Initialize(appConfig.enableLog);                           // 网络TCP
-            FWindowSortService.Initialize();                                      // Window 排序服务
+            DOTween.Init(true, true, LogBehaviour.Default);                         // DOTween
+            ScriptWatch.Initialize(!releaseVersion);                                // 代码监测
+            Logger.Initialize(appConfig.enableLog);                                 // 日志
+            TCPSession.Initialize(appConfig.enableLog);                             // 网络TCP
+            FairyWindowSortingOrder.Initialize();                                   // Window 排序服务
             var language = appConfig.useSystemLanguage ? Application.systemLanguage : appConfig.language;
-            Localization.Initialize(language, appConfig.defaultLanguage);         // 本地化多语言
-            if (runModel == AppRunModel.Develop) Lua.Initialize();                // Lua(开发模式或者热更新完成方可启动)
+            i18n.Initialize(language, appConfig.defaultLanguage);                   // 国际化
+            if (runModel == AppRunModel.Develop) Lua.Initialize();                  // Lua(开发模式或者热更新完成方可启动)
         }
 
         public void AppQuit()
         {
             TCPSession.Disconnecte();      // 网络TCP
             Lua.Close();                   // Lua
-            Localization.Release();        // 本地化多语言
+            i18n.Release();        // 国际化
         }
 
         #region Delegate

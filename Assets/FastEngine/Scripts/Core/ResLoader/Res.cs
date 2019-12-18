@@ -3,7 +3,7 @@
  * @Date: 2019-06-22 15:28:19
  * @Description: 资源基类
  */
-using FastEngine.Utils;
+using FastEngine.Ref;
 using UnityEngine;
 
 namespace FastEngine.Core

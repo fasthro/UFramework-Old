@@ -9,7 +9,6 @@ using UnityEngine.UI;
 using System.Reflection;
 using FastEngine.Core;
 using FairyGUI;
-using FastEngine.FUI;
 using FastEngine;
 
 public static class CustomSettings
@@ -118,15 +117,8 @@ public static class CustomSettings
         _GT(typeof(TCPSessionService)),
         _GT(typeof(TCPSessionServiceBuiltIn)),
 
-        _GT(typeof(Localization)),
-        #region fui
-        
-        _GT(typeof(FWindow)),
-        _GT(typeof(FLayer)),
-        _GT(typeof(FWindowState)),
-        
-        #endregion
-
+        _GT(typeof(i18n)),
+        _GT(typeof(i18nObject)),
         #endregion
     };
 

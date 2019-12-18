@@ -6,7 +6,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using FastEngine.Utils;
+using LitJson;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -128,7 +128,7 @@ namespace FastEngine.Core
             // 加载数据目录版本配置
             var dp = FilePathUtils.Combine(AppUtils.DataRootDirectory(), "VersionConfig.json");
             if (FilePathUtils.FileExists(dp))
-                m_version = AppUtils.LoadConfig<VersionConfig>(dp);
+                m_version = AppUtils.ReadConfig<VersionConfig>(dp);
 
             // 加载原始版本配置
             var rp = AppUtils.AppRawPath() + "VersionConfig.json";
@@ -141,7 +141,7 @@ namespace FastEngine.Core
             }
             else
             {
-                m_rawVersion = AppUtils.LoadConfig<VersionConfig>(rp);
+                m_rawVersion = AppUtils.ReadConfig<VersionConfig>(rp);
                 CheckUnpackBase();
             }
         }
@@ -157,7 +157,7 @@ namespace FastEngine.Core
             yield return request.SendWebRequest();
             if (request.isDone)
             {
-                m_rawVersion = AppUtils.LoadConfig2<VersionConfig>(request.downloadHandler.text);
+                m_rawVersion = JsonMapper.ToObject<VersionConfig>(request.downloadHandler.text);
             }
         }
 
@@ -254,7 +254,7 @@ namespace FastEngine.Core
             yield return request.SendWebRequest();
             if (request.isDone)
             {
-                m_hotfix = AppUtils.LoadConfig2<HotfixConfig>(request.downloadHandler.text);
+                m_hotfix = JsonMapper.ToObject<HotfixConfig>(request.downloadHandler.text);
                 if (m_hotfix.hotfix) CheckUpdate();
                 else HotfixFinished();
             }

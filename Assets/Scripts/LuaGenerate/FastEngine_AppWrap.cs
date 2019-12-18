@@ -12,9 +12,10 @@ public class FastEngine_AppWrap
 		L.RegFunction("BindCallback", BindCallback);
 		L.RegFunction("__eq", op_Equality);
 		L.RegFunction("__tostring", ToLua.op_ToString);
-		L.RegVar("runModel", get_runModel, set_runModel);
-		L.RegVar("QATest", get_QATest, set_QATest);
-		L.RegVar("appConfig", get_appConfig, set_appConfig);
+		L.RegVar("runModel", get_runModel, null);
+		L.RegVar("QATest", get_QATest, null);
+		L.RegVar("releaseVersion", get_releaseVersion, null);
+		L.RegVar("appConfig", get_appConfig, null);
 		L.EndClass();
 	}
 
@@ -115,11 +116,11 @@ public class FastEngine_AppWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_appConfig(IntPtr L)
+	static int get_releaseVersion(IntPtr L)
 	{
 		try
 		{
-			ToLua.PushObject(L, FastEngine.App.appConfig);
+			LuaDLL.lua_pushboolean(L, FastEngine.App.releaseVersion);
 			return 1;
 		}
 		catch (Exception e)
@@ -129,43 +130,12 @@ public class FastEngine_AppWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_runModel(IntPtr L)
+	static int get_appConfig(IntPtr L)
 	{
 		try
 		{
-			FastEngine.AppRunModel arg0 = (FastEngine.AppRunModel)ToLua.CheckObject(L, 2, typeof(FastEngine.AppRunModel));
-			FastEngine.App.runModel = arg0;
-			return 0;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_QATest(IntPtr L)
-	{
-		try
-		{
-			bool arg0 = LuaDLL.luaL_checkboolean(L, 2);
-			FastEngine.App.QATest = arg0;
-			return 0;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_appConfig(IntPtr L)
-	{
-		try
-		{
-			FastEngine.Core.AppConfig arg0 = (FastEngine.Core.AppConfig)ToLua.CheckObject<FastEngine.Core.AppConfig>(L, 2);
-			FastEngine.App.appConfig = arg0;
-			return 0;
+			ToLua.PushObject(L, FastEngine.App.appConfig);
+			return 1;
 		}
 		catch (Exception e)
 		{

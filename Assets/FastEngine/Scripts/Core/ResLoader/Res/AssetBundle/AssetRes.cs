@@ -26,6 +26,9 @@ namespace FastEngine.Core
 
         public void Recycle()
         {
+            // 移除缓存
+            ResCache.Remove(ResData.AllocateAsset(assetName, bundleName));
+            // 回收
             ObjectPool<AssetRes>.Instance.Recycle(this);
         }
         #endregion
@@ -47,7 +50,7 @@ namespace FastEngine.Core
         {
             if (m_assetBundle == null)
             {
-                m_bundleRes = ResPool.Get<BundleRes>(ResData.AllocateBundle(bundleName));
+                m_bundleRes = ResCache.Get<BundleRes>(ResData.AllocateBundle(bundleName));
                 if (m_bundleRes != null)
                 {
                     m_assetBundle = m_bundleRes.assetBundle;
@@ -63,7 +66,7 @@ namespace FastEngine.Core
         {
             if (m_state == ResState.Ready)
                 return true;
-                
+
             if (!SearchAssetBundle())
             {
                 m_state = ResState.Failed;
@@ -166,7 +169,7 @@ namespace FastEngine.Core
 
             m_assetBundle = null;
             m_asset = null;
-            
+
             Recycle();
         }
     }

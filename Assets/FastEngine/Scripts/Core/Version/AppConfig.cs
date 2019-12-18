@@ -9,12 +9,14 @@ using UnityEngine;
 
 namespace FastEngine.Core
 {
-    public class AppConfig
+    public class AppConfig : IConfig
     {
         // 是否开启日志
         public bool enableLog { get; set; }
         // App 运行模式
         public AppRunModel runModel { get; set; }
+        // 是否为发布版本
+        public bool releaseVersion { get; set; }
         // 使用系统语言
         public bool useSystemLanguage { get; set; }
         // 指定语言
@@ -26,9 +28,12 @@ namespace FastEngine.Core
         // QATest
         public bool QATest { get; set; }
 
-        public AppConfig()
+        public void Initialize()
         {
-            
+            if (supportedLanuages == null)
+            {
+                supportedLanuages = new List<SystemLanguage>();
+            }
         }
     }
 }

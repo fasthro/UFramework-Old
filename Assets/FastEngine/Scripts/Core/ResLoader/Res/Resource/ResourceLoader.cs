@@ -35,7 +35,7 @@ namespace FastEngine.Core
 
         public void Init(string assetName, ResNotificationListener listener)
         {
-            m_mainRes = ResPool.Get<ResourceRes>(ResData.AllocateResource(assetName), true);
+            m_mainRes = ResCache.Get<ResourceRes>(ResData.AllocateResource(assetName), true);
             m_listener = listener;
         }
 

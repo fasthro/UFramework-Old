@@ -4,7 +4,6 @@
  * @Description: download handler pro
  */
 using System.IO;
-using FastEngine.Utils;
 using UnityEngine;
 using UnityEngine.Networking;
 

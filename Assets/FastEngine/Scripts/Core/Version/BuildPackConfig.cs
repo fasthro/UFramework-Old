@@ -5,7 +5,7 @@
  */
 namespace FastEngine.Core
 {
-    public class BuildPackConfig
+    public class BuildPackConfig : IConfig
     {
         public bool cleanBuild { get; set; }           // 是否清理打包
 
@@ -17,5 +17,7 @@ namespace FastEngine.Core
         public bool andoridIL2CPP { get; set; }        //  IL2CPP
         public bool iOSIL2CPP { get; set; }            //  IL2CPP
         public bool WindowsIL2CPP { get; set; }        //  IL2CPP
+
+        public void Initialize() { }
     }
 }

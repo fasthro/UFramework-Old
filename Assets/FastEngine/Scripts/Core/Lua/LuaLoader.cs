@@ -6,7 +6,6 @@
 using UnityEngine;
 using System.IO;
 using LuaInterface;
-using FastEngine.Utils;
 
 namespace FastEngine.Core
 {

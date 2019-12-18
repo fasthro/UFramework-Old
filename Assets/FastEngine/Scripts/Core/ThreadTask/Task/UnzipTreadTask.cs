@@ -4,7 +4,6 @@
  * @Description: 解压任务
  */
 using System.IO;
-using FastEngine.Utils;
 
 namespace FastEngine.Core
 {

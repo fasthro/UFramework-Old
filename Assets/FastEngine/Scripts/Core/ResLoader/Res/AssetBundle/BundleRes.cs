@@ -4,7 +4,6 @@
  * @Description: Assetbundle 资源
  */
 using System.Collections;
-using FastEngine.Utils;
 using UnityEngine;
 
 namespace FastEngine.Core
@@ -29,6 +28,9 @@ namespace FastEngine.Core
 
         public void Recycle()
         {
+            // 移除缓存
+            ResCache.Remove(ResData.AllocateBundle(bundleName));
+            // 回收
             ObjectPool<BundleRes>.Instance.Recycle(this);
         }
         #endregion
@@ -52,7 +54,7 @@ namespace FastEngine.Core
             m_dependencies = new BundleRes[length];
             for (int i = 0; i < length; i++)
             {
-                m_dependencies[i] = ResPool.Get<BundleRes>(ResData.AllocateBundle(ds[i]), true);
+                m_dependencies[i] = ResCache.Get<BundleRes>(ResData.AllocateBundle(ds[i]), true);
             }
             return length > 0;
         }

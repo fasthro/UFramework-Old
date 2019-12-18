@@ -12,7 +12,7 @@ namespace FastEngine.Editor.Version
         [MenuItem("FastEngine/HotfixUpdate -> 打开配置", false, 500)]
         public static void OpenConfig()
         {
-            HotfixCEW.Open<HotfixCEW>();
+            FastEditorWindow.ShowWindow<HotfixEditorWindow>();
         }
 
         [MenuItem("FastEngine/HotfixUpdate -> 构建资源", false, 501)]

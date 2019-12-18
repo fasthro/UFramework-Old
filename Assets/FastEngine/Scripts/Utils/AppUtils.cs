@@ -7,13 +7,96 @@ using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using FastEngine.Core;
 using LitJson;
 using UnityEngine;
 
-namespace FastEngine.Utils
+namespace FastEngine
 {
     public static class AppUtils
     {
+        /// <summary>
+        /// FastAssets 根目录
+        /// </summary>
+        /// <returns></returns>
+        public static string FastAssetsRootDirectory()
+        {
+            return FilePathUtils.Combine(Application.dataPath, "FastAssets");
+        }
+
+        #region Table
+
+        /// <summary>
+        /// Table excel 配置表目录
+        /// </summary>
+        /// <returns></returns>
+        public static string TableExcelDirectory()
+        {
+            return FilePathUtils.Combine(FastAssetsRootDirectory(), "Table", "Excel");
+        }
+
+        /// <summary>
+        /// Table 数据输出目录
+        /// </summary>
+        /// <returns></returns>
+        public static string TableDataDirectory()
+        {
+            return FilePathUtils.Combine(FastAssetsRootDirectory(), "Table", "Data");
+        }
+
+        /// <summary>
+        /// Table 数据对象输出目录
+        /// </summary>
+        /// <returns></returns>
+        public static string TableObjectDirectory()
+        {
+            return FilePathUtils.Combine(FastAssetsRootDirectory(), "Table", "TableObject");
+        }
+
+        #endregion
+
+        #region i18n
+        /// <summary>
+        /// i18n excel 配置文件路径
+        /// </summary>
+        /// <returns></returns>
+        public static string i18nExcelFilePath()
+        {
+            return FilePathUtils.Combine(FastAssetsRootDirectory(), "i18n", "Excel", "i18n.xlsx");
+        }
+
+        /// <summary>
+        /// i18n data 目录
+        /// </summary>
+        /// <returns></returns>
+        public static string i18nDataDirectory()
+        {
+            return FilePathUtils.Combine(FastAssetsRootDirectory(), "i18n", "Data");
+        }
+
+        /// <summary>
+        /// i18n data 目录
+        /// </summary>
+        /// <returns></returns>
+        public static string i18nIndexDirectory()
+        {
+            return FilePathUtils.Combine(FastAssetsRootDirectory(), "i18n", "Index");
+        }
+        #endregion
+
+        #region editor
+
+        /// <summary>
+        /// 编辑器配置根目录
+        /// </summary>
+        /// <returns></returns>
+        public static string EditorConfigRootDirectory()
+        {
+            return FilePathUtils.Combine(FastAssetsRootDirectory(), "EditorConfig");
+        }
+
+        #endregion
+
         /// <summary>
         /// 数据根目录
         /// </summary>
@@ -116,28 +199,40 @@ namespace FastEngine.Utils
         }
 
         /// <summary>
-        /// 加载配置
+        /// 读取编辑器配置
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static T ReadEditorConfig<T>() where T : IConfig, new()
+        {
+            return ReadConfig<T>(FilePathUtils.Combine(AppUtils.EditorConfigRootDirectory(), typeof(T).Name + ".json"));
+        }
+
+        /// <summary>
+        /// 写入编辑器配置
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static void WriteEditorConfig<T>(string content) where T : IConfig, new()
+        {
+            FilePathUtils.FileWriteAllText(FilePathUtils.Combine(AppUtils.EditorConfigRootDirectory(), typeof(T).Name + ".json"), content);
+        }
+
+        /// <summary>
+        /// 读取配置
         /// </summary>
         /// <param name="path">配置路径</param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static T LoadConfig<T>(string path) where T : new()
+        public static T ReadConfig<T>(string path) where T : IConfig, new()
         {
             bool succeed = false;
-            var context = FilePathUtils.FileReadAllText(path, out succeed);
-            if (succeed) return JsonMapper.ToObject<T>(context);
-            else return new T();
-        }
-
-        /// <summary>
-        /// 加载配置
-        /// </summary>
-        /// <param name="context">配置文本内容</param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public static T LoadConfig2<T>(string context) where T : new()
-        {
-            return JsonMapper.ToObject<T>(context);
+            var content = FilePathUtils.FileReadAllText(path, out succeed);
+            T obj;
+            if (succeed) obj = JsonMapper.ToObject<T>(content);
+            else obj = new T();
+            obj.Initialize();
+            return obj;
         }
     }
 }

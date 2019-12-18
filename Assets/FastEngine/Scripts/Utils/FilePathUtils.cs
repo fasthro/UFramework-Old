@@ -4,8 +4,9 @@
  * @Description: 文件/路径工具
  */
 using System.IO;
+using System.Text;
 
-namespace FastEngine.Utils
+namespace FastEngine
 {
     public static class FilePathUtils
     {
@@ -174,7 +175,6 @@ namespace FastEngine.Utils
         /// </summary>
         /// <param name="path"></param>
         /// <param name="context"></param>
-        /// <returns></returns>
         public static bool FileWriteAllText(string path, string context)
         {
             try
@@ -184,6 +184,30 @@ namespace FastEngine.Utils
                 if (info.Exists) info.Delete();
 
                 File.WriteAllText(path, context);
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// File WriteAllText
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="context"></param>
+        /// <param name="encoding"></param>
+        /// <returns></returns>
+        public static bool FileWriteAllText(string path, string context, Encoding encoding)
+        {
+            try
+            {
+                FileInfo info = new FileInfo(path);
+                if (!info.Directory.Exists) info.Directory.Create();
+                if (info.Exists) info.Delete();
+
+                File.WriteAllText(path, context, encoding);
             }
             catch
             {

@@ -23,6 +23,9 @@ namespace FastEngine.Core
 
         public void Recycle()
         {
+            // 移除缓存
+            ResCache.Remove(ResData.AllocateResource(assetName));
+            // 回收
             ObjectPool<ResourceRes>.Instance.Recycle(this);
         }
         #endregion
@@ -119,7 +122,7 @@ namespace FastEngine.Core
                 else Resources.UnloadAsset(m_asset);
             }
             m_asset = null;
-            
+
             Recycle();
         }
     }
