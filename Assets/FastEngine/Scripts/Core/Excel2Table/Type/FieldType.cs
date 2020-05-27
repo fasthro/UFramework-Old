@@ -16,6 +16,7 @@ namespace FastEngine.Core.Excel2Table
         Boolean,
         Vector2,
         Vector3,
+        i18n,
         ArrayByte,
         ArrayInt,
         ArrayLong,
@@ -25,7 +26,7 @@ namespace FastEngine.Core.Excel2Table
         ArrayBoolean,
         ArrayVector2,
         ArrayVector3,
-        i18n,
+        Arrayi18n,
         Ignore,
         Unknow,
     }

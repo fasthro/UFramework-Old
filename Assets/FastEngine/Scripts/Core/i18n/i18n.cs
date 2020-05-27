@@ -24,14 +24,12 @@ namespace FastEngine.Core
             language = systemLanguage;
             // 中文默认就是中文简体
             if (language == SystemLanguage.Chinese)
-            {
                 language = SystemLanguage.ChineseSimplified;
-            }
+
             // 是否使用默认语言
-            if (!App.appConfig.supportedLanuages.Contains(language))
-            {
+            var appConfig = Config.ReadResourceDirectory<AppConfig>();
+            if (!appConfig.supportedLanuages.Contains(language))
                 language = defaultLanguage;
-            }
         }
 
         /// <summary>
@@ -94,7 +92,7 @@ namespace FastEngine.Core
         /// <summary>
         /// 释放内存
         /// </summary>
-        public static void Release()
+        public static void Dispose()
         {
             modelDictonary.Clear();
 

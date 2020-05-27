@@ -71,6 +71,15 @@ namespace FastEngine.Core
             if (!initialized) Initialize();
             AssetBundleMappingData data = null;
             mapping.TryGetValue(resPath, out data);
+            if (data == null)
+            {
+                string result = resPath.Replace("Assets/", "");
+                result = result.Replace(".png", "");
+                result = result.Replace(".prefab", "");
+                result = result.Replace(".mp3", "");
+                result = result.Replace(".ogg", "");
+                mapping.TryGetValue(result, out data);
+            }
             if (data == null) Debug.LogError("assetbundle mapping data not exist:" + resPath);
             return data;
         }

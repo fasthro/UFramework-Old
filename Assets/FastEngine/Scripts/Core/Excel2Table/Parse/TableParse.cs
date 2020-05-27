@@ -27,7 +27,7 @@ namespace FastEngine.Core.Excel2Table
             }
             else
             {
-                var loader = AssetBundleLoader.Allocate("Data/Table/" + m_tableName, null);
+                var loader = AssetBundleLoader.Allocate(FilePathUtils.Combine(AppUtils.TableDataBundleRootDirectory(), m_tableName), null);
                 loader.LoadSync();
                 m_content = loader.assetRes.GetAsset<TextAsset>().text;
                 loader.Unload();

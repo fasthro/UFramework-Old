@@ -9,6 +9,7 @@ public class FastEngine_AppRunModelWrap
 		L.BeginEnum(typeof(FastEngine.AppRunModel));
 		L.RegVar("Develop", get_Develop, null);
 		L.RegVar("Release", get_Release, null);
+		L.RegVar("Test", get_Test, null);
 		L.RegFunction("IntToEnum", IntToEnum);
 		L.EndEnum();
 		TypeTraits<FastEngine.AppRunModel>.Check = CheckType;
@@ -36,6 +37,13 @@ public class FastEngine_AppRunModelWrap
 	static int get_Release(IntPtr L)
 	{
 		ToLua.Push(L, FastEngine.AppRunModel.Release);
+		return 1;
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_Test(IntPtr L)
+	{
+		ToLua.Push(L, FastEngine.AppRunModel.Test);
 		return 1;
 	}
 

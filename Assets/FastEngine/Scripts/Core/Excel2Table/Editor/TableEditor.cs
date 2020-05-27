@@ -3,6 +3,7 @@
  * @Date: 2019-12-17 19:51:37
  * @Description: table editor
  */
+using FastEngine.Core;
 using FastEngine.Core.Excel2Table;
 using UnityEditor;
 using UnityEngine;
@@ -20,11 +21,14 @@ namespace FastEngine.Editor.Excel2Table
         [MenuItem("FastEngine/Table -> 生成数据", false, 601)]
         public static void Generate()
         {
-            TableConfig tableConfig = AppUtils.ReadEditorConfig<TableConfig>();
+            TableConfig tableConfig = Config.ReadEditorDirectory<TableConfig>();
+
+            FilePathUtils.DirectoryClean(AppUtils.TableDataDirectory());
+            FilePathUtils.DirectoryClean(AppUtils.TableObjectDirectory());
 
             tableConfig.tableDictionary.ForEach((item) =>
             {
-
+                Debug.Log("[Excel To Table] Generate:" + item.Value.tableName);
                 var options = new ExcelReaderOptions();
                 options.tableName = item.Value.tableName;
                 options.tableModelNamespace = tableConfig.tableModelNamespace;

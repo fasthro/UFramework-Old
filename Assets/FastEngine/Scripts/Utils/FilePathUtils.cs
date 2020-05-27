@@ -3,8 +3,10 @@
  * @Date: 2019-10-28 17:36:15
  * @Description: 文件/路径工具
  */
+using System;
 using System.IO;
 using System.Text;
+using UnityEngine;
 
 namespace FastEngine
 {
@@ -185,8 +187,9 @@ namespace FastEngine
 
                 File.WriteAllText(path, context);
             }
-            catch
+            catch (Exception e)
             {
+                Debug.LogError("FileWriteAllText Exception: " + e.ToString());
                 return false;
             }
             return true;
@@ -209,8 +212,9 @@ namespace FastEngine
 
                 File.WriteAllText(path, context, encoding);
             }
-            catch
+            catch (Exception e)
             {
+                Debug.LogError("FileWriteAllText Exception: " + e.ToString());
                 return false;
             }
             return true;
@@ -233,9 +237,9 @@ namespace FastEngine
                     return File.ReadAllText(path);
                 }
             }
-            catch
+            catch (Exception e)
             {
-
+                Debug.LogError("FileReadAllText Exception: " + e.ToString());
             }
             succeed = false;
             return "";
@@ -256,7 +260,10 @@ namespace FastEngine
                     return true;
                 }
             }
-            catch { }
+            catch (Exception e)
+            {
+                Debug.LogError("DeleteFile Exception: " + e.ToString());
+            }
             return false;
         }
 
@@ -285,10 +292,12 @@ namespace FastEngine
                 {
                     Directory.CreateDirectory(info.DirectoryName);
                 }
+                DeleteFile(dest);
                 File.Copy(source, dest);
             }
-            catch
+            catch (Exception e)
             {
+                Debug.LogError("FileCopy Exception: " + e.ToString());
                 return false;
             }
             return true;

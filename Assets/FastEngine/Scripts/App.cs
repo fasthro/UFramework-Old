@@ -11,7 +11,6 @@ using FastEngine.Core;
 using Logger = FastEngine.Core.Logger;
 using DG.Tweening;
 using FairyGUI;
-using FastEngine.FairyUI;
 using FastEngine.Debuger;
 
 namespace FastEngine
@@ -36,20 +35,38 @@ namespace FastEngine
     /// <summary>
     /// App 运行模式
     /// </summary>
-    /// 开发模式为编辑器开发阶段
+    /// 开发模式
     ///     - 热更新:关闭
     ///     - Localization:非Bundle加载
     ///     - UI:非Bundle加载
     ///     - 其他资源:Bundle加载
-    /// 正式bundle资源模式
+    /// 正式模式
     ///     - 热更新:开启
     ///     - Localization:Bundle加载
     ///     - UI:Bundle加载
     ///     - 其他资源:Bundle加载
+    /// 测试模式
     public enum AppRunModel
     {
+        /// <summary>
+        /// 开发模式
+        /// - 关闭热更新
+        /// </summary>
         Develop,
+        /// <summary>
+        /// 正式模式
+        /// - 开启热更新
+        /// - 开启bundle资源加载
+        /// - 关闭日志
+        /// </summary>
         Release,
+        /// <summary>
+        /// 测试模式
+        /// - 开启热更新
+        /// - 开启bundle资源加载
+        /// - 开启日志
+        /// </summary>
+        Test,
     }
 
     [MonoSingletonPath("FastEngine/App")]
@@ -61,62 +78,72 @@ namespace FastEngine
         public static AppRunModel runModel { get; private set; }
 
         /// <summary>
-        /// QA 测试包
-        /// </summary>
-        public static bool QATest { get; private set; }
-
-        /// <summary>
-        /// 发布版本
-        /// </summary>
-        public static bool releaseVersion { get; private set; }
-
-        /// <summary>
-        /// App 配置
-        /// </summary>
-        public static AppConfig appConfig { get; private set; }
-
-        /// <summary>
         /// 程序启动
         /// </summary>
         public void AppRun()
         {
-            // 加载AppConfig
-            var textAsset = Resources.Load<TextAsset>("AppConfig");
-            if (textAsset == null) appConfig = new AppConfig();
-            else appConfig = LitJson.JsonMapper.ToObject<AppConfig>(textAsset.text);
+            var appConfig = Config.ReadResourceDirectory<AppConfig>();
 
-            // 配置app参数
+            // 运行模式
             runModel = appConfig.runModel;
-            releaseVersion = appConfig.releaseVersion;
-            QATest = appConfig.QATest;
+
             Application.runInBackground = true;
             Screen.fullScreen = true;
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
             Application.targetFrameRate = 60;
             QualitySettings.vSyncCount = 2;
 
-            // 设置屏幕分辨率
-            GRoot.inst.SetContentScaleFactor(2048, 1152, UIContentScaler.ScreenMatchMode.MatchWidthOrHeight);
-            // 设置字体
-            UIConfig.defaultFont = "Helvetica Condensed";
+            #region Test Model
+
+            // 设置测试环境分辨率
+            if (runModel == AppRunModel.Test)
+            {
+#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
+                Screen.SetResolution(appConfig.resolutionWidth, appConfig.resolutionHeight, false);
+#endif
+            }
+
+            #endregion
+
+            #region fairyGUI
+
             // 关闭移除包同时卸载Bundle
             UIPackage.unloadBundleByFGUI = false;
 
+            // fairy 设置屏幕分辨率
+            GRoot.inst.SetContentScaleFactor(2048, 1152, UIContentScaler.ScreenMatchMode.MatchWidthOrHeight);
+            // 设置字体
+            UIConfig.defaultFont = "Helvetica Condensed";
+            // FontManager.RegisterFont(FontManager.GetFont("OLIVERSB"), "Oliver's Barney");
+
+            #endregion
+
             DOTween.Init(true, true, LogBehaviour.Default);                         // DOTween
-            ScriptWatch.Initialize(!releaseVersion);                                // 代码监测
+            ScriptWatch.Initialize(runModel != AppRunModel.Release);                // 代码监测
             Logger.Initialize(appConfig.enableLog);                                 // 日志
             TCPSession.Initialize(appConfig.enableLog);                             // 网络TCP
-            FairyWindowSortingOrder.Initialize();                                   // Window 排序服务
             var language = appConfig.useSystemLanguage ? Application.systemLanguage : appConfig.language;
             i18n.Initialize(language, appConfig.defaultLanguage);                   // 国际化
-            if (runModel == AppRunModel.Develop) Lua.Initialize();                  // Lua(开发模式或者热更新完成方可启动)
+            SDK.Instance.Initialize();                                              // SDK
+            if (runModel == AppRunModel.Develop)                                    // Lua(开发模式或者热更新完成方可启动)
+            {
+                Lua.Initialize();
+            }
+            else
+            {
+                Messenger.AddListener(MessengerEvent.HOTFIX_FINISHED, () =>
+                {
+                    Lua.Initialize();
+                });
+            }
         }
 
         public void AppQuit()
         {
             TCPSession.Disconnecte();      // 网络TCP
             Lua.Close();                   // Lua
-            i18n.Release();        // 国际化
+            i18n.Dispose();                // 国际化
+            SDK.Instance.Dispose();        // SDK
         }
 
         #region Delegate

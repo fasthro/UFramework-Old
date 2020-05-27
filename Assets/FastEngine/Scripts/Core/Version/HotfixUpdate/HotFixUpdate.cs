@@ -40,6 +40,8 @@ namespace FastEngine.Core
         private UnpackCallback m_unpackBaseCallback;
 
         // 数据目录版本配置
+        private AppConfig m_appConfig;
+        // 数据目录版本配置
         private VersionConfig m_version;
         // 原始版本配置(包体版本配置)
         private VersionConfig m_rawVersion;
@@ -125,40 +127,15 @@ namespace FastEngine.Core
         {
             m_eventCallback.Callback(HotfixEvent.InitVersion);
 
-            // 加载数据目录版本配置
-            var dp = FilePathUtils.Combine(AppUtils.DataRootDirectory(), "VersionConfig.json");
-            if (FilePathUtils.FileExists(dp))
-                m_version = AppUtils.ReadConfig<VersionConfig>(dp);
+            // 应用配置
+            m_appConfig = Config.ReadResourceDirectory<AppConfig>();
+            // 数据目录版本配置
+            m_version = Config.ReadDataDirectory<VersionConfig>();
+            // 当前应用版本配置
+            m_rawVersion = m_appConfig.version;
 
-            // 加载原始版本配置
-            var rp = AppUtils.AppRawPath() + "VersionConfig.json";
-            if (Application.platform == RuntimePlatform.Android)
-            {
-                CoroutineFactory.CreateAndStart(AndroidReadRawVersion(rp), (result) =>
-                {
-                    CheckUnpackBase();
-                });
-            }
-            else
-            {
-                m_rawVersion = AppUtils.ReadConfig<VersionConfig>(rp);
-                CheckUnpackBase();
-            }
-        }
-
-        /// <summary>
-        /// Android 读取Raw版本配置
-        /// </summary>
-        /// <returns></returns>
-        IEnumerator AndroidReadRawVersion(string rp)
-        {
-            var request = new UnityWebRequest(rp);
-            request.downloadHandler = new DownloadHandlerBuffer();
-            yield return request.SendWebRequest();
-            if (request.isDone)
-            {
-                m_rawVersion = JsonMapper.ToObject<VersionConfig>(request.downloadHandler.text);
-            }
+            // 检查自己资源是否解压
+            CheckUnpackBase();
         }
 
         /// <summary>
@@ -167,7 +144,6 @@ namespace FastEngine.Core
         private void CheckUnpackBase()
         {
             m_eventCallback.Callback(HotfixEvent.CheckBase);
-
             // 检查bundle目录
             var unpack = !Directory.Exists(AppUtils.BundleRootDirectory());
             // 版本配置检查
@@ -179,17 +155,26 @@ namespace FastEngine.Core
                     unpack = true;
                 }
             }
-            if (m_rawVersion != null && m_version == null) m_version = m_rawVersion;
+            if (m_rawVersion != null && m_version == null)
+            {
+                m_version = m_rawVersion;
+            }
             if (m_rawVersion == null)
             {
                 // 非法客户端
-                Debug.Log("非法客户端");
+                Debug.LogError("Installation package error");
             }
             else
             {
                 // 解压/检查更新
-                if (unpack) UnpackBase();
-                else InitUpdate();
+                if (unpack)
+                {
+                    UnpackBase();
+                }
+                else
+                {
+                    InitUpdate();
+                }
             }
         }
         #endregion
@@ -201,7 +186,7 @@ namespace FastEngine.Core
         private void UnpackBase()
         {
             m_eventCallback.Callback(HotfixEvent.UnpackBase);
-            m_unpackBaseCallback = new UnpackCallback(m_version.compressFileTotalCount);
+            m_unpackBaseCallback = new UnpackCallback(m_appConfig.compressFileTotalCount);
             var source = AppUtils.AppRawPath() + PlatformUtils.PlatformId() + ".zip";
             if (Application.platform == RuntimePlatform.Android)
             {
@@ -344,6 +329,9 @@ namespace FastEngine.Core
         /// </summary>
         private void HotfixFinished()
         {
+            // 派发热更新完成事件
+            Messenger.Broadcast(MessengerEvent.HOTFIX_FINISHED);
+            // 
             m_eventCallback.Callback(HotfixEvent.HotfixFinished);
         }
     }

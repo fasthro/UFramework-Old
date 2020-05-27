@@ -16,7 +16,7 @@ namespace FastEngine.Core
         /// </summary>
         public void Initialize()
         {
-            beZip = App.runModel == AppRunModel.Release;
+            beZip = App.runModel != AppRunModel.Develop;
             if (beZip)
             {
                 var path = FilePathUtils.Combine(AppUtils.BundleRootDirectory(), "lua");

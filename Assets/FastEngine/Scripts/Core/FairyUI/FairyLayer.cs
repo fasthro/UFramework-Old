@@ -3,6 +3,7 @@
  * @Date: 2019-10-28 14:00:49
  * @Description: fairy ui layer
  */
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -14,16 +15,18 @@ namespace FastEngine.FairyUI
     public enum FairyLayerType
     {
         Scene = 0,
-        SceneTop = 10000,
-        WindowBottom = 20000,
-        Window = 30000,
-        WindowTop = 40000,
-        Popup = 50000,
-        Guide = 60000,
-        Notification = 70000,
-        Network = 80000,
-        Loader = 90000,
-        Forward = 100000,
+        SceneTop,
+        WindowBottom,
+        MainWindow,
+        MainTop,
+        Window,
+        WindowTop,
+        Popup,
+        Guide,
+        Notification,
+        Network,
+        Loader,
+        Forward
     }
 
     /// <summary>
@@ -68,6 +71,12 @@ namespace FastEngine.FairyUI
         }
 
         /// <summary>
+        /// next layer number
+        /// </summary>
+        /// <returns></returns>
+        public int Next() { return m_baseIndex + m_windows.Count + 1; }
+
+        /// <summary>
         /// sort windows
         /// </summary>
         public void Sort()
@@ -82,10 +91,16 @@ namespace FastEngine.FairyUI
     }
 
     /// <summary>
-    /// fairy window sortingOrder
+    /// fairy window layer sortingOrder
     /// </summary>
-    public class FairyWindowSortingOrder
+    public class FairyWindowLayer
     {
+        // 层级间隔
+        public const int LAYER_INTERVAL = 1000000;
+
+        // 初始化
+        static bool initialized = false;
+        // layer 字典
         static Dictionary<FairyLayerType, FairyLayer> layerDictionary;
 
         /// <summary>
@@ -93,30 +108,21 @@ namespace FastEngine.FairyUI
         /// </summary>
         public static void Initialize()
         {
+            if (!initialized) initialized = true;
+            else return;
+
             layerDictionary = new Dictionary<FairyLayerType, FairyLayer>();
 
-            AddLayer(FairyLayerType.Scene);
-            AddLayer(FairyLayerType.SceneTop);
-            AddLayer(FairyLayerType.WindowBottom);
-            AddLayer(FairyLayerType.Window);
-            AddLayer(FairyLayerType.WindowTop);
-            AddLayer(FairyLayerType.Guide);
-            AddLayer(FairyLayerType.Notification);
-            AddLayer(FairyLayerType.Network);
-            AddLayer(FairyLayerType.Loader);
-            AddLayer(FairyLayerType.Forward);
+            Type type = typeof(FairyLayerType);
+            FieldInfo[] fieldInfos = type.GetFields(BindingFlags.Static | BindingFlags.Public);
+            for (int i = 0; i < fieldInfos.Length; i++)
+            {
+                var layer = (FairyLayerType)fieldInfos[i].GetValue(null);
+                layerDictionary.Add(layer, new FairyLayer((int)layer * LAYER_INTERVAL));
+            }
         }
 
-        /// <summary>
-        /// add layer
-        /// </summary>
-        /// <param name="layer"></param>
-        static void AddLayer(FairyLayerType layer)
-        {
-            layerDictionary.Add(layer, new FairyLayer((int)layer));
-        }
-
-        /// <summary>
+        /// <summary>llll
         /// add window to layer
         /// </summary>
         /// <param name="window"></param>
@@ -124,6 +130,7 @@ namespace FastEngine.FairyUI
         /// <returns></returns>
         public static int Add(FairyWindow window, bool isAutoSort = true)
         {
+            Initialize();
             FairyLayer fairyLayer = null;
             if (layerDictionary.TryGetValue(window.layer, out fairyLayer))
                 return fairyLayer.Add(window, isAutoSort);
@@ -136,9 +143,26 @@ namespace FastEngine.FairyUI
         /// <param name="window"></param>
         public static void Remove(FairyWindow window)
         {
+            Initialize();
             FairyLayer fairyLayer = null;
             if (layerDictionary.TryGetValue(window.layer, out fairyLayer))
                 fairyLayer.Remove(window);
+        }
+
+        /// <summary>
+        /// next layer number
+        /// </summary>
+        /// <param name="layer"></param>
+        /// <returns></returns>
+        public static int Next(FairyLayerType layer)
+        {
+            Initialize();
+            FairyLayer fairyLayer = null;
+            if (layerDictionary.TryGetValue(layer, out fairyLayer))
+            {
+                return fairyLayer.Next();
+            }
+            return (int)layer * LAYER_INTERVAL;
         }
 
         /// <summary>
@@ -147,6 +171,7 @@ namespace FastEngine.FairyUI
         /// <param name="layer"></param>
         public static void Sort(FairyLayerType layer)
         {
+            Initialize();
             FairyLayer fairyLayer = null;
             if (layerDictionary.TryGetValue(layer, out fairyLayer))
                 fairyLayer.Sort();
@@ -157,7 +182,11 @@ namespace FastEngine.FairyUI
         /// </summary>
         public static void SortAll()
         {
-            layerDictionary.ForEach((item) => { item.Value.Sort(); });
+            Initialize();
+            layerDictionary.ForEach<FairyLayerType, FairyLayer>((TargetException, layer) =>
+            {
+                layer.Sort();
+            });
         }
     }
 }

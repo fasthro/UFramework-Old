@@ -42,6 +42,19 @@ namespace FastEngine.FairyUI
         public bool enabledLog = true;     // 是否开启日志
         public string logMark = "";        // 日志标志
         public bool fullScreen = true;     // 是否全屏UI(标志是否为全屏UI，可以通过此标志设置场景相机在打开全屏UI的时候关闭渲染，进行DrawCall优化)
+        public bool showAlways = false;    // 是否一致显示，不会被关闭(仅仅是个标志，关闭销毁逻辑内不做任何判断)
+        
+        // 模型、粒子、骨骼动画等3D对象
+        public Fairy3DGameObject m_fairyGameObject;
+        public Fairy3DGameObject fairyGameObject
+        {
+            get
+            {
+                if (m_fairyGameObject == null)
+                    m_fairyGameObject = FairyWindow3DGameObject.Add(this);
+                return m_fairyGameObject;
+            }
+        }
 
         public GComponent handle { get { return contentPane; } }  // 窗口组件句柄
 
@@ -102,6 +115,7 @@ namespace FastEngine.FairyUI
         /// </summary>
         new public void Dispose()
         {
+            // dependencies
             for (int i = 0; i < m_mianPackage.dependencies.Length; i++)
             {
                 foreach (KeyValuePair<string, string> item in m_mianPackage.dependencies[i])
@@ -110,6 +124,10 @@ namespace FastEngine.FairyUI
                 }
             }
             if (m_dependencies != null) FairyPackage.Remove(m_dependencies);
+            // 3d gameObject
+            if (m_fairyGameObject != null) FairyWindow3DGameObject.Remove(this);
+            m_fairyGameObject = null;
+            // 
             Hide();
             base.Dispose();
         }
@@ -134,13 +152,13 @@ namespace FastEngine.FairyUI
             MakeFullScreen();
             contentPane = UIPackage.CreateObject(m_mainPackageName, m_comName).asCom;
             contentPane.SetSize(GRoot.inst.width, GRoot.inst.height);
-            sortingOrder = FairyWindowSortingOrder.Add(this);
             gameObjectName = string.Format("FairyWindow-{0}-layer:{1}-{2}", m_comName, layer.ToString(), sortingOrder.ToString());
             base.OnInit();
         }
 
         protected override void OnShown()
         {
+            sortingOrder = FairyWindowLayer.Add(this);
             state = FairyWindowState.Showing;
             // 注册网络协议
             if (m_tcpCmds != null)
@@ -203,6 +221,10 @@ namespace FastEngine.FairyUI
         public void TCPSend(SocketPack pack) { TCPSession.Send(pack); }
         public void TCPSend(int cmd, IMessage message) { TCPSession.Send(cmd, message); }
         public void TCPSend(int cmd, LuaByteBuffer luabyte) { TCPSession.Send(cmd, luabyte); }
+        #endregion
+
+        #region 3d gameObject
+
         #endregion
 
         #region log

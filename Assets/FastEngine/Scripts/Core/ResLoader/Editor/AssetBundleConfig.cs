@@ -8,12 +8,12 @@ using FastEngine.Core;
 
 namespace FastEngine.Editor.AssetBundle
 {
-    public class AssetBundleConfig : IConfig
+    public class AssetBundleConfig : ConfigObject
     {
         public List<Pack> packs;           // assetbundle pack
         public List<Source> sources;       // copu source
 
-        public void Initialize()
+        protected override void OnInitialize()
         {
             if (packs == null)
             {

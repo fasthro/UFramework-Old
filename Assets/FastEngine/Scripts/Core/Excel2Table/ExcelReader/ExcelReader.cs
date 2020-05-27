@@ -118,7 +118,7 @@ namespace FastEngine.Core.Excel2Table
             int step = 0;
             while (count > 0)
             {
-                index = indexs[0] - step;
+                index = indexs[step] - step;
 
                 sources.RemoveAt(index);
                 count--;

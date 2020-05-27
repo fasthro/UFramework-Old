@@ -15,49 +15,41 @@ namespace FastEngine.Editor.Version
             FastEditorWindow.ShowWindow<VersionEditorWindow>();
         }
 
-        [MenuItem("FastEngine/Version -> Build Android Application", false, 401)]
+        [MenuItem("FastEngine/Version -> Build Android .apk", false, 401)]
         public static void BuildAndroid()
         {
-            BuildPack.Run(BuildTarget.Android);
+            Build.Run(BuildTarget.Android);
         }
 
-        // [MenuItem("FastEngine/Version -> Build Android Environment", false, 402)]
-        // public static void BuildAndroidEnv()
-        // {
-        //     BuildPack.Run(BuildTarget.Android, false);
-        // }
-
-        [MenuItem("FastEngine/Version -> Build iOS Application", false, 410)]
+        [MenuItem("FastEngine/Version -> Build iOS .app", false, 410)]
         public static void BuildiOS()
         {
-            BuildPack.Run(BuildTarget.iOS);
+            Build.Run(BuildTarget.iOS);
         }
 
-        // [MenuItem("FastEngine/Version -> Build iOS Environment", false, 411)]
-        // public static void BuildiOSEnv()
-        // {
-        //     BuildPack.Run(BuildTarget.iOS, false);
-        // }
-
-        [MenuItem("FastEngine/Version -> Build Windows Application", false, 420)]
+        [MenuItem("FastEngine/Version -> Build Windows .exe", false, 420)]
         public static void BuildWindows()
         {
-            BuildPack.Run(BuildTarget.StandaloneWindows64);
+            Build.Run(BuildTarget.StandaloneWindows64);
         }
 
-        // [MenuItem("FastEngine/Version -> Build Windows Environment", false, 421)]
-        // public static void BuildWindowsEnv()
-        // {
-        //     if (EditorUserBuildSettings.activeBuildTarget == BuildTarget.StandaloneWindows || EditorUserBuildSettings.activeBuildTarget == BuildTarget.StandaloneWindows64)
-        //     {
-        //         BuildPack.Run(EditorUserBuildSettings.activeBuildTarget, false);
-        //     }
-        // }
 
         [MenuItem("FastEngine/Version -> 切换到开发模式", false, 430)]
-        public static void SwitchDevelop()
+        public static void SwitchDevelopModel()
         {
-            BuildPack.SwitchDevelop();
+            Build.SwitchModel(AppRunModel.Develop);
+        }
+
+        [MenuItem("FastEngine/Version -> 切换到测试模式", false, 431)]
+        public static void SwitchTestModel()
+        {
+            Build.SwitchModel(AppRunModel.Test);
+        }
+
+        [MenuItem("FastEngine/Version -> 切换到正式模式", false, 432)]
+        public static void SwitchReleaseModel()
+        {
+            Build.SwitchModel(AppRunModel.Release);
         }
     }
 }

@@ -162,10 +162,6 @@ namespace FastEngine.Core.Excel2Table
             {
                 field.SetValue(obj, value);
             }
-            else if (field.FieldType == typeof(i18nObject))
-            {
-                field.SetValue(obj, TypeUtils.ContentToI18nObjectValue(value));
-            }
             else if (field.FieldType == typeof(bool))
             {
                 field.SetValue(obj, TypeUtils.ContentToBooleanValue(value));
@@ -177,6 +173,10 @@ namespace FastEngine.Core.Excel2Table
             else if (field.FieldType == typeof(Vector3))
             {
                 field.SetValue(obj, TypeUtils.ContentToVector3Value(value));
+            }
+            else if (field.FieldType == typeof(i18nObject))
+            {
+                field.SetValue(obj, TypeUtils.ContentToI18nObjectValue(value));
             }
             else if (field.FieldType == typeof(byte[]))
             {
@@ -213,6 +213,10 @@ namespace FastEngine.Core.Excel2Table
             else if (field.FieldType == typeof(Vector3[]))
             {
                 field.SetValue(obj, TypeUtils.ContentToArrayVector3Value(value));
+            }
+            else if (field.FieldType == typeof(i18nObject[]))
+            {
+                field.SetValue(obj, TypeUtils.ContentToArrayI18nObjectValue(value));
             }
         }
 

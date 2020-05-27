@@ -21,17 +21,16 @@ namespace FastEngine.Editor.Excel2Table
         protected override void OnInitialize()
         {
             titleContent.text = "Table 配置编辑器";
-            m_table = AppUtils.ReadEditorConfig<TableConfig>();
-
-            if (m_table.tableDictionary == null)
-                m_table.tableDictionary = new Dictionary<string, TableItem>();
+            m_table = Config.ReadEditorDirectory<TableConfig>();
 
             if (Directory.Exists(AppUtils.TableExcelDirectory()))
             {
                 var files = Directory.GetFiles(AppUtils.TableExcelDirectory(), "*.xlsx", SearchOption.AllDirectories);
+                HashSet<string> fileHashSet = new HashSet<string>();
                 for (int i = 0; i < files.Length; i++)
                 {
                     var fileName = FilePathUtils.GetFileName(files[i], false);
+                    fileHashSet.Add(fileName);
                     if (!m_table.tableDictionary.ContainsKey(fileName))
                     {
                         var item = new TableItem();
@@ -39,6 +38,20 @@ namespace FastEngine.Editor.Excel2Table
                         item.dataFormatOptions = DataFormatOptions.Array;
                         m_table.tableDictionary.Add(fileName, item);
                     }
+                }
+
+                List<string> removes = new List<string>();
+                m_table.tableDictionary.ForEach((item) =>
+                {
+                    if (!fileHashSet.Contains(item.Value.tableName))
+                    {
+                        removes.Add(item.Value.tableName);
+                    }
+                });
+
+                for (int i = 0; i < removes.Count; i++)
+                {
+                    m_table.tableDictionary.Remove(removes[i]);
                 }
             }
         }
@@ -48,13 +61,13 @@ namespace FastEngine.Editor.Excel2Table
             EditorGUILayout.BeginHorizontal("box");
             if (GUILayout.Button("Save"))
             {
-                AppUtils.WriteEditorConfig<TableConfig>(JsonMapper.ToJson(m_table));
+                m_table.Save<TableConfig>();
                 AssetDatabase.Refresh();
             }
 
             if (GUILayout.Button("Generate"))
             {
-                AppUtils.WriteEditorConfig<TableConfig>(JsonMapper.ToJson(m_table));
+                m_table.Save<TableConfig>();
                 AssetDatabase.Refresh();
 
                 TableEditor.Generate();

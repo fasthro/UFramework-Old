@@ -14,20 +14,20 @@ namespace FastEngine.Editor.Version
     public class VersionEditorWindow : FastEditorWindow
     {
         static AppConfig appConfig;
-        static VersionConfig versionConfig;
-        static BuildPackConfig buildConfig;
-        static BuildHotfixConfig hotfixConfig;
+        static AppRunModel lastAppRunModel;
 
+        static BuildConfig buildConfig;
         static int buildTarget;
         static string[] targetStrs = new string[] { "Android", "iOS", "Windows" };
 
         protected override void OnInitialize()
         {
-            titleContent.text = "Version 配置编辑器";
-            appConfig = AppUtils.ReadConfig<AppConfig>(FilePathUtils.Combine(Application.dataPath, "Resources", "AppConfig.json"));
-            versionConfig = AppUtils.ReadEditorConfig<VersionConfig>();
-            buildConfig = AppUtils.ReadEditorConfig<BuildPackConfig>();
-            hotfixConfig = AppUtils.ReadEditorConfig<BuildHotfixConfig>();
+            titleContent.text = "应用配置编辑器";
+
+            appConfig = Config.ReadEditorDirectory<AppConfig>();
+            lastAppRunModel = appConfig.runModel;
+
+            buildConfig = Config.ReadEditorDirectory<BuildConfig>();
             buildTarget = 0;
         }
 
@@ -35,6 +35,15 @@ namespace FastEngine.Editor.Version
         {
             if (GUILayout.Button("Save"))
             {
+                #region app config
+                if (appConfig.resolutionWidth <= 0)
+                {
+                    appConfig.resolutionWidth = 1280;
+                }
+                if (appConfig.resolutionHeight <= 0)
+                {
+                    appConfig.resolutionHeight = 720;
+                }
                 // 支持语言列表去重(此处不考虑效率问题啦)
                 List<SystemLanguage> sames = new List<SystemLanguage>();
                 for (int i = 0; i < appConfig.supportedLanuages.Count; i++)
@@ -45,15 +54,21 @@ namespace FastEngine.Editor.Version
                     }
                 }
                 appConfig.supportedLanuages = sames;
+                // 
+                Config.Write<AppConfig>(appConfig);
+                #endregion
 
-                AppUtils.WriteEditorConfig<AppConfig>(JsonMapper.ToJson(appConfig));
-                AppUtils.WriteEditorConfig<VersionConfig>(JsonMapper.ToJson(versionConfig));
-                AppUtils.WriteEditorConfig<BuildPackConfig>(JsonMapper.ToJson(buildConfig));
-                AppUtils.WriteEditorConfig<BuildHotfixConfig>(JsonMapper.ToJson(hotfixConfig));
+                #region builk config
+
+                Config.Write<BuildConfig>(buildConfig);
+
+                #endregion
 
                 AssetDatabase.Refresh();
             }
-            #region app
+
+            #region app config
+
             EditorGUILayout.BeginVertical("box");
             GUILayout.Label("App Config");
 
@@ -63,28 +78,49 @@ namespace FastEngine.Editor.Version
             GUILayout.Label("App Run Model");
             appConfig.runModel = (AppRunModel)EditorGUILayout.EnumPopup("", appConfig.runModel);
             EditorGUILayout.EndVertical();
-            // release Version
-            EditorGUILayout.BeginVertical("box");
-            appConfig.releaseVersion = EditorGUILayout.ToggleLeft("Release Version", appConfig.releaseVersion);
-            EditorGUILayout.EndVertical();
-            // QATest
-            EditorGUILayout.BeginVertical("box");
-            appConfig.QATest = EditorGUILayout.ToggleLeft("QA Test", appConfig.QATest);
-            if (appConfig.releaseVersion)
+            // change run model
+            if (lastAppRunModel != appConfig.runModel)
+            {
+                lastAppRunModel = appConfig.runModel;
+                appConfig.enableLog = appConfig.runModel != AppRunModel.Release;
+                if (appConfig.runModel == AppRunModel.Release)
+                {
+                    appConfig.useSystemLanguage = true;
+                    appConfig.defaultLanguage = SystemLanguage.English;
+                }
+                else
+                {
+                    appConfig.useSystemLanguage = false;
+                    appConfig.language = SystemLanguage.English;
+                    appConfig.defaultLanguage = SystemLanguage.English;
+                }
+            }
+#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
+            if (appConfig.runModel == AppRunModel.Test)
             {
                 EditorGUILayout.BeginVertical("box");
-                EditorGUILayout.LabelField("Please confirm whether it is the released version");
+                GUILayout.Label("Screen Resolution");
+                EditorGUILayout.BeginVertical("box");
+                appConfig.resolutionWidth = EditorGUILayout.IntField("Width", appConfig.resolutionWidth);
+                if (appConfig.resolutionWidth <= 0)
+                {
+                    appConfig.resolutionWidth = 1280;
+                }
+                EditorGUILayout.EndVertical();
+                EditorGUILayout.BeginVertical("box");
+                appConfig.resolutionHeight = EditorGUILayout.IntField("Height", appConfig.resolutionHeight);
+                if (appConfig.resolutionHeight <= 0)
+                {
+                    appConfig.resolutionHeight = 720;
+                }
+                EditorGUILayout.EndVertical();
                 EditorGUILayout.EndVertical();
             }
-            EditorGUILayout.EndVertical();
+#endif
             // log
-            if (!appConfig.releaseVersion)
-            {
-                EditorGUILayout.BeginVertical("box");
-                appConfig.enableLog = EditorGUILayout.ToggleLeft("Enable Log", appConfig.enableLog);
-                EditorGUILayout.EndVertical();
-            }
-            else appConfig.enableLog = false;
+            EditorGUILayout.BeginVertical("box");
+            appConfig.enableLog = EditorGUILayout.ToggleLeft("Log Enable", appConfig.enableLog);
+            EditorGUILayout.EndVertical();
             // language
             EditorGUILayout.BeginVertical("box");
             appConfig.useSystemLanguage = EditorGUILayout.ToggleLeft("Use System Language", appConfig.useSystemLanguage);
@@ -102,19 +138,12 @@ namespace FastEngine.Editor.Version
             EditorGUILayout.EndVertical();
             // app support language
             EditorGUILayout.BeginVertical("box");
-            EditorGUILayout.BeginHorizontal("box");
             GUILayout.Label("Supported Languages");
-            if (GUILayout.Button(EditorGUIUtility.IconContent("Toolbar Plus")))
-            {
-                appConfig.supportedLanuages.Add(Application.systemLanguage);
-            }
-            EditorGUILayout.EndHorizontal();
-            EditorGUILayout.BeginVertical("box");
             for (int i = 0; i < appConfig.supportedLanuages.Count; i++)
             {
                 EditorGUILayout.BeginHorizontal("box");
                 appConfig.supportedLanuages[i] = (SystemLanguage)EditorGUILayout.EnumPopup("", appConfig.supportedLanuages[i]);
-                if (GUILayout.Button(EditorGUIUtility.IconContent("TreeEditor.Trash")))
+                if (GUILayout.Button(EditorGUIUtility.IconContent("TreeEditor.Trash"), GUILayout.Height(18)))
                 {
                     appConfig.supportedLanuages.RemoveAt(i);
                     break;
@@ -125,32 +154,11 @@ namespace FastEngine.Editor.Version
             {
                 GUILayout.Label("The application does not support any language types");
             }
-            EditorGUILayout.EndHorizontal();
+            if (GUILayout.Button(EditorGUIUtility.IconContent("Toolbar Plus")))
+            {
+                appConfig.supportedLanuages.Add(Application.systemLanguage);
+            }
             EditorGUILayout.EndVertical();
-
-            EditorGUILayout.EndVertical();
-
-            EditorGUILayout.EndVertical();
-            #endregion
-
-            #region version
-            EditorGUILayout.BeginVertical("box");
-            GUILayout.Label("Version Config");
-
-            EditorGUILayout.BeginVertical("box");
-
-            GUILayout.Label("Version");
-            EditorGUILayout.BeginHorizontal("box");
-            versionConfig.large = Mathf.Abs(EditorGUILayout.IntField(versionConfig.large));
-            versionConfig.middle = Mathf.Abs(EditorGUILayout.IntField(versionConfig.middle));
-            versionConfig.small = Mathf.Abs(EditorGUILayout.IntField(versionConfig.small));
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.BeginVertical("box");
-            GUILayout.Label("Resource Version");
-            versionConfig.resource = EditorGUILayout.IntField(versionConfig.resource);
-            EditorGUILayout.EndVertical();
-
             EditorGUILayout.EndVertical();
             EditorGUILayout.EndVertical();
             #endregion
@@ -164,47 +172,77 @@ namespace FastEngine.Editor.Version
             EditorGUILayout.EndVertical();
 
             buildTarget = GUILayout.Toolbar(buildTarget, targetStrs);
+
             if (buildTarget == 0)
             {
+                DrawVersion(buildConfig.android.version);
+
                 EditorGUILayout.BeginVertical("box");
 
                 EditorGUILayout.BeginVertical("box");
                 GUILayout.Label("Keystore Name");
-                buildConfig.keystoreName = EditorGUILayout.TextField(buildConfig.keystoreName);
+                buildConfig.android.keystoreName = EditorGUILayout.TextField(buildConfig.android.keystoreName);
                 GUILayout.Label("Keystore Password");
-                buildConfig.keystorePass = EditorGUILayout.PasswordField(buildConfig.keystorePass);
+                buildConfig.android.keystorePass = EditorGUILayout.PasswordField(buildConfig.android.keystorePass);
                 GUILayout.Label("keyalias Name");
-                buildConfig.keyaliasName = EditorGUILayout.TextField(buildConfig.keyaliasName);
+                buildConfig.android.keyaliasName = EditorGUILayout.TextField(buildConfig.android.keyaliasName);
                 GUILayout.Label("Keystore Password");
-                buildConfig.keyaliasPass = EditorGUILayout.PasswordField(buildConfig.keyaliasPass);
+                buildConfig.android.keyaliasPass = EditorGUILayout.PasswordField(buildConfig.android.keyaliasPass);
                 EditorGUILayout.EndVertical();
 
                 EditorGUILayout.BeginVertical("box");
-                buildConfig.andoridIL2CPP = EditorGUILayout.ToggleLeft("IL2CPP", buildConfig.andoridIL2CPP);
+                buildConfig.android.il2cpp = EditorGUILayout.ToggleLeft("il2cpp", buildConfig.android.il2cpp);
                 EditorGUILayout.EndVertical();
 
                 EditorGUILayout.EndVertical();
             }
             else if (buildTarget == 1)
             {
+                DrawVersion(buildConfig.ios.version);
+
                 EditorGUILayout.BeginVertical("box");
 
                 EditorGUILayout.BeginVertical("box");
-                buildConfig.iOSIL2CPP = EditorGUILayout.ToggleLeft("IL2CPP", buildConfig.iOSIL2CPP);
+                buildConfig.ios.il2cpp = EditorGUILayout.ToggleLeft("il2cpp", buildConfig.ios.il2cpp);
                 EditorGUILayout.EndVertical();
 
                 EditorGUILayout.EndVertical();
             }
             else if (buildTarget == 2)
             {
+                DrawVersion(buildConfig.windows.version);
+
                 EditorGUILayout.BeginVertical("box");
-                buildConfig.WindowsIL2CPP = EditorGUILayout.ToggleLeft("IL2CPP", buildConfig.WindowsIL2CPP);
+                buildConfig.windows.il2cpp = EditorGUILayout.ToggleLeft("il2cpp", buildConfig.windows.il2cpp);
                 EditorGUILayout.EndVertical();
             }
 
             EditorGUILayout.EndVertical();
             #endregion
 
+        }
+
+        void DrawVersion(VersionConfig version)
+        {
+            EditorGUILayout.BeginVertical("box");
+            GUILayout.Label("Version Config");
+
+            EditorGUILayout.BeginVertical("box");
+
+            GUILayout.Label("Version");
+            EditorGUILayout.BeginHorizontal("box");
+            version.large = Mathf.Abs(EditorGUILayout.IntField(version.large));
+            version.middle = Mathf.Abs(EditorGUILayout.IntField(version.middle));
+            version.small = Mathf.Abs(EditorGUILayout.IntField(version.small));
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginVertical("box");
+            GUILayout.Label("Resource Version");
+            version.resource = EditorGUILayout.IntField(version.resource);
+            EditorGUILayout.EndVertical();
+
+            EditorGUILayout.EndVertical();
+            EditorGUILayout.EndVertical();
         }
     }
 }

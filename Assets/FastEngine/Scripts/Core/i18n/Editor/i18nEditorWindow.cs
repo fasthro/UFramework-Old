@@ -5,8 +5,8 @@
  */
 using UnityEngine;
 using UnityEditor;
-using System.Collections.Generic;
 using LitJson;
+using FastEngine.Core;
 
 namespace FastEngine.Editor.I18n
 {
@@ -19,7 +19,7 @@ namespace FastEngine.Editor.I18n
         protected override void OnInitialize()
         {
             titleContent.text = "i18n 配置编辑器";
-            config = AppUtils.ReadEditorConfig<i18nConfig>();
+            config = Config.ReadEditorDirectory<i18nConfig>();
         }
 
         void OnGUI()
@@ -27,13 +27,13 @@ namespace FastEngine.Editor.I18n
             EditorGUILayout.BeginHorizontal("box");
             if (GUILayout.Button("Save"))
             {
-                AppUtils.WriteEditorConfig<i18nConfig>(JsonMapper.ToJson(config));
+                config.Save<i18nConfig>();
                 AssetDatabase.Refresh();
             }
 
             if (GUILayout.Button("Generate"))
             {
-                AppUtils.WriteEditorConfig<i18nConfig>(JsonMapper.ToJson(config));
+                config.Save<i18nConfig>();
                 AssetDatabase.Refresh();
 
                 LocalizationEditor.Generate();

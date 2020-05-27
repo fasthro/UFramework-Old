@@ -59,7 +59,7 @@ namespace FastEngine.Editor.AssetBundle
         [MenuItem("FastEngine/AssetBundle -> Copy Source", false, 104)]
         public static void CopySource()
         {
-            AssetBundleConfig config = AppUtils.ReadEditorConfig<AssetBundleConfig>();
+            AssetBundleConfig config = Config.ReadEditorDirectory<AssetBundleConfig>();
             for (int i = 0; i < config.sources.Count; i++)
             {
                 var source = config.sources[i];
@@ -71,7 +71,7 @@ namespace FastEngine.Editor.AssetBundle
         static bool StartGenMapping()
         {
             AssetDatabase.RemoveUnusedAssetBundleNames();
-            AssetBundleConfig config = AppUtils.ReadEditorConfig<AssetBundleConfig>();
+            AssetBundleConfig config = Config.ReadEditorDirectory<AssetBundleConfig>();
             Dictionary<string, AssetBundleMappingData> mapingDic = new Dictionary<string, AssetBundleMappingData>();
             for (int i = 0; i < config.packs.Count; i++)
             {

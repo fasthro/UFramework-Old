@@ -21,6 +21,7 @@ namespace FastEngine.Editor.AssetBundle
         File,             // 单一文件打包
         Folder,           // 整个文件夹打包
         FolderChild,      // 子文件夹打包
+        FolderFile,      // 文件夹内单个文件打包
     }
 
     public enum GenerateMapping
@@ -90,6 +91,9 @@ namespace FastEngine.Editor.AssetBundle
                 case BuildModel.FolderChild:
                     BuildFolderChild();
                     break;
+                case BuildModel.FolderFile:
+                    BuildFolderFile();
+                    break;
                 default:
                     break;
             }
@@ -155,6 +159,15 @@ namespace FastEngine.Editor.AssetBundle
                     var abName = Path.Combine(bundlePath, _type);
                     SetBundleName(files[index], abName);
                 }
+            }
+        }
+
+        private void BuildFolderFile()
+        {
+            string[] files = Directory.GetFiles(target, pattern, SearchOption.TopDirectoryOnly);
+            for (int i = 0; i < files.Length; i++)
+            {
+                SetBundleName(files[i], FilePathUtils.Combine(bundlePath, FilePathUtils.GetFileName(files[i], false)));
             }
         }
 

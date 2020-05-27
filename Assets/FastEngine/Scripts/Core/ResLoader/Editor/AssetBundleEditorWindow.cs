@@ -23,7 +23,7 @@ namespace FastEngine.Editor.AssetBundle
         protected override void OnInitialize()
         {
             titleContent.text = "AssetBundle 配置编辑器";
-            assetBundleCconfig = AppUtils.ReadEditorConfig<AssetBundleConfig>();
+            assetBundleCconfig = Config.ReadEditorDirectory<AssetBundleConfig>();
         }
 
         void OnGUI()
@@ -31,7 +31,7 @@ namespace FastEngine.Editor.AssetBundle
             EditorGUILayout.BeginHorizontal("box");
             if (GUILayout.Button("Save"))
             {
-                AppUtils.WriteEditorConfig<AssetBundleConfig>(JsonMapper.ToJson(assetBundleCconfig));
+                assetBundleCconfig.Save<AssetBundleConfig>();
                 AssetDatabase.Refresh();
             }
             if (GUILayout.Button(EditorGUIUtility.IconContent("Toolbar Plus")))

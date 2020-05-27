@@ -134,15 +134,20 @@ $variable$
             template = template.Replace("$tableName$", reader.options.tableName);
             template = template.Replace("$tableNameStr$", string.Format("\"{0}\"", reader.options.tableName));
             template = template.Replace("$dataFormat$", reader.options.dataFormatOptions.ToString());
-            template = template.Replace("$GetIndexDataError$", string.Format("Debug.LogError(\"[Table] DataFormatOptions: {0}. Please use the GetKeyData(index)\");", DataFormatOptions.Array.ToString()));
-            template = template.Replace("$GetIntKeyDataError$", string.Format("Debug.LogError(\"[Table] DataFormatOptions: {0}. Please use the GetKeyData(int-key)\");", DataFormatOptions.IntDictionary.ToString()));
-            template = template.Replace("$GetStringKeyDataError$", string.Format("Debug.LogError(\"[Table] DataFormatOptions: {0}. Please use the GetKeyData(string-key)\");", DataFormatOptions.StringDictionary.ToString()));
-            template = template.Replace("$GetInt2IntKeyDataError$", string.Format("Debug.LogError(\"[Table] DataFormatOptions: {0}. Please use the GetKeyData(int-key, int-key)\");", DataFormatOptions.Int2IntDictionary.ToString()));
+            template = template.Replace("$GetIndexDataError$", string.Format("Debug.LogError(\"[{0}Table] DataFormatOptions: {1}. Please use the GetKeyData(index)\");", reader.options.tableName, DataFormatOptions.Array.ToString()));
+            template = template.Replace("$GetIntKeyDataError$", string.Format("Debug.LogError(\"[{0}Table] DataFormatOptions: {1}. Please use the GetKeyData(int-key)\");", reader.options.tableName, DataFormatOptions.IntDictionary.ToString()));
+            template = template.Replace("$GetStringKeyDataError$", string.Format("Debug.LogError(\"[{0}Table] DataFormatOptions: {1}. Please use the GetKeyData(string-key)\");", reader.options.tableName, DataFormatOptions.StringDictionary.ToString()));
+            template = template.Replace("$GetInt2IntKeyDataError$", string.Format("Debug.LogError(\"[{0}Table] DataFormatOptions: {1}. Please use the GetKeyData(int-key, int-key)\");", reader.options.tableName, DataFormatOptions.Int2IntDictionary.ToString()));
 
             for (int i = 0; i < reader.fields.Count; i++)
             {
                 m_stringBuilder.AppendLine("        // " + reader.descriptions[i]);
                 m_stringBuilder.AppendLine(string.Format("        public {0} {1};", TypeUtils.FieldTypeToTypeContent(reader.types[i]), reader.fields[i]));
+                // 方便国家化字段调用,为国际化添加字段
+                if (reader.types[i] == FieldType.i18n)
+                {
+                    m_stringBuilder.AppendLine(string.Format("        public string {0}_i18n {{ get {{ return {1}.ToString(); }} }}", reader.fields[i], reader.fields[i]));
+                }
             }
             template = template.Replace("$variable$", m_stringBuilder.ToString());
 

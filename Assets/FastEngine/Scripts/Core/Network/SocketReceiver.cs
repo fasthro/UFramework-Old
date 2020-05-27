@@ -68,8 +68,14 @@ namespace FastEngine.Core
             {
                 if (m_cursor >= SocketPackHeader.HEADER_SIZE)
                 {
-                    m_header.Read(m_cache);
-                    m_isProcessing = true;
+                    if (!m_header.Readed)
+                    {
+                        m_header.Read(m_cache);
+                    }
+                    if (m_cursor >= m_header.packSize + SocketPackHeader.SPLIT_SIZE)
+                    {
+                        m_isProcessing = true;
+                    }
                 }
             }
 
@@ -90,7 +96,10 @@ namespace FastEngine.Core
                     m_cache = newBytes;
 
                     m_isProcessing = false;
-                    return SocketPackFactory.CreateReader(m_header.cmd, m_header.sessionId, packData);
+                    var pack = SocketPackFactory.CreateReader(m_header.cmd, m_header.sessionId, packData);
+                    m_header.Reset();
+
+                    return pack;
                 }
             }
             return null;

@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace FastEngine.Core
 {
-    [MonoSingletonPath("Action/System")]
+    [MonoSingletonPath("FastEngine/Action/System")]
     public class ActionSystem : MonoSingleton<ActionSystem>
     {
         // actions

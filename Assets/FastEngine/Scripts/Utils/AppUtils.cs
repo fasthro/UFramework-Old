@@ -45,6 +45,15 @@ namespace FastEngine
         }
 
         /// <summary>
+        /// Table 数据Bundle根目录
+        /// </summary>
+        /// <returns></returns>
+        public static string TableDataBundleRootDirectory()
+        {
+            return FilePathUtils.Combine("FastAssets", "Table", "Data");
+        }
+
+        /// <summary>
         /// Table 数据对象输出目录
         /// </summary>
         /// <returns></returns>
@@ -75,7 +84,7 @@ namespace FastEngine
         }
 
         /// <summary>
-        /// i18n data 目录
+        /// i18n index 目录
         /// </summary>
         /// <returns></returns>
         public static string i18nIndexDirectory()
@@ -95,6 +104,41 @@ namespace FastEngine
             return FilePathUtils.Combine(FastAssetsRootDirectory(), "EditorConfig");
         }
 
+        /// <summary>
+        /// 配置目录-Data数据目录
+        /// </summary>
+        /// <returns></returns>
+        public static string ConfigDataDirectory()
+        {
+            return FilePathUtils.Combine(BundleRootDirectory(), "config");
+        }
+
+        /// <summary>
+        /// 配置目录-Raw数据目录
+        /// </summary>
+        /// <returns></returns>
+        public static string ConfigRawDirectory()
+        {
+            return FilePathUtils.Combine(AppRawPath(), "config/");
+        }
+
+        /// <summary>
+        /// 配置目录-Resource目录
+        /// </summary>
+        /// <returns></returns>
+        public static string ConfigResourceDirectory()
+        {
+            return "Config";
+        }
+
+        /// <summary>
+        /// 配置目录-编辑器目录
+        /// </summary>
+        /// <returns></returns>
+        public static string ConfigEditorDirectory()
+        {
+            return FilePathUtils.Combine(FastAssetsRootDirectory(), "Config");
+        }
         #endregion
 
         /// <summary>
@@ -135,6 +179,51 @@ namespace FastEngine
         }
 
         /// <summary>
+        /// 编辑器下持久化目录
+        /// </summary>
+        /// <returns></returns>
+        public static string EditorPersistentDataRootDirectory()
+        {
+            return FilePathUtils.Combine(FilePathUtils.GetTopDirectory(Application.dataPath), "PersistentData");
+        }
+
+        /// <summary>
+        /// 编辑器下配置文件目录
+        /// </summary>
+        /// <returns></returns>
+        public static string EditorResourceConfigRootDirectory()
+        {
+            return FilePathUtils.Combine(Application.dataPath, "Resources", "Config");
+        }
+
+        /// <summary>
+        /// Build 根目录
+        /// </summary>
+        /// <returns></returns>
+        public static string BuildRootDirectory()
+        {
+            return FilePathUtils.Combine(FilePathUtils.GetTopDirectory(Application.dataPath), "Build");
+        }
+
+        /// <summary>
+        /// Build 版本目录
+        /// </summary>
+        /// <returns></returns>
+        public static string BuildVersionRootDirectory(VersionConfig version)
+        {
+            return FilePathUtils.Combine(BuildRootDirectory(), version.ToVersionString());
+        }
+
+        /// <summary>
+        /// Build Resource 版本目录
+        /// </summary>
+        /// <returns></returns>
+        public static string BuildVersionResourceRootDirectory(VersionConfig version)
+        {
+            return FilePathUtils.Combine(BuildVersionRootDirectory(version), version.ToResourceString());
+        }
+
+        /// <summary>
         /// Bundle根目录
         /// </summary>
         /// <returns></returns>
@@ -142,16 +231,6 @@ namespace FastEngine
         {
             if (!Application.isPlaying) return FilePathUtils.Combine(Application.streamingAssetsPath, PlatformUtils.PlatformId());
             return FilePathUtils.Combine(DataRootDirectory(), PlatformUtils.PlatformId());
-        }
-
-        /// <summary>
-        /// 编辑器配置路径
-        /// </summary>
-        /// <param name="configName"></param>
-        /// <returns></returns>
-        public static string EditorConfigPath(string configName)
-        {
-            return FilePathUtils.Combine(Application.dataPath, "EditorConfig", configName + ".json");
         }
 
         /// <summary>
@@ -196,43 +275,6 @@ namespace FastEngine
             {
                 throw new Exception("md5file() fail, error:" + ex.Message);
             }
-        }
-
-        /// <summary>
-        /// 读取编辑器配置
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public static T ReadEditorConfig<T>() where T : IConfig, new()
-        {
-            return ReadConfig<T>(FilePathUtils.Combine(AppUtils.EditorConfigRootDirectory(), typeof(T).Name + ".json"));
-        }
-
-        /// <summary>
-        /// 写入编辑器配置
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public static void WriteEditorConfig<T>(string content) where T : IConfig, new()
-        {
-            FilePathUtils.FileWriteAllText(FilePathUtils.Combine(AppUtils.EditorConfigRootDirectory(), typeof(T).Name + ".json"), content);
-        }
-
-        /// <summary>
-        /// 读取配置
-        /// </summary>
-        /// <param name="path">配置路径</param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public static T ReadConfig<T>(string path) where T : IConfig, new()
-        {
-            bool succeed = false;
-            var content = FilePathUtils.FileReadAllText(path, out succeed);
-            T obj;
-            if (succeed) obj = JsonMapper.ToObject<T>(content);
-            else obj = new T();
-            obj.Initialize();
-            return obj;
         }
     }
 }

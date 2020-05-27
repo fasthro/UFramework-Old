@@ -9,7 +9,7 @@ public class FastEngine_Core_i18nWrap
 		L.BeginClass(typeof(FastEngine.Core.i18n), typeof(System.Object));
 		L.RegFunction("Initialize", Initialize);
 		L.RegFunction("Get", Get);
-		L.RegFunction("Release", Release);
+		L.RegFunction("Dispose", Dispose);
 		L.RegFunction("New", _CreateFastEngine_Core_i18n);
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.RegVar("language", get_language, null);
@@ -76,12 +76,12 @@ public class FastEngine_Core_i18nWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int Release(IntPtr L)
+	static int Dispose(IntPtr L)
 	{
 		try
 		{
 			ToLua.CheckArgsCount(L, 0);
-			FastEngine.Core.i18n.Release();
+			FastEngine.Core.i18n.Dispose();
 			return 0;
 		}
 		catch (Exception e)

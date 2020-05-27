@@ -21,8 +21,8 @@ namespace FastEngine.Core
         private void InternalInitialize()
         {
             luaState = new LuaState();
-            
             // open lib
+            luaState.OpenLibs(LuaDLL.luaopen_socket_core); 
             luaState.OpenLibs(LuaDLL.luaopen_pb);
             // lua set top
             luaState.LuaSetTop(0);

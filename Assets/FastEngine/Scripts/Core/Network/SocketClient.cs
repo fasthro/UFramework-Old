@@ -89,7 +89,7 @@ namespace FastEngine.Core
         /// <summary>
         /// 连接超时时间
         /// </summary>
-        private readonly static int ConnectedTimeout = 5000;
+        private readonly static int ConnectedTimeout = 15000;
 
         /// <summary>
         /// 接收数据池大小
@@ -139,6 +139,10 @@ namespace FastEngine.Core
         private SocketPack m_recPack;
         // 双队列接收处理机制
         private DoubleQueue<SocketPack> m_recDQueue;
+        // 主线程处理接受异常
+        private bool m_mainThreadRecException;
+        // 异常
+        private Exception m_exception;
         #endregion
 
         #region send
@@ -161,6 +165,7 @@ namespace FastEngine.Core
         public string ip { get; private set; }
         public int port { get; private set; }
         public bool isConnected { get; private set; }
+        public bool isSocketConnected { get { return m_clientSocket != null && m_clientSocket.Connected; } }
 
         /// <summary>
         /// socket client
@@ -188,6 +193,7 @@ namespace FastEngine.Core
             ProcessConnecte();
             ProcessReceive();
             ProcessSend();
+            ProcessMainThreadRecException();
         }
 
         public void Connect(string ip, int port)
@@ -362,7 +368,8 @@ namespace FastEngine.Core
                 {
                     if (isConnected)
                     {
-                        Exception(SocketException.Receive, e);
+                        m_mainThreadRecException = true;
+                        m_exception = e;
                     }
                     break;
                 }
@@ -378,6 +385,15 @@ namespace FastEngine.Core
                 var pack = m_recDQueue.Dequeue();
                 Log("broadcast receive cmd: " + pack.cmd);
                 BroadcastReceived(pack);
+            }
+        }
+
+        private void ProcessMainThreadRecException()
+        {
+            if (m_mainThreadRecException)
+            {
+                m_mainThreadRecException = false;
+                Exception(SocketException.Receive, m_exception);
             }
         }
 
@@ -436,6 +452,7 @@ namespace FastEngine.Core
 
         private void BroadcastException(SocketException exception, string error)
         {
+            UnityEngine.Debug.Log("SocketClient 广播断线事件");
             m_eventCallback.InvokeGracefully(new SocketEventArgs(SocketState.Disconnected, exception, error));
         }
         #endregion

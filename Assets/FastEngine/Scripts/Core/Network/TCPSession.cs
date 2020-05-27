@@ -13,12 +13,38 @@ namespace FastEngine.Core
     public class TCPSession : MonoSingleton<TCPSession>
     {
         private SocketClient m_client;
-        private bool m_isConnected { get { return m_client != null && m_client.isConnected; } }
+        private bool m_isConnected { get { return m_client != null && m_client.isConnected && m_client.isSocketConnected; } }
         private Dictionary<int, int> sessionDic = new Dictionary<int, int>();
+
+        private Queue<SocketEventArgs> socketEventArgQueue = new Queue<SocketEventArgs>();
 
         void Update()
         {
             if (m_client != null) m_client.Update();
+
+            if (socketEventArgQueue.Count > 0)
+            {
+                var args = socketEventArgQueue.Dequeue();
+
+                switch (args.socketState)
+                {
+                    case SocketState.Received:
+                        var pack = args.socketPack;
+                        if (sessionDic.ContainsKey(pack.cmd)) pack.valid = pack.sessionId == sessionDic[pack.cmd];
+                        else pack.valid = true;
+                        TCPSessionService.Broadcast(args.socketPack);
+                        break;
+                    case SocketState.Connected:
+                        TCPSessionService.Broadcast(TCPSessionServiceBuiltIn.Connected);
+                        break;
+                    case SocketState.Disconnected:
+                        UnityEngine.Debug.Log("TCPSession 广播断线事件");
+                        TCPSessionService.Broadcast(TCPSessionServiceBuiltIn.Disconnected);
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
 
         #region internal api
@@ -80,23 +106,7 @@ namespace FastEngine.Core
         /// <param name="args"></param>
         private void OnSocketEventCallback(SocketEventArgs args)
         {
-            switch (args.socketState)
-            {
-                case SocketState.Received:
-                    var pack = args.socketPack;
-                    if (sessionDic.ContainsKey(pack.cmd)) pack.valid = pack.sessionId == sessionDic[pack.cmd];
-                    else pack.valid = true;
-                    TCPSessionService.Broadcast(args.socketPack);
-                    break;
-                case SocketState.Connected:
-                    TCPSessionService.Broadcast(TCPSessionServiceBuiltIn.Connected);
-                    break;
-                case SocketState.Disconnected:
-                    TCPSessionService.Broadcast(TCPSessionServiceBuiltIn.Disconnected);
-                    break;
-                default:
-                    break;
-            }
+            socketEventArgQueue.Enqueue(args);
         }
         #region API
         public static bool isConnected { get { return Instance.m_isConnected; } }

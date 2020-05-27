@@ -36,6 +36,9 @@ namespace FastEngine.Core
         // 预留字节
         public byte[] reserved { get; private set; }
 
+        // 已经读取
+        public bool Readed { get; private set; }
+
         private MemoryStream m_stream;
         private BinaryWriter m_writer;
         private BinaryReader m_reader;
@@ -46,6 +49,7 @@ namespace FastEngine.Core
         /// <param name="data"></param>
         public void Read(byte[] data)
         {
+            Readed = true;
             m_stream = new MemoryStream(data);
             m_reader = new BinaryReader(m_stream);
 
@@ -98,6 +102,23 @@ namespace FastEngine.Core
             m_writer.Close();
 
             return nbs;
+        }
+
+        /// <summary>
+        /// 重置
+        /// </summary>
+        public void Reset()
+        {
+            Readed = false;
+
+            // 包长度
+            packSize = 0;
+            // 命令
+            cmd = 0;
+            // sessionId
+            sessionId = 0;
+            // 预留字节
+            reserved = null;
         }
     }
 }

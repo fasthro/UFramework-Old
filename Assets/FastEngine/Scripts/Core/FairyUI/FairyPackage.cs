@@ -51,14 +51,23 @@ namespace FastEngine.FairyUI
                 // 正式模式使用 assetBundle 加载
                 m_assetBundleLoader = AssetBundleLoader.Allocate("ui/" + name, null, null);
                 var ready = m_assetBundleLoader.LoadSync();
-                if (ready) package = UIPackage.AddPackage(m_assetBundleLoader.bundleRes.assetBundle);
-                else Debug.LogError("FPack AddPackage Error! PackageName:" + name);
+                if (ready)
+                {
+                    package = UIPackage.AddPackage(m_assetBundleLoader.bundleRes.assetBundle);
+                }
+                else
+                {
+                    Debug.LogError("FPack AddPackage Error! PackageName:" + name);
+                }
             }
         }
 
         protected override void OnZeroRef()
         {
-            if (package != null) UIPackage.RemovePackage(package.id);
+            if (package != null)
+            {
+                UIPackage.RemovePackage(package.id);
+            }
         }
     }
 
@@ -90,7 +99,9 @@ namespace FastEngine.FairyUI
         {
             Package pack = null;
             if (map.TryGetValue(packageName, out pack))
+            {
                 pack.Retain();
+            }
             else
             {
                 pack = new Package(packageName);
@@ -123,7 +134,10 @@ namespace FastEngine.FairyUI
             if (map.TryGetValue(packageName, out pack))
             {
                 pack.Release();
-                if (pack.isRefZero) map.Remove(packageName);
+                if (pack.isRefZero)
+                {
+                    map.Remove(packageName);
+                }
             }
         }
     }
